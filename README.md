@@ -14,4 +14,5 @@ $ mvn clean package
 ```
 
 The release artefacts are `fringeutils-common-<version>.jar` and `fringeutils-common-<version>-sources.jar` under `'\target\'` folder.
+
 The release artefacts can then be copied to `'\dependencies\'` folder in both LogViewer and TracerViewer project.
