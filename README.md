@@ -1,8 +1,8 @@
 FringeUtils-Common
 ==============
 FringeUtils-Common is a common library used in LogViewer and TracerViewer tools.
-This library contains functionality for file reading and common swing components like TreeTable etc.
 
+This library contains functionality for file reading and common swing components like TreeTable etc.
 
 Build
 -----
@@ -13,6 +13,19 @@ To build the library jar and sources use the following command:
 $ mvn clean package
 ```
 
-The release artefacts are `fringeutils-common-<version>.jar` and `fringeutils-common-<version>-sources.jar` under `'\target\'` folder.
+The artefacts `fringeutils-common-<version>.jar` and `fringeutils-common-<version>-sources.jar` are created under `'\target\'` folder.
 
-The release artefacts can then be copied to `'\dependencies\'` folder in both LogViewer and TracerViewer project.
+To install into local maven repository
+```
+$ mvn clean install
+```
+
+To release the library to JFrog Bintray use the following command:
+```
+$ mvn clean deploy
+```
+
+The released artefacts are uploaded to JFrog Bintray under following location
+
+'https://dl.bintray.com/pegasystems/fringeutils/com/pega/gcs/fringeutils-common/<*version*>' folder.
+
