@@ -1,3 +1,5 @@
+[![Travis](https://img.shields.io/travis/pegasystems/fringeutils-common.svg)](https://travis-ci.org/pegasystems/fringeutils-common)
+
 FringeUtils-Common
 ==============
 FringeUtils-Common is a common library used in LogViewer and TracerViewer tools.
