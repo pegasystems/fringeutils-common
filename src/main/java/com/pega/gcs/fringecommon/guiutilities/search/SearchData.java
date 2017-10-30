@@ -11,7 +11,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class SearchData<T> {
 
@@ -50,10 +49,17 @@ public class SearchData<T> {
 	}
 
 	// clear the map leaving the default items only
+	// fixing issue - keep the existing search keywords for user to see/use, but
+	// clear the results
 	protected void clearSearchResultMap() {
 
-		Set<Object> searchResultKeySet = searchResultMap.keySet();
-		searchResultKeySet.retainAll(defaultSearchKeySet);
+		// Set<Object> searchResultKeySet = searchResultMap.keySet();
+		// searchResultKeySet.retainAll(defaultSearchKeySet);
+
+		// not removing the keys, but clearing its values.
+		for (Map.Entry<Object, List<T>> entry : searchResultMap.entrySet()) {
+			entry.setValue(null);
+		}
 
 	}
 

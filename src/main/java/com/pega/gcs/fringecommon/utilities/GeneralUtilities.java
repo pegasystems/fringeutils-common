@@ -27,6 +27,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
+import org.apache.commons.lang3.StringEscapeUtils;
+
 import com.pega.gcs.fringecommon.log4j2.Log4j2Helper;
 
 public class GeneralUtilities {
@@ -518,6 +520,33 @@ public class GeneralUtilities {
 		}
 
 		return hostAddressSet.toArray(new String[hostAddressSet.size()]);
+	}
+
+	public static String getListAsCSV(List<?> objctList) {
+
+		StringBuffer sb = new StringBuffer();
+
+		boolean first = true;
+
+		for (Object object : objctList) {
+
+			if (!first) {
+				sb.append(",");
+			}
+
+			if (object != null) {
+				
+				String objStr = object.toString();
+
+				objStr = StringEscapeUtils.escapeCsv(objStr);
+
+				sb.append(objStr);
+			}
+
+			first = false;
+		}
+
+		return sb.toString();
 	}
 
 	public static void main(String[] args) {

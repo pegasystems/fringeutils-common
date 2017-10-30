@@ -18,6 +18,8 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -232,6 +234,11 @@ public abstract class BaseFrame extends JFrame {
 
 	public static File openFileChooser(Component parent, Class<?> clazz, String title, final List<String> fileExtList,
 			final String description, File prevSelectedFile) {
+		return openFileChooser(parent, clazz, title, null, fileExtList, description, prevSelectedFile);
+	}
+
+	public static File openFileChooser(Component parent, Class<?> clazz, String title, String fileNameRegex,
+			final List<String> fileExtList, final String description, File prevSelectedFile) {
 
 		File selectedFile = null;
 
@@ -245,19 +252,36 @@ public abstract class BaseFrame extends JFrame {
 			@Override
 			public boolean accept(File f) {
 
+				String filename = FileUtilities.getNameWithoutExtension(f);
 				String ext = FileUtilities.getExtension(f);
 
 				boolean retVal = true;
 
-				if ((fileExtList != null) && (f.isFile())) {
+				if (f.isFile()) {
 
-					retVal = false;
+					if (fileExtList != null) {
 
-					for (String fileExt : fileExtList) {
+						retVal = false;
 
-						if (fileExt.equalsIgnoreCase(ext)) {
+						for (String fileExt : fileExtList) {
+
+							if (fileExt.equalsIgnoreCase(ext)) {
+								retVal = true;
+								break;
+							}
+						}
+					}
+
+					if ((retVal) && (fileNameRegex != null) && (!"".equals(fileNameRegex))) {
+
+						Pattern fileNamePattern = Pattern.compile(fileNameRegex);
+
+						Matcher fileNameMatcher = fileNamePattern.matcher(filename);
+
+						if (fileNameMatcher.matches()) {
 							retVal = true;
-							break;
+						} else {
+							retVal = false;
 						}
 					}
 				}

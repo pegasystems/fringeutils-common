@@ -8,9 +8,12 @@ package com.pega.gcs.fringecommon.guiutilities;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import com.pega.gcs.fringecommon.log4j2.Log4j2Helper;
 import com.pega.gcs.fringecommon.utilities.GeneralUtilities;
@@ -173,5 +176,50 @@ public class RecentFileContainer implements PropertyChangeListener {
 			saveRecentFilesPreferrence();
 		}
 
+	}
+
+	public RecentFile getRecentFile(File selectedFile, String charset) {
+		return getRecentFile(selectedFile, charset, null);
+	}
+
+	public RecentFile getRecentFile(File selectedFile, String charset, Map<String, Object> defaultAttribsIfNew) {
+
+		RecentFile recentFile = null;
+
+		// identify the recent file
+		for (RecentFile rf : getRecentFileList()) {
+
+			String file = (String) rf.getAttribute(RecentFile.KEY_FILE);
+
+			if ((file != null) && (file.toLowerCase().equals(selectedFile.getPath().toLowerCase()))) {
+				// found in recent files
+				recentFile = rf;
+				break;
+			}
+		}
+
+		if (recentFile == null) {
+
+			recentFile = new RecentFile(selectedFile.getPath(), charset);
+
+			if (defaultAttribsIfNew != null) {
+
+				for (Map.Entry<String, Object> entry : defaultAttribsIfNew.entrySet()) {
+					recentFile.setAttribute(entry.getKey(), entry.getValue());
+				}
+			}
+		}
+
+		try (FileInputStream fis = new FileInputStream(selectedFile)) {
+			long totalSize = fis.getChannel().size();
+			recentFile.setAttribute(RecentFile.KEY_SIZE, totalSize);
+		} catch (Exception e) {
+			LOG.error("Error getting filesize :" + selectedFile, e);
+		}
+
+		// save and bring it to front
+		addRecentFile(recentFile);
+
+		return recentFile;
 	}
 }
