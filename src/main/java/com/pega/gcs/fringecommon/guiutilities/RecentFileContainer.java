@@ -55,7 +55,7 @@ public class RecentFileContainer implements PropertyChangeListener {
 
 		if (byteArray != null) {
 			try {
-				recentFileList = (ArrayList<RecentFile>) KryoSerializer.decompress(byteArray, ArrayList.class);
+				recentFileList = KryoSerializer.decompress(byteArray, ArrayList.class);
 			} catch (Exception e) {
 				LOG.error("Error decompressing recent files list", e);
 			}

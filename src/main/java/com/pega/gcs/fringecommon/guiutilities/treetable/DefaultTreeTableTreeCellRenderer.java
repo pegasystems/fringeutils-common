@@ -23,6 +23,10 @@ public class DefaultTreeTableTreeCellRenderer extends DefaultTreeCellRenderer {
 		this.treeTable = treeTable;
 	}
 
+	protected AbstractTreeTable getTreeTable() {
+		return treeTable;
+	}
+
 	@Override
 	public Color getBackgroundSelectionColor() {
 
@@ -38,27 +42,11 @@ public class DefaultTreeTableTreeCellRenderer extends DefaultTreeCellRenderer {
 
 	@Override
 	public Color getBackgroundNonSelectionColor() {
-
-		// Color color = super.getBackgroundNonSelectionColor();
-		//
-		// if (treeTable != null) {
-		// color = treeTable.getBackground();
-		//
-		// }
-
 		return null;
 	}
 
 	@Override
 	public Color getBackground() {
-
-		// Color color = super.getBackground();
-		//
-		// if (treeTable != null) {
-		// color = treeTable.getBackground();
-		//
-		// }
-
 		return null;
 	}
 

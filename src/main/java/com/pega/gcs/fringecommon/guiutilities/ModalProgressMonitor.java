@@ -34,24 +34,23 @@ public class ModalProgressMonitor extends ProgressMonitor {
 	private boolean indeterminate;
 
 	/**
-	 * Constructs a graphic object that shows progress, typically by filling in
-	 * a rectangular bar as the process nears completion.
+	 * Constructs a graphic object that shows progress, typically by filling in a
+	 * rectangular bar as the process nears completion.
 	 * 
 	 * @param parentComponent
 	 *            the parent component for the dialog box
 	 * @param message
-	 *            a descriptive message that will be shown to the user to
-	 *            indicate what operation is being monitored. This does not
-	 *            change as the operation progresses. See the message parameters
-	 *            to methods in {@link JOptionPane#message} for the range of
-	 *            values.
+	 *            a descriptive message that will be shown to the user to indicate
+	 *            what operation is being monitored. This does not change as the
+	 *            operation progresses. See the message parameters to methods in
+	 *            {@link JOptionPane#message} for the range of values.
 	 * @param note
 	 *            a short note describing the state of the operation. As the
 	 *            operation progresses, you can call setNote to change the note
-	 *            displayed. This is used, for example, in operations that
-	 *            iterate through a list of files to show the name of the file
-	 *            being processes. If note is initially null, there will be no
-	 *            note line in the dialog box and setNote will be ineffective
+	 *            displayed. This is used, for example, in operations that iterate
+	 *            through a list of files to show the name of the file being
+	 *            processes. If note is initially null, there will be no note line
+	 *            in the dialog box and setNote will be ineffective
 	 * @param min
 	 *            the lower bound of the range
 	 * @param max
@@ -197,9 +196,9 @@ public class ModalProgressMonitor extends ProgressMonitor {
 	}
 
 	/**
-	 * Indicate that the operation is complete. This happens automatically when
-	 * the value set by setProgress is >= max, but it may be called earlier if
-	 * the operation ends early.
+	 * Indicate that the operation is complete. This happens automatically when the
+	 * value set by setProgress is >= max, but it may be called earlier if the
+	 * operation ends early.
 	 */
 	@Override
 	public void close() {
@@ -276,8 +275,8 @@ public class ModalProgressMonitor extends ProgressMonitor {
 	}
 
 	/**
-	 * Specifies the amount of time to wait before deciding whether or not to
-	 * popup a progress monitor.
+	 * Specifies the amount of time to wait before deciding whether or not to popup
+	 * a progress monitor.
 	 * 
 	 * @param millisToDecideToPopup
 	 *            an int specifying the time to wait, in milliseconds
@@ -289,8 +288,8 @@ public class ModalProgressMonitor extends ProgressMonitor {
 	}
 
 	/**
-	 * Returns the amount of time this object waits before deciding whether or
-	 * not to popup a progress monitor.
+	 * Returns the amount of time this object waits before deciding whether or not
+	 * to popup a progress monitor.
 	 * 
 	 * @see #setMillisToDecideToPopup
 	 */
@@ -300,8 +299,8 @@ public class ModalProgressMonitor extends ProgressMonitor {
 	}
 
 	/**
-	 * Specifies the amount of time it will take for the popup to appear. (If
-	 * the predicted time remaining is less than this time, the popup won't be
+	 * Specifies the amount of time it will take for the popup to appear. (If the
+	 * predicted time remaining is less than this time, the popup won't be
 	 * displayed.)
 	 * 
 	 * @param millisToPopup
@@ -325,8 +324,8 @@ public class ModalProgressMonitor extends ProgressMonitor {
 
 	/**
 	 * Specifies the additional note that is displayed along with the progress
-	 * message. Used, for example, to show which file the is currently being
-	 * copied during a multiple-file copy.
+	 * message. Used, for example, to show which file the is currently being copied
+	 * during a multiple-file copy.
 	 * 
 	 * @param note
 	 *            a String specifying the note to display
@@ -350,6 +349,18 @@ public class ModalProgressMonitor extends ProgressMonitor {
 	@Override
 	public String getNote() {
 		return note;
+	}
+
+	public boolean isIndeterminate() {
+		return indeterminate;
+	}
+
+	public void setIndeterminate(boolean indeterminate) {
+
+		this.indeterminate = indeterminate;
+
+		// close the existing dialog to setup new one
+		close();
 	}
 
 }

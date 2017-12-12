@@ -57,6 +57,8 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Highlighter;
 
+import org.apache.commons.lang3.StringEscapeUtils;
+
 import com.pega.gcs.fringecommon.guiutilities.MyColor;
 import com.pega.gcs.fringecommon.guiutilities.RightClickMenuItem;
 import com.pega.gcs.fringecommon.log4j2.Log4j2Helper;
@@ -98,7 +100,8 @@ public abstract class XMLElementTextDetailsPanel extends JPanel implements ListS
 		setBorder(BorderFactory.createTitledBorder(loweredEtched, "Details"));
 	}
 
-	public void populatePanel(XMLNode xmlNode, String[] primarySearchArray, String secondarySearch, Font font) {
+	public void populatePanel(XMLNode xmlNode, String[] primarySearchArray, String secondarySearch,
+			boolean unescapeHTMLText, Font font) {
 
 		detailsPanel.removeAll();
 		detailsPanel.setLayout(new BorderLayout());
@@ -108,11 +111,13 @@ public abstract class XMLElementTextDetailsPanel extends JPanel implements ListS
 			String nodeName = xmlNode.getNodeName();
 
 			if ((xmlElementTypeMap != null) && (xmlElementTypeMap.containsKey(nodeName))) {
-				JPanel xmlNodeTablePanel = getXMLNodeTablePanel(xmlNode, primarySearchArray, secondarySearch, font);
+				JPanel xmlNodeTablePanel = getXMLNodeTablePanel(xmlNode, primarySearchArray, secondarySearch,
+						unescapeHTMLText, font);
 
 				detailsPanel.add(xmlNodeTablePanel);
 			} else {
-				JPanel xmlNodeTextPanel = getXMLNodeTextPanel(xmlNode, primarySearchArray, secondarySearch, font);
+				JPanel xmlNodeTextPanel = getXMLNodeTextPanel(xmlNode, primarySearchArray, secondarySearch,
+						unescapeHTMLText, font);
 
 				detailsPanel.add(xmlNodeTextPanel);
 			}
@@ -124,7 +129,7 @@ public abstract class XMLElementTextDetailsPanel extends JPanel implements ListS
 	}
 
 	private JPanel getXMLNodeTextPanel(XMLNode xmlNode, String[] primarySearchArray, String secondarySearch,
-			Font font) {
+			boolean unescapeHTMLText, Font font) {
 
 		JPanel xmlNodeTextPanel = new JPanel();
 		xmlNodeTextPanel.setLayout(new GridBagLayout());
@@ -140,9 +145,13 @@ public abstract class XMLElementTextDetailsPanel extends JPanel implements ListS
 
 		Border border = BorderFactory.createLineBorder(Color.LIGHT_GRAY);
 
-		String text = xmlNode.getNodeName();
+		String nodeName = xmlNode.getNodeName();
 
-		JTextArea nameJTextArea = getNameJTextArea(text, font);
+		if (unescapeHTMLText) {
+			nodeName = StringEscapeUtils.unescapeHtml4(nodeName);
+		}
+
+		JTextArea nameJTextArea = getNameJTextArea(nodeName, font);
 
 		Dimension dim = new Dimension(22, 22);
 		nameJTextArea.setPreferredSize(dim);
@@ -173,9 +182,13 @@ public abstract class XMLElementTextDetailsPanel extends JPanel implements ListS
 			gbc2.anchor = GridBagConstraints.NORTHWEST;
 			gbc2.insets = new Insets(1, 2, 1, 2);
 
-			text = xmlNode.getNodeValue(index);
+			String nodeValue = xmlNode.getNodeValue(index);
 
-			JTextArea valueTextArea = getValueJTextArea(text, font);
+			if (unescapeHTMLText) {
+				nodeValue = StringEscapeUtils.unescapeHtml4(nodeValue);
+			}
+
+			JTextArea valueTextArea = getValueJTextArea(nodeValue, font);
 
 			JScrollPane valueComponent = new JScrollPane(valueTextArea, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
 					ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -195,12 +208,10 @@ public abstract class XMLElementTextDetailsPanel extends JPanel implements ListS
 
 	@SuppressWarnings("deprecation")
 	private JPanel getXMLNodeTablePanel(XMLNode xmlNode, String[] primarySearchArray, String secondarySearch,
-			Font font) {
+			boolean unescapeHTMLText, Font font) {
 
 		JPanel xmlNodeTablePanel = new JPanel();
 		xmlNodeTablePanel.setLayout(new GridBagLayout());
-
-		String nodeName = xmlNode.getNodeName();
 
 		GridBagConstraints gbc1 = new GridBagConstraints();
 		gbc1.gridx = 0;
@@ -213,6 +224,12 @@ public abstract class XMLElementTextDetailsPanel extends JPanel implements ListS
 		gbc1.gridwidth = GridBagConstraints.REMAINDER;
 
 		Border border = BorderFactory.createLineBorder(Color.LIGHT_GRAY);
+
+		String nodeName = xmlNode.getNodeName();
+
+		if (unescapeHTMLText) {
+			nodeName = StringEscapeUtils.unescapeHtml4(nodeName);
+		}
 
 		JTextArea nameJTextArea = getNameJTextArea(nodeName, font);
 
@@ -246,6 +263,10 @@ public abstract class XMLElementTextDetailsPanel extends JPanel implements ListS
 			String nodeValue = xmlNode.getNodeValue(index);
 
 			if (nodeValue != null) {
+
+				if (unescapeHTMLText) {
+					nodeValue = StringEscapeUtils.unescapeHtml4(nodeValue);
+				}
 
 				String[] nameValueTextArray = nodeValue.split(seperator);
 
@@ -506,7 +527,7 @@ public abstract class XMLElementTextDetailsPanel extends JPanel implements ListS
 							dataSB.append("\t");
 						}
 
-						dataSB.append("\n");
+						dataSB.append(System.getProperty("line.separator"));
 					}
 
 				}
@@ -580,7 +601,7 @@ public abstract class XMLElementTextDetailsPanel extends JPanel implements ListS
 										dataSB.append("\t");
 									}
 
-									dataSB.append("\n");
+									dataSB.append(System.getProperty("line.separator"));
 								}
 
 								clipboard.setContents(new StringSelection(dataSB.toString()), copyRow);
@@ -613,7 +634,7 @@ public abstract class XMLElementTextDetailsPanel extends JPanel implements ListS
 										dataSB.append("\t");
 									}
 
-									dataSB.append("\n");
+									dataSB.append(System.getProperty("line.separator"));
 								}
 
 								clipboard.setContents(new StringSelection(dataSB.toString()), copyTable);

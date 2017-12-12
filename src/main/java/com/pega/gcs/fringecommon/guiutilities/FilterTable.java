@@ -26,9 +26,19 @@ public class FilterTable<T extends Comparable<? super T>> extends CustomJTable {
 
 	private static final long serialVersionUID = -3587453063266930735L;
 
+	// will be false for compare table. Remove column filter from the initial
+	// display table as the table model is same as original model.
+	private boolean filterColumns;
+
 	public FilterTable(FilterTableModel<T> filterTableModel) {
+		this(filterTableModel, true);
+	}
+
+	public FilterTable(FilterTableModel<T> filterTableModel, boolean filterColumns) {
 
 		super(filterTableModel);
+
+		this.filterColumns = filterColumns;
 
 		setAutoCreateColumnsFromModel(false);
 
@@ -44,10 +54,14 @@ public class FilterTable<T extends Comparable<? super T>> extends CustomJTable {
 
 		setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
 
-		setTraceTableHeader();
+		setFilterTableHeader();
 	}
 
-	private void setTraceTableHeader() {
+	public boolean isFilterColumns() {
+		return filterColumns;
+	}
+
+	private void setFilterTableHeader() {
 
 		JTableHeader tableHeader = getTableHeader();
 
@@ -77,48 +91,52 @@ public class FilterTable<T extends Comparable<? super T>> extends CustomJTable {
 
 					if (tableModel instanceof FilterTableModel) {
 
-						@SuppressWarnings("unchecked")
-						FilterTableModel<T> ftm = (FilterTableModel<T>) tableModel;
+						if (filterColumns) {
+							
+							@SuppressWarnings("unchecked")
+							FilterTableModel<T> ftm = (FilterTableModel<T>) tableModel;
 
-						final int columnIndex = target.columnAtPoint(e.getPoint());
+							final int columnIndex = target.columnAtPoint(e.getPoint());
 
-						boolean columnFilterEnabled = ftm.isColumnFilterEnabled(columnIndex);
+							boolean columnFilterEnabled = ftm.isColumnFilterEnabled(columnIndex);
 
-						boolean columnLoading = ftm.isColumnLoading(columnIndex);
+							boolean columnLoading = ftm.isColumnLoading(columnIndex);
 
-						if ((columnFilterEnabled) && (!columnLoading)) {
+							if ((columnFilterEnabled) && (!columnLoading)) {
 
-							Set<CheckBoxMenuItemPopupEntry<T>> filterTableHeaderColumnEntrySet;
-							filterTableHeaderColumnEntrySet = ftm.getColumnFilterEntrySet(columnIndex);
+								Set<CheckBoxMenuItemPopupEntry<T>> filterTableHeaderColumnEntrySet;
+								filterTableHeaderColumnEntrySet = ftm.getColumnFilterEntrySet(columnIndex);
 
-							JPopupMenu filterTableHeaderPopupMenu = new FilterTableHeaderPopupMenu<T>(
-									filterTableHeaderColumnEntrySet) {
+								JPopupMenu filterTableHeaderPopupMenu = new FilterTableHeaderPopupMenu<T>(
+										filterTableHeaderColumnEntrySet) {
 
-								private static final long serialVersionUID = 69036102746514349L;
+									private static final long serialVersionUID = 69036102746514349L;
 
-								@Override
-								public void applyJButtonAction() {
-									applyColumnHeaderFilter(columnIndex, false);
+									@Override
+									public void applyJButtonAction() {
+										applyColumnHeaderFilter(columnIndex, false);
+									}
+								};
+
+								// limit the size of popup
+								filterTableHeaderPopupMenu
+										.setMaximumSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE));
+
+								int width = filterTableHeaderPopupMenu.getPreferredSize().width;
+								int height = filterTableHeaderPopupMenu.getPreferredSize().height;
+
+								if ((width > 300) || (height > 400)) {
+
+									width = 300;
+									height = ((height > 400) ? 400 : height);
+
+									filterTableHeaderPopupMenu.setPreferredSize(new Dimension(width, height));
 								}
-							};
 
-							// limit the size of popup
-							filterTableHeaderPopupMenu.setMaximumSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE));
+								Rectangle rect = target.getHeaderRect(columnIndex);
+								filterTableHeaderPopupMenu.show(target, rect.x, rect.height);
 
-							int width = filterTableHeaderPopupMenu.getPreferredSize().width;
-							int height = filterTableHeaderPopupMenu.getPreferredSize().height;
-
-							if ((width > 300) || (height > 400)) {
-
-								width = 300;
-								height = ((height > 400) ? 400 : height);
-
-								filterTableHeaderPopupMenu.setPreferredSize(new Dimension(width, height));
 							}
-
-							Rectangle rect = target.getHeaderRect(columnIndex);
-							filterTableHeaderPopupMenu.show(target, rect.x, rect.height);
-
 						}
 					}
 				}
@@ -130,7 +148,7 @@ public class FilterTable<T extends Comparable<? super T>> extends CustomJTable {
 		setTableHeader(tableHeader);
 	}
 
-	public void applyColumnHeaderFilter(int columnIndex, boolean clearAll) {
+	private void applyColumnHeaderFilter(int columnIndex, boolean clearAll) {
 
 		TableModel tableModel = getModel();
 

@@ -522,20 +522,24 @@ public class GeneralUtilities {
 		return hostAddressSet.toArray(new String[hostAddressSet.size()]);
 	}
 
-	public static String getListAsCSV(List<?> objctList) {
+	public static String getListAsSeperatedValues(List<?> objctList, String seperator) {
 
 		StringBuffer sb = new StringBuffer();
 
+		if ((seperator == null) || ("".equals(seperator))) {
+			seperator = ",";
+		}
+		
 		boolean first = true;
 
 		for (Object object : objctList) {
 
 			if (!first) {
-				sb.append(",");
+				sb.append(seperator);
 			}
 
 			if (object != null) {
-				
+
 				String objStr = object.toString();
 
 				objStr = StringEscapeUtils.escapeCsv(objStr);

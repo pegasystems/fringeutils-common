@@ -498,55 +498,20 @@ public class SearchPanel<T> extends JPanel implements SearchModelListener<T> {
 		return searchNavIndexJLabel;
 	}
 
-	// // making sure that the entries are unique
-	// private void updateSearchJComboBox(Object searchStr) {
-	//
-	// if ((searchStr != null) && (!"".equals(searchStr))) {
-	//
-	// boolean present = false;
-	//
-	// JComboBox<Object> comboBox = getSearchJComboBox();
-	//
-	// for (int i = 0; i < comboBox.getItemCount(); i++) {
-	//
-	// Object comboBoxItem = comboBox.getItemAt(i);
-	//
-	// if (comboBoxItem != null) {
-	// if (comboBoxItem.equals(searchStr)) {
-	// present = true;
-	// }
-	// }
-	// }
-	//
-	// if (!present) {
-	// // null item is always at index 0
-	// comboBox.insertItemAt(searchStr, 1);
-	// searchItemSet.add(searchStr.toString());
-	// }
-	// }
-	// }
-
-	// the search is asynchronous
 	protected void searchEvents() {
 
 		Object searchStrObj = getSearchJComboBox().getSelectedItem();
 
 		if (searchStrObj != null) {
 
-			/* boolean searched = */searchInEvents(searchStrObj, this);
-
 			// updating of nav detail will occur from fire event after search
 			// task is completed
-			// if (!searched) {
-			// resetSearchPageDetails(false);
-			// }
-
-			// refreshSearchJComboBox();
+			searchInEvents(searchStrObj, this);
 		}
 
 	}
 
-	private boolean searchInEvents(Object searchStrObj, JComponent parent) {
+	private void searchInEvents(Object searchStrObj, JComponent parent) {
 
 		UIManager.put("ModalProgressMonitor.progressText", "Search");
 
@@ -555,9 +520,7 @@ public class SearchPanel<T> extends JPanel implements SearchModelListener<T> {
 		mProgressMonitor.setMillisToDecideToPopup(0);
 		mProgressMonitor.setMillisToPopup(0);
 
-		boolean search = searchModel.searchInEvents(searchStrObj, mProgressMonitor);
-
-		return search;
+		searchModel.searchInEvents(searchStrObj, mProgressMonitor);
 	}
 
 	public void updateSearchNavIndexDetails() {

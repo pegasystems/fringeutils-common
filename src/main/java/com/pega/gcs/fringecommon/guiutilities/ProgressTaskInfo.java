@@ -12,10 +12,17 @@ public class ProgressTaskInfo implements Comparable<ProgressTaskInfo> {
 
 	private long count;
 
+	private String note;
+
 	public ProgressTaskInfo(long total, long count) {
+		this(total, count, null);
+	}
+
+	public ProgressTaskInfo(long total, long count, String note) {
 		super();
 		this.total = total;
 		this.count = count;
+		this.note = note;
 	}
 
 	public long getTotal() {
@@ -24,6 +31,10 @@ public class ProgressTaskInfo implements Comparable<ProgressTaskInfo> {
 
 	public long getCount() {
 		return count;
+	}
+
+	public String getNote() {
+		return note;
 	}
 
 	@Override

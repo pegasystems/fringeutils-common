@@ -14,7 +14,6 @@ import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableModel;
 
 import com.pega.gcs.fringecommon.utilities.FileUtilities;
 
@@ -48,8 +47,7 @@ public class FilterTableHeaderCellRenderer extends DefaultTableCellRenderer {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * javax.swing.table.DefaultTableCellRenderer#getTableCellRendererComponent
+	 * @see javax.swing.table.DefaultTableCellRenderer#getTableCellRendererComponent
 	 * (javax.swing.JTable, java.lang.Object, boolean, boolean, int, int)
 	 */
 	@Override
@@ -59,32 +57,40 @@ public class FilterTableHeaderCellRenderer extends DefaultTableCellRenderer {
 		JLabel origComponent = (JLabel) origTableCellRenderer.getTableCellRendererComponent(table, value, isSelected,
 				hasFocus, row, column);
 
-		TableModel tableModel = table.getModel();
-
-		if (tableModel instanceof FilterTableModel) {
-
-			FilterTableModel<?> ftm = (FilterTableModel<?>) tableModel;
-
-			boolean columnFilterEnabled = ftm.isColumnFilterEnabled(column);
-
-			if (columnFilterEnabled) {
-
-				boolean columnFiltered = ftm.isColumnFiltered(column);
-				boolean columnLoading = ftm.isColumnLoading(column);
-
-				if (columnLoading) {
-					origComponent.setIcon(loadingImageIcon);
-				} else if (columnFiltered) {
-					origComponent.setIcon(downarrowFilteredImageIcon);
-				} else {
-					origComponent.setIcon(downarrowImageIcon);
-				}
-
-				origComponent.setHorizontalTextPosition(LEFT);
-
-			}
+		if (table instanceof FilterTable) {
 
 			origComponent.setHorizontalAlignment(CENTER);
+
+			FilterTable<?> filterTable = (FilterTable<?>) table;
+
+			// will be false for compare table. Remove column filter from the initial
+			// display table as the table model is same as original model.
+			boolean filterColumns = filterTable.isFilterColumns();
+
+			if (filterColumns) {
+
+				FilterTableModel<?> filterTableModel = (FilterTableModel<?>) filterTable.getModel();
+
+				boolean columnFilterEnabled = filterTableModel.isColumnFilterEnabled(column);
+
+				if (columnFilterEnabled) {
+
+					boolean columnFiltered = filterTableModel.isColumnFiltered(column);
+					boolean columnLoading = filterTableModel.isColumnLoading(column);
+
+					if (columnLoading) {
+						origComponent.setIcon(loadingImageIcon);
+					} else if (columnFiltered) {
+						origComponent.setIcon(downarrowFilteredImageIcon);
+					} else {
+						origComponent.setIcon(downarrowImageIcon);
+					}
+
+					origComponent.setHorizontalTextPosition(LEFT);
+
+				}
+			}
+
 		}
 
 		// set header height

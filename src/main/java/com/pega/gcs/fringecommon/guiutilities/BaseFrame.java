@@ -18,8 +18,6 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -232,15 +230,7 @@ public abstract class BaseFrame extends JFrame {
 		return jScrollPane;
 	}
 
-	public static File openFileChooser(Component parent, Class<?> clazz, String title, final List<String> fileExtList,
-			final String description, File prevSelectedFile) {
-		return openFileChooser(parent, clazz, title, null, fileExtList, description, prevSelectedFile);
-	}
-
-	public static File openFileChooser(Component parent, Class<?> clazz, String title, String fileNameRegex,
-			final List<String> fileExtList, final String description, File prevSelectedFile) {
-
-		File selectedFile = null;
+	public static FileFilter getDefaultFileFilter(final String description, final List<String> fileExtList) {
 
 		FileFilter fileFilter = new FileFilter() {
 
@@ -252,14 +242,14 @@ public abstract class BaseFrame extends JFrame {
 			@Override
 			public boolean accept(File f) {
 
-				String filename = FileUtilities.getNameWithoutExtension(f);
-				String ext = FileUtilities.getExtension(f);
-
 				boolean retVal = true;
 
+				// pass through directories
 				if (f.isFile()) {
 
 					if (fileExtList != null) {
+
+						String ext = FileUtilities.getExtension(f);
 
 						retVal = false;
 
@@ -271,26 +261,22 @@ public abstract class BaseFrame extends JFrame {
 							}
 						}
 					}
-
-					if ((retVal) && (fileNameRegex != null) && (!"".equals(fileNameRegex))) {
-
-						Pattern fileNamePattern = Pattern.compile(fileNameRegex);
-
-						Matcher fileNameMatcher = fileNamePattern.matcher(filename);
-
-						if (fileNameMatcher.matches()) {
-							retVal = true;
-						} else {
-							retVal = false;
-						}
-					}
 				}
 
 				return retVal;
 			}
 		};
 
+		return fileFilter;
+	}
+
+	public static File openFileChooser(Component parent, Class<?> clazz, String title, FileFilter fileFilter,
+			File prevSelectedFile) {
+
+		File selectedFile = null;
+
 		String prefName = PREF_LAST_VISITED_DIR;
+
 		String lastVisitedDir = GeneralUtilities.getPreferenceString(clazz, prefName);
 
 		File jChooserFile = getExistingDirectory(prevSelectedFile);
@@ -303,7 +289,11 @@ public abstract class BaseFrame extends JFrame {
 		JFileChooser jFileChooser = new JFileChooser(jChooserFile);
 
 		jFileChooser.setDialogTitle(title);
-		jFileChooser.setFileFilter(fileFilter);
+
+		if (fileFilter != null) {
+			jFileChooser.setFileFilter(fileFilter);
+		}
+
 		int returnValue = jFileChooser.showOpenDialog(parent);
 
 		if (returnValue == JFileChooser.APPROVE_OPTION) {

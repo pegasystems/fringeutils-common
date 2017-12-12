@@ -63,9 +63,9 @@ public class KryoSerializer {
 		return byteArray;
 	}
 
-	public static Object decompress(byte[] serialized, Class<?> clazz) throws Exception {
+	public static <T> T decompress(byte[] serialized, Class<T> clazz) throws Exception {
 
-		Object object = null;
+		T object = null;
 
 		if (serialized != null) {
 

@@ -13,6 +13,8 @@ import javax.swing.JTable;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 
+import org.apache.commons.lang3.StringEscapeUtils;
+
 import com.pega.gcs.fringecommon.guiutilities.MyColor;
 
 public class XMLLabelTableCellRenderer extends DefaultTableCellRenderer {
@@ -39,6 +41,12 @@ public class XMLLabelTableCellRenderer extends DefaultTableCellRenderer {
 
 		String text = xmlNode.getNodeValue(column);
 
+		XMLTreeTable xmlTreeTable = (XMLTreeTable) table;
+		
+		if(xmlTreeTable.isUnescapeHTMLText()) {
+			text = StringEscapeUtils.unescapeHtml4(text);
+		}
+		
 		super.getTableCellRendererComponent(table, text, isSelected, hasFocus, row, column);
 
 		if (!isSelected) {

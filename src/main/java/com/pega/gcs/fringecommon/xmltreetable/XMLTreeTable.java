@@ -15,7 +15,6 @@ import javax.swing.table.TableColumnModel;
 import com.pega.gcs.fringecommon.guiutilities.treetable.AbstractTreeTable;
 import com.pega.gcs.fringecommon.guiutilities.treetable.AbstractTreeTableTreeModel;
 import com.pega.gcs.fringecommon.guiutilities.treetable.DefaultTreeTableTree;
-import com.pega.gcs.fringecommon.guiutilities.treetable.DefaultTreeTableTreeCellRenderer;
 import com.pega.gcs.fringecommon.guiutilities.treetable.TreeTableCellEditor;
 import com.pega.gcs.fringecommon.guiutilities.treetable.TreeTableColumn;
 import com.pega.gcs.fringecommon.guiutilities.treetable.TreeTableModelAdapter;
@@ -24,14 +23,24 @@ public class XMLTreeTable extends AbstractTreeTable {
 
 	private static final long serialVersionUID = 8579465261755437998L;
 
+	private boolean unescapeHTMLText;
+
 	public XMLTreeTable(XMLTreeTableTreeModel treeTableModel) {
-
 		super(treeTableModel, 20, 30);
-
-		// setBackground(MyColor.LIGHTEST_GRAY);
-
+		
+		this.unescapeHTMLText = false;
 	}
 
+	public boolean isUnescapeHTMLText() {
+		return unescapeHTMLText;
+	}
+
+	public void setUnescapeHTMLText(boolean unescapeHTMLText) {
+		this.unescapeHTMLText = unescapeHTMLText;
+
+		updateUI();
+	}
+	
 	@Override
 	protected TreeTableModelAdapter getTreeTableModelAdapter(DefaultTreeTableTree tree) {
 
@@ -44,18 +53,11 @@ public class XMLTreeTable extends AbstractTreeTable {
 	@Override
 	protected DefaultTreeTableTree constructTree(AbstractTreeTableTreeModel abstractTreeTableModel) {
 
-		DefaultTreeTableTreeCellRenderer defaultTreeTableTreeCellRenderer;
-
-		defaultTreeTableTreeCellRenderer = new DefaultTreeTableTreeCellRenderer(this);
-		// defaultTreeTableTreeCellRenderer.setOpenIcon(null);
-		// defaultTreeTableTreeCellRenderer.setClosedIcon(null);
-		// defaultTreeTableTreeCellRenderer.setLeafIcon(null);
+		XMLTreeTableTreeCellRenderer xmlTreeTableTreeCellRenderer;
+		xmlTreeTableTreeCellRenderer = new XMLTreeTableTreeCellRenderer(this);
 
 		XMLTreeTableTree xmlTreeTableTree = new XMLTreeTableTree(this, (XMLTreeTableTreeModel) abstractTreeTableModel,
-				defaultTreeTableTreeCellRenderer);
-
-		// xmlTreeTableTree.setRootVisible(false);
-		// xmlTreeTableTree.setShowsRootHandles(true);
+				xmlTreeTableTreeCellRenderer);
 
 		return xmlTreeTableTree;
 	}
@@ -108,14 +110,5 @@ public class XMLTreeTable extends AbstractTreeTable {
 		}
 
 		setColumnModel(tableColumnModel);
-	}
-
-	public void setUnescapeHTMLText(boolean unescapeHTMLText) {
-
-		XMLTreeTableTree xmlTreeTableTree = (XMLTreeTableTree) getTree();
-		xmlTreeTableTree.setUnescapeHTMLText(unescapeHTMLText);
-
-		updateUI();
-
 	}
 }

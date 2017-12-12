@@ -54,24 +54,19 @@ public class XMLNode extends AbstractTreeTableNode {
 
 	private boolean[] secondaryParentSearchFound;
 
-	// private boolean[] specialCharsInValue;
-
-	private boolean unescapeHTMLText;
-
 	// 0 based indexes.
 	private Map<Integer, Integer> compareIndexMap;
 
-	public XMLNode(Element nodeArray, String searchStr, boolean unescapeHTMLText) {
+	public XMLNode(Element nodeArray, String searchStr) {
 
-		this(new Element[] { nodeArray }, new String[] { searchStr }, unescapeHTMLText);
+		this(new Element[] { nodeArray }, new String[] { searchStr });
 	}
 
-	public XMLNode(Element[] nodeArray, String[] searchStr, boolean unescapeHTMLText) {
+	public XMLNode(Element[] nodeArray, String[] searchStr) {
 		super();
 
 		this.nodeArray = nodeArray;
 		this.searchStr = searchStr;
-		this.unescapeHTMLText = unescapeHTMLText;
 
 		this.compareIndexMap = new HashMap<>();
 
@@ -210,16 +205,6 @@ public class XMLNode extends AbstractTreeTableNode {
 		return secondaryParentSearch;
 	}
 
-	// public boolean isSpecialCharsInValue(int column) {
-	// return specialCharsInValue[column];
-	// }
-
-	public void setUnescapeHTMLText(boolean unescapeHTMLText) {
-		this.unescapeHTMLText = unescapeHTMLText;
-
-		initialize();
-	}
-
 	private void initialize() {
 
 		if (nodeArray != null) {
@@ -257,23 +242,9 @@ public class XMLNode extends AbstractTreeTableNode {
 				if (node != null) {
 
 					nodeName = getElementName(node);
-
-					if (unescapeHTMLText) {
-						nodeName = StringEscapeUtils.unescapeHtml4(nodeName);
-					}
-
 					nodeValue[0] = nodeName;
 
 					String nodeValueText = node.getText().trim();
-
-					if (nodeValueText.contains("\n")) {
-						// specialCharsInValue[i + 1] = true;
-					}
-
-					if (unescapeHTMLText) {
-						nodeValueText = StringEscapeUtils.unescapeHtml4(nodeValueText);
-					}
-
 					nodeValue[i + 1] = nodeValueText;
 
 					if (("PZ__".equals(nodeName) || ("PZ__ERROR".equals(nodeName)))
@@ -307,7 +278,6 @@ public class XMLNode extends AbstractTreeTableNode {
 						}
 					}
 				}
-
 			}
 		}
 	}
@@ -513,7 +483,7 @@ public class XMLNode extends AbstractTreeTableNode {
 
 						System.arraycopy(childElements, 0, childElementArray, 0, childElements.length);
 
-						childNodeList.add(new XMLNode(childElementArray, searchStr, unescapeHTMLText));
+						childNodeList.add(new XMLNode(childElementArray, searchStr));
 					}
 
 				} catch (Exception e) {
@@ -530,7 +500,7 @@ public class XMLNode extends AbstractTreeTableNode {
 				Collections.sort(childElemList, elementComparator);
 
 				for (Element childElem : childElemList) {
-					childNodeList.add(new XMLNode(childElem, search, unescapeHTMLText));
+					childNodeList.add(new XMLNode(childElem, search));
 				}
 
 			}
@@ -620,6 +590,16 @@ public class XMLNode extends AbstractTreeTableNode {
 
 					if (lValue.indexOf(lSearchStr) != -1) {
 						secondarySearchFound[i] = true;
+					}
+					
+					// double searching to handle escaped data
+					if(!secondarySearchFound[i]) {
+						lValue = StringEscapeUtils.unescapeHtml4(lValue);
+
+						if (lValue.indexOf(lSearchStr) != -1) {
+							secondarySearchFound[i] = true;
+						}
+
 					}
 				}
 			}

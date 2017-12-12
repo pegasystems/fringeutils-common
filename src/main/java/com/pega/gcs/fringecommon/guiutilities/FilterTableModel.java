@@ -41,7 +41,7 @@ public abstract class FilterTableModel<T extends Comparable<? super T>> extends 
 	public static final String EMPTY_STR = "<EMPTY>";
 
 	protected abstract TableColumnModel getTableColumnModel();
-	
+
 	protected abstract int getModelColumnIndex(int column);
 
 	// performing one by one search because of showing progress in the monitor
@@ -76,7 +76,7 @@ public abstract class FilterTableModel<T extends Comparable<? super T>> extends 
 	private Message message;
 
 	private PropertyChangeSupport propertyChangeSupport;
-
+	
 	public FilterTableModel(RecentFile recentFile) {
 
 		this.recentFile = recentFile;
@@ -106,6 +106,19 @@ public abstract class FilterTableModel<T extends Comparable<? super T>> extends 
 	public void setRecentFile(RecentFile recentFile) {
 		this.recentFile = recentFile;
 		resetModel();
+	}
+
+	public String getFilePath() {
+
+		String filePath = null;
+
+		RecentFile recentFile = getRecentFile();
+
+		if (recentFile != null) {
+			filePath = (String) recentFile.getAttribute(RecentFile.KEY_FILE);
+		}
+
+		return filePath;
 	}
 
 	public String getModelName() {

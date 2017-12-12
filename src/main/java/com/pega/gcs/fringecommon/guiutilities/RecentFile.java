@@ -36,6 +36,7 @@ public class RecentFile implements Serializable {
 
 	private transient PropertyChangeSupport propertyChangeSupport;
 
+	@SuppressWarnings("unused")
 	private RecentFile() {
 		// constructor for kryo purpose
 	}

@@ -13,7 +13,6 @@ import javax.swing.JTable;
 
 import com.pega.gcs.fringecommon.guiutilities.MyColor;
 import com.pega.gcs.fringecommon.guiutilities.treetable.DefaultTreeTableTree;
-import com.pega.gcs.fringecommon.guiutilities.treetable.DefaultTreeTableTreeCellRenderer;
 import com.pega.gcs.fringecommon.utilities.GeneralUtilities;
 
 public class XMLTreeTableTree extends DefaultTreeTableTree {
@@ -21,15 +20,8 @@ public class XMLTreeTableTree extends DefaultTreeTableTree {
 	private static final long serialVersionUID = -1702028340648975873L;
 
 	public XMLTreeTableTree(XMLTreeTable xmlTreeTable, XMLTreeTableTreeModel xmlTreeTableTreeModel,
-			DefaultTreeTableTreeCellRenderer defaultTreeTableTreeCellRenderer) {
-		super(xmlTreeTable, xmlTreeTableTreeModel, defaultTreeTableTreeCellRenderer);
-	}
-
-	public void setUnescapeHTMLText(boolean unescapeHTMLText) {
-		XMLTreeTableTreeModel xmlTreeTableTreeModel;
-		xmlTreeTableTreeModel = (XMLTreeTableTreeModel) getModel();
-
-		xmlTreeTableTreeModel.setUnescapeHTMLText(unescapeHTMLText);
+			XMLTreeTableTreeCellRenderer xmlTreeTableTreeCellRenderer) {
+		super(xmlTreeTable, xmlTreeTableTreeModel, xmlTreeTableTreeCellRenderer);
 	}
 
 	@Override

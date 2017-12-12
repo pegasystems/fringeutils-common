@@ -15,11 +15,12 @@ import com.pega.gcs.fringecommon.utilities.GeneralUtilities;
 
 public class XMLTreeTableTreeModel extends DefaultTreeTableTreeModel {
 
+	private static final long serialVersionUID = 4775143068906869999L;
+
 	private static final Log4j2Helper LOG = new Log4j2Helper(XMLTreeTableTreeModel.class);
 
 	private long totalNodeCount;
 
-	private static final long serialVersionUID = 4775143068906869999L;
 
 	public XMLTreeTableTreeModel(XMLNode root, TreeTableColumn[] columns) {
 
@@ -46,17 +47,6 @@ public class XMLTreeTableTreeModel extends DefaultTreeTableTreeModel {
 			LOG.error("Error initialising XMLNode", e);
 		}
 
-	}
-
-	public void setUnescapeHTMLText(boolean unescapeHTMLText) {
-		XMLNode root = (XMLNode) getRoot();
-		root.setUnescapeHTMLText(unescapeHTMLText);
-		root.removeAllChildren();
-		initialise(root);
-
-		// reload causes collapse of tree structure, using nodeChanged instead
-		// reload();
-		nodeChanged(root);
 	}
 
 	// causes preloading of all xml node because of walk through

@@ -170,7 +170,7 @@ public abstract class AbstractTreeTable extends CustomJTable {
 							dataSB.append("\t");
 						}
 
-						dataSB.append("\n");
+						dataSB.append(System.getProperty("line.separator"));
 					}
 
 				}

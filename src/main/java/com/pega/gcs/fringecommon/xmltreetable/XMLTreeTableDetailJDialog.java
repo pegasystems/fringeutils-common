@@ -83,7 +83,7 @@ public class XMLTreeTableDetailJDialog extends JFrame {
 
 		setIconImage(appIcon.getImage());
 
-		XMLNode rootXMLNode = new XMLNode(traceEventPropertyElement, searchStr, false);
+		XMLNode rootXMLNode = new XMLNode(traceEventPropertyElement, searchStr);
 
 		xmlTreeTableModel = new XMLTreeTableTreeModel(rootXMLNode, treeTableColumns);
 
@@ -176,6 +176,13 @@ public class XMLTreeTableDetailJDialog extends JFrame {
 					} else {
 						xmlTreeTable.setUnescapeHTMLText(false);
 					}
+
+					XMLElementTextDetailsPanel xmlElementTextDetailsPanel;
+					xmlElementTextDetailsPanel = getXMLElementTextDetailsPanel();
+
+					xmlElementTextDetailsPanel.revalidate();
+					xmlElementTextDetailsPanel.repaint();
+
 				}
 			});
 		}
@@ -209,7 +216,7 @@ public class XMLTreeTableDetailJDialog extends JFrame {
 			};
 
 			searchPanel = new SearchPanel<XMLNode>(navigationTableController,
-					xmlTreeTableModelAdapter.getXMLNodeSearchModel());
+					xmlTreeTableModelAdapter.getSearchModel());
 
 		}
 
@@ -513,14 +520,14 @@ public class XMLTreeTableDetailJDialog extends JFrame {
 
 						XMLTreeTableModelAdapter xmlTreeTableModelAdapter;
 						xmlTreeTableModelAdapter = (XMLTreeTableModelAdapter) xmlTreeTable.getModel();
-						Object secondarySearchStrObj = xmlTreeTableModelAdapter.getXMLNodeSearchModel()
-								.getSearchStrObj();
+						Object secondarySearchStrObj = xmlTreeTableModelAdapter.getSearchModel().getSearchStrObj();
 						String secondarySearchStr = (secondarySearchStrObj != null) ? secondarySearchStrObj.toString()
 								: null;
 
 						XMLElementTextDetailsPanel xmlElementTextDetailsPanel = getXMLElementTextDetailsPanel();
+
 						xmlElementTextDetailsPanel.populatePanel(xmlNode, getSearchStr(), secondarySearchStr,
-								xmlTreeTable.getFont());
+								xmlTreeTable.isUnescapeHTMLText(), xmlTreeTable.getFont());
 
 					}
 

@@ -37,8 +37,5 @@ public interface Searchable<T> {
 
 	public void resetResults(boolean clearResults);
 
-	// searching is asynchronous. however return true/false in case of search
-	// task performed. this is for taking care of seperators and empty search
-	// strings
-	public boolean searchInEvents(Object searchStrObj, ModalProgressMonitor mProgressMonitor);
+	public void searchInEvents(Object searchStrObj, ModalProgressMonitor mProgressMonitor);
 }
