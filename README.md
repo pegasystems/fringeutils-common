@@ -11,20 +11,25 @@ Build
 needs JDK8.  
 
 To build the library jar and sources use the following command:
+
 ```
-$ mvn clean package
+$ ./gradlew clean build
 ```
 
 The artefacts `fringeutils-common-<version>.jar` and `fringeutils-common-<version>-sources.jar` are created under `'\target\'` folder.
 
 To install into local maven repository
+
 ```
-$ mvn clean install
+$ ./gradlew publishToMavenLocal
 ```
 
 To release the library to JFrog Bintray use the following command:
+
 ```
-$ mvn clean deploy
+git tag v<major>.<minor>.<patch>
+git push --tags
+./gradlew final
 ```
 
 The released artefacts are uploaded to JFrog Bintray under following location
