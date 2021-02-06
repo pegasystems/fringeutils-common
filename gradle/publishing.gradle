@@ -60,18 +60,6 @@ bintray {
         publicDownloadNumbers = true
         githubRepo = 'pegasystems/fringeutils-common'
         githubReleaseNotesFile = 'README.md'
-
-        version {
-            name = '${project.version}'
-            desc = "FringeUtils-Common"
-            released  = new Date()
-            vcsTag = '${project.version}'
-
-            gpg {
-                sign = true
-                passphrase = resolveProperty('gpgPassphrase')
-            }
-        }
     }
 }
 
