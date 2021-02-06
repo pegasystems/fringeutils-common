@@ -4,62 +4,65 @@
  * Contributors:
  *     Manu Varghese
  *******************************************************************************/
+
 package com.pega.gcs.fringecommon.guiutilities.treetable;
 
 public class DefaultTreeTableTreeModel extends AbstractTreeTableTreeModel {
 
-	private static final long serialVersionUID = -8113315733763386280L;
+    private static final long serialVersionUID = -8113315733763386280L;
 
-	private TreeTableColumn[] columns;
+    private TreeTableColumn[] columns;
 
-	public DefaultTreeTableTreeModel(AbstractTreeTableNode root, TreeTableColumn[] columns) {
+    public DefaultTreeTableTreeModel(AbstractTreeTableNode root, TreeTableColumn[] columns) {
 
-		super(root);
-		this.columns = columns;
-	}
+        super(root);
+        this.columns = columns;
+    }
 
-	/**
-	 * @return the columns
-	 */
-	protected TreeTableColumn[] getColumns() {
-		return columns;
-	}
+    public void setColumns(TreeTableColumn[] columns) {
+        this.columns = columns;
+        reload();
+    }
 
-	@Override
-	public TreeTableColumn getColumn(int column) {
-		return getColumns()[column];
-	}
+    private TreeTableColumn[] getColumns() {
+        return columns;
+    }
 
-	@Override
-	public int getColumnCount() {
-		return getColumns().length;
-	}
+    @Override
+    public TreeTableColumn getColumn(int column) {
+        return getColumns()[column];
+    }
 
-	@Override
-	public String getColumnName(int column) {
-		return getColumns()[column].getDisplayName();
-	}
+    @Override
+    public int getColumnCount() {
+        return getColumns().length;
+    }
 
-	@Override
-	public Class<?> getColumnClass(int column) {
-		return getColumns()[column].getColumnClass();
-	}
+    @Override
+    public String getColumnName(int column) {
+        return getColumns()[column].getDisplayName();
+    }
 
-	@Override
-	public boolean isCellEditable(Object node, int column) {
-		return true;
-	}
+    @Override
+    public Class<?> getColumnClass(int column) {
+        return getColumns()[column].getColumnClass();
+    }
 
-	@Override
-	public Object getValueAt(Object node, int column) {
-		// return the xml node back itself as it we need the whole metadata. the
-		// rendering of value is taken care by the cell renderer for each
-		// columns
-		return node;
-	}
+    @Override
+    public boolean isCellEditable(Object node, int column) {
+        return true;
+    }
 
-	@Override
-	public void setValueAt(Object aValue, Object node, int column) {
-		// do nothing
-	}
+    @Override
+    public Object getValueAt(Object node, int column) {
+        // return the xml node back itself as it we need the whole metadata. the
+        // rendering of value is taken care by the cell renderer for each
+        // columns
+        return node;
+    }
+
+    @Override
+    public void setValueAt(Object value, Object node, int column) {
+        // do nothing
+    }
 }

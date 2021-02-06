@@ -4,11 +4,12 @@
  * Contributors:
  *     Manu Varghese
  *******************************************************************************/
+
 package com.pega.gcs.fringecommon.guiutilities;
 
 public interface RecentFileContainerListener {
 
-	public abstract void recentFileAdded();
+    public abstract void recentFileAdded();
 
-	public abstract void recentFileDeleted();
+    public abstract void recentFileDeleted();
 }

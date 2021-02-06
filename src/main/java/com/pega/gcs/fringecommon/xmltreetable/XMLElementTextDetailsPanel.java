@@ -4,6 +4,7 @@
  * Contributors:
  *     Manu Varghese
  *******************************************************************************/
+
 package com.pega.gcs.fringecommon.xmltreetable;
 
 import java.awt.BorderLayout;
@@ -25,8 +26,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -57,7 +61,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Highlighter;
 
-import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 
 import com.pega.gcs.fringecommon.guiutilities.MyColor;
 import com.pega.gcs.fringecommon.guiutilities.RightClickMenuItem;
@@ -66,715 +70,724 @@ import com.pega.gcs.fringecommon.utilities.KnuthMorrisPrattAlgorithm;
 
 public abstract class XMLElementTextDetailsPanel extends JPanel implements ListSelectionListener {
 
-	private static final long serialVersionUID = 2833789190370268564L;
+    private static final long serialVersionUID = 2833789190370268564L;
 
-	private static final Log4j2Helper LOG = new Log4j2Helper(XMLNode.class);
+    private static final Log4j2Helper LOG = new Log4j2Helper(XMLNode.class);
 
-	// contains xml element names that need to be displayed as table on details
-	// window.
-	private Map<String, XMLElementType> xmlElementTypeMap;
+    // contains xml element names that need to be displayed as table on details
+    // window.
+    private Map<String, XMLElementType> xmlElementTypeMap;
 
-	private JPanel detailsPanel;
+    private Charset charset;
 
-	private Highlighter.HighlightPainter primarySearchHighlightPainter;
+    private JPanel detailsPanel;
 
-	private Highlighter.HighlightPainter secondarySearchHighlightPainter;
+    private Highlighter.HighlightPainter primarySearchHighlightPainter;
 
-	public XMLElementTextDetailsPanel(Map<String, XMLElementType> xmlElementTypeMap) {
-		super();
+    private Highlighter.HighlightPainter secondarySearchHighlightPainter;
 
-		this.xmlElementTypeMap = xmlElementTypeMap;
+    public XMLElementTextDetailsPanel(Map<String, XMLElementType> xmlElementTypeMap, Charset charset) {
+        super();
 
-		this.primarySearchHighlightPainter = new DefaultHighlighter.DefaultHighlightPainter(MyColor.LIGHT_YELLOW);
+        this.xmlElementTypeMap = xmlElementTypeMap;
+        this.charset = charset;
 
-		this.secondarySearchHighlightPainter = new DefaultHighlighter.DefaultHighlightPainter(MyColor.LIME);
+        this.primarySearchHighlightPainter = new DefaultHighlighter.DefaultHighlightPainter(MyColor.LIGHT_YELLOW);
 
-		setLayout(new BorderLayout());
+        this.secondarySearchHighlightPainter = new DefaultHighlighter.DefaultHighlightPainter(MyColor.LIME);
 
-		detailsPanel = new JPanel();
+        setLayout(new BorderLayout());
 
-		add(detailsPanel);
+        detailsPanel = new JPanel();
 
-		Border loweredEtched = BorderFactory.createEtchedBorder(EtchedBorder.LOWERED);
+        add(detailsPanel);
 
-		setBorder(BorderFactory.createTitledBorder(loweredEtched, "Details"));
-	}
+        Border loweredEtched = BorderFactory.createEtchedBorder(EtchedBorder.LOWERED);
 
-	public void populatePanel(XMLNode xmlNode, String[] primarySearchArray, String secondarySearch,
-			boolean unescapeHTMLText, Font font) {
+        setBorder(BorderFactory.createTitledBorder(loweredEtched, "Details"));
+    }
 
-		detailsPanel.removeAll();
-		detailsPanel.setLayout(new BorderLayout());
+    public void populatePanel(XMLNode xmlNode, String[] primarySearchArray, String secondarySearch,
+            boolean unescapeHtmlText, Font font) {
 
-		if (xmlNode != null) {
+        detailsPanel.removeAll();
+        detailsPanel.setLayout(new BorderLayout());
 
-			String nodeName = xmlNode.getNodeName();
+        if (xmlNode != null) {
 
-			if ((xmlElementTypeMap != null) && (xmlElementTypeMap.containsKey(nodeName))) {
-				JPanel xmlNodeTablePanel = getXMLNodeTablePanel(xmlNode, primarySearchArray, secondarySearch,
-						unescapeHTMLText, font);
+            String nodeName = xmlNode.getNodeName();
 
-				detailsPanel.add(xmlNodeTablePanel);
-			} else {
-				JPanel xmlNodeTextPanel = getXMLNodeTextPanel(xmlNode, primarySearchArray, secondarySearch,
-						unescapeHTMLText, font);
+            if ((xmlElementTypeMap != null) && (xmlElementTypeMap.containsKey(nodeName))) {
+                JPanel xmlNodeTablePanel = getXMLNodeTablePanel(xmlNode, primarySearchArray, secondarySearch,
+                        unescapeHtmlText, font);
 
-				detailsPanel.add(xmlNodeTextPanel);
-			}
-		}
+                detailsPanel.add(xmlNodeTablePanel);
+            } else {
+                JPanel xmlNodeTextPanel = getXMLNodeTextPanel(xmlNode, primarySearchArray, secondarySearch,
+                        unescapeHtmlText, font);
 
-		detailsPanel.revalidate();
-		detailsPanel.repaint();
+                detailsPanel.add(xmlNodeTextPanel);
+            }
+        }
 
-	}
+        detailsPanel.revalidate();
+        detailsPanel.repaint();
 
-	private JPanel getXMLNodeTextPanel(XMLNode xmlNode, String[] primarySearchArray, String secondarySearch,
-			boolean unescapeHTMLText, Font font) {
+    }
 
-		JPanel xmlNodeTextPanel = new JPanel();
-		xmlNodeTextPanel.setLayout(new GridBagLayout());
+    private JPanel getXMLNodeTextPanel(XMLNode xmlNode, String[] primarySearchArray, String secondarySearch,
+            boolean unescapeHtmlText, Font font) {
 
-		GridBagConstraints gbc1 = new GridBagConstraints();
-		gbc1.gridx = 0;
-		gbc1.gridy = 0;
-		gbc1.weightx = 1.0D;
-		gbc1.weighty = 0.0D;
-		gbc1.fill = GridBagConstraints.HORIZONTAL;
-		gbc1.anchor = GridBagConstraints.NORTHWEST;
-		gbc1.insets = new Insets(2, 2, 1, 2);
+        JPanel xmlNodeTextPanel = new JPanel();
+        xmlNodeTextPanel.setLayout(new GridBagLayout());
 
-		Border border = BorderFactory.createLineBorder(Color.LIGHT_GRAY);
+        GridBagConstraints gbc1 = new GridBagConstraints();
+        gbc1.gridx = 0;
+        gbc1.gridy = 0;
+        gbc1.weightx = 1.0D;
+        gbc1.weighty = 0.0D;
+        gbc1.fill = GridBagConstraints.HORIZONTAL;
+        gbc1.anchor = GridBagConstraints.NORTHWEST;
+        gbc1.insets = new Insets(2, 2, 1, 2);
 
-		String nodeName = xmlNode.getNodeName();
+        Border border = BorderFactory.createLineBorder(Color.LIGHT_GRAY);
 
-		if (unescapeHTMLText) {
-			nodeName = StringEscapeUtils.unescapeHtml4(nodeName);
-		}
+        String nodeName = xmlNode.getNodeName();
 
-		JTextArea nameJTextArea = getNameJTextArea(nodeName, font);
+        if (unescapeHtmlText) {
+            nodeName = StringEscapeUtils.unescapeHtml4(nodeName);
+        }
 
-		Dimension dim = new Dimension(22, 22);
-		nameJTextArea.setPreferredSize(dim);
+        JTextArea nameJTextArea = getNameJTextArea(nodeName, font);
 
-		JPanel nameComponent = new JPanel();
-		LayoutManager layout = new BoxLayout(nameComponent, BoxLayout.X_AXIS);
-		nameComponent.setLayout(layout);
+        Dimension dim = new Dimension(22, 22);
+        nameJTextArea.setPreferredSize(dim);
 
-		nameComponent.add(nameJTextArea);
-		nameComponent.setBorder(border);
-		nameComponent.setPreferredSize(nameJTextArea.getPreferredSize());
+        JPanel nameComponent = new JPanel();
+        LayoutManager layout = new BoxLayout(nameComponent, BoxLayout.X_AXIS);
+        nameComponent.setLayout(layout);
 
-		xmlNodeTextPanel.add(nameComponent, gbc1);
+        nameComponent.add(nameJTextArea);
+        nameComponent.setBorder(border);
+        nameComponent.setPreferredSize(nameJTextArea.getPreferredSize());
 
-		// Name - highlight text if required
-		performTextAreaHighlight(xmlNode, 0, nameJTextArea, primarySearchArray, secondarySearch);
+        xmlNodeTextPanel.add(nameComponent, gbc1);
 
-		for (int count = 0; count < xmlNode.getNodeElements().length; count++) {
+        // Name - highlight text if required
+        performTextAreaHighlight(xmlNode, 0, nameJTextArea, primarySearchArray, secondarySearch);
 
-			int index = count + 1;
+        for (int count = 0; count < xmlNode.getNodeElements().length; count++) {
 
-			GridBagConstraints gbc2 = new GridBagConstraints();
-			gbc2.gridx = 0;
-			gbc2.gridy = index;
-			gbc2.weightx = 1.0D;
-			gbc2.weighty = 1.0D;
-			gbc2.fill = GridBagConstraints.BOTH;
-			gbc2.anchor = GridBagConstraints.NORTHWEST;
-			gbc2.insets = new Insets(1, 2, 1, 2);
+            int index = count + 1;
 
-			String nodeValue = xmlNode.getNodeValue(index);
+            GridBagConstraints gbc2 = new GridBagConstraints();
+            gbc2.gridx = 0;
+            gbc2.gridy = index;
+            gbc2.weightx = 1.0D;
+            gbc2.weighty = 1.0D;
+            gbc2.fill = GridBagConstraints.BOTH;
+            gbc2.anchor = GridBagConstraints.NORTHWEST;
+            gbc2.insets = new Insets(1, 2, 1, 2);
 
-			if (unescapeHTMLText) {
-				nodeValue = StringEscapeUtils.unescapeHtml4(nodeValue);
-			}
+            String nodeValue = xmlNode.getNodeValue(index);
 
-			JTextArea valueTextArea = getValueJTextArea(nodeValue, font);
+            if (unescapeHtmlText) {
+                nodeValue = StringEscapeUtils.unescapeHtml4(nodeValue);
+            }
 
-			JScrollPane valueComponent = new JScrollPane(valueTextArea, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
-					ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+            JTextArea valueTextArea = getValueJTextArea(nodeValue, font);
 
-			valueComponent.setBorder(border);
-			valueComponent.setPreferredSize(valueTextArea.getPreferredSize());
+            JScrollPane valueComponent = new JScrollPane(valueTextArea, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+                    ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
-			xmlNodeTextPanel.add(valueComponent, gbc2);
+            valueComponent.setBorder(border);
+            valueComponent.setPreferredSize(valueTextArea.getPreferredSize());
 
-			// Value - highlight text if required
-			performTextAreaHighlight(xmlNode, index, valueTextArea, primarySearchArray, secondarySearch);
+            xmlNodeTextPanel.add(valueComponent, gbc2);
 
-		}
+            // Value - highlight text if required
+            performTextAreaHighlight(xmlNode, index, valueTextArea, primarySearchArray, secondarySearch);
 
-		return xmlNodeTextPanel;
-	}
+        }
 
-	@SuppressWarnings("deprecation")
-	private JPanel getXMLNodeTablePanel(XMLNode xmlNode, String[] primarySearchArray, String secondarySearch,
-			boolean unescapeHTMLText, Font font) {
+        return xmlNodeTextPanel;
+    }
 
-		JPanel xmlNodeTablePanel = new JPanel();
-		xmlNodeTablePanel.setLayout(new GridBagLayout());
+    private JPanel getXMLNodeTablePanel(XMLNode xmlNode, String[] primarySearchArray, String secondarySearch,
+            boolean unescapeHtmlText, Font font) {
 
-		GridBagConstraints gbc1 = new GridBagConstraints();
-		gbc1.gridx = 0;
-		gbc1.gridy = 0;
-		gbc1.weightx = 1.0D;
-		gbc1.weighty = 0.0D;
-		gbc1.fill = GridBagConstraints.HORIZONTAL;
-		gbc1.anchor = GridBagConstraints.NORTHWEST;
-		gbc1.insets = new Insets(2, 2, 1, 2);
-		gbc1.gridwidth = GridBagConstraints.REMAINDER;
+        JPanel xmlNodeTablePanel = new JPanel();
+        xmlNodeTablePanel.setLayout(new GridBagLayout());
 
-		Border border = BorderFactory.createLineBorder(Color.LIGHT_GRAY);
+        GridBagConstraints gbc1 = new GridBagConstraints();
+        gbc1.gridx = 0;
+        gbc1.gridy = 0;
+        gbc1.weightx = 1.0D;
+        gbc1.weighty = 0.0D;
+        gbc1.fill = GridBagConstraints.HORIZONTAL;
+        gbc1.anchor = GridBagConstraints.NORTHWEST;
+        gbc1.insets = new Insets(2, 2, 1, 2);
+        gbc1.gridwidth = GridBagConstraints.REMAINDER;
 
-		String nodeName = xmlNode.getNodeName();
+        Border border = BorderFactory.createLineBorder(Color.LIGHT_GRAY);
 
-		if (unescapeHTMLText) {
-			nodeName = StringEscapeUtils.unescapeHtml4(nodeName);
-		}
+        String nodeName = xmlNode.getNodeName();
 
-		JTextArea nameJTextArea = getNameJTextArea(nodeName, font);
+        if (unescapeHtmlText) {
+            nodeName = StringEscapeUtils.unescapeHtml4(nodeName);
+        }
 
-		Dimension dim = new Dimension(22, 22);
-		nameJTextArea.setPreferredSize(dim);
+        JTextArea nameJTextArea = getNameJTextArea(nodeName, font);
 
-		JPanel nameComponent = new JPanel();
-		LayoutManager layout = new BoxLayout(nameComponent, BoxLayout.X_AXIS);
-		nameComponent.setLayout(layout);
+        Dimension dim = new Dimension(22, 22);
+        nameJTextArea.setPreferredSize(dim);
 
-		nameComponent.add(nameJTextArea);
-		nameComponent.setBorder(border);
-		nameComponent.setPreferredSize(nameJTextArea.getPreferredSize());
+        JPanel nameComponent = new JPanel();
+        LayoutManager layout = new BoxLayout(nameComponent, BoxLayout.X_AXIS);
+        nameComponent.setLayout(layout);
 
-		xmlNodeTablePanel.add(nameComponent, gbc1);
+        nameComponent.add(nameJTextArea);
+        nameComponent.setBorder(border);
+        nameComponent.setPreferredSize(nameJTextArea.getPreferredSize());
 
-		// Name - highlight text if required
-		performTextAreaHighlight(xmlNode, 0, nameJTextArea, primarySearchArray, secondarySearch);
+        xmlNodeTablePanel.add(nameComponent, gbc1);
 
-		XMLElementType xmlElementType = xmlElementTypeMap.get(nodeName);
+        // Name - highlight text if required
+        performTextAreaHighlight(xmlNode, 0, nameJTextArea, primarySearchArray, secondarySearch);
 
-		String seperator = xmlElementType.getSeperatorforLevel(0);
-		boolean decodeHTML = xmlElementType.isDecodeHTML();
+        XMLElementType xmlElementType = xmlElementTypeMap.get(nodeName);
 
-		for (int count = 0; count < xmlNode.getNodeElements().length; count++) {
+        String seperator = xmlElementType.getSeperatorforLevel(0);
+        boolean decodeHtml = xmlElementType.isDecodeHtml();
 
-			int index = count + 1;
+        for (int count = 0; count < xmlNode.getNodeElements().length; count++) {
 
-			TreeMap<String, String> nameValueMap = new TreeMap<String, String>();
+            int index = count + 1;
 
-			String nodeValue = xmlNode.getNodeValue(index);
+            TreeMap<String, String> nameValueMap = new TreeMap<String, String>();
 
-			if (nodeValue != null) {
+            String nodeValue = xmlNode.getNodeValue(index);
 
-				if (unescapeHTMLText) {
-					nodeValue = StringEscapeUtils.unescapeHtml4(nodeValue);
-				}
+            if (nodeValue != null) {
 
-				String[] nameValueTextArray = nodeValue.split(seperator);
+                if (unescapeHtmlText) {
+                    nodeValue = StringEscapeUtils.unescapeHtml4(nodeValue);
+                }
 
-				for (String nameValueText : nameValueTextArray) {
+                String[] nameValueTextArray = nodeValue.split(seperator, 0);
 
-					String[] nameValueArray = nameValueText.split("=");
+                for (String nameValueText : nameValueTextArray) {
 
-					String name = null;
-					String value = null;
+                    String[] nameValueArray = nameValueText.split("=", 0);
 
-					switch (nameValueArray.length) {
+                    String name = null;
+                    String value = null;
 
-					case 1:
-						name = nameValueArray[0];
-						break;
+                    switch (nameValueArray.length) {
 
-					case 2:
-						name = nameValueArray[0];
-						value = nameValueArray[1];
+                    case 1:
+                        name = nameValueArray[0];
+                        break;
 
-						if (decodeHTML) {
-							value = URLDecoder.decode(value);
-						}
-						break;
+                    case 2:
+                        name = nameValueArray[0];
+                        value = nameValueArray[1];
 
-					default:
-						break;
+                        if (decodeHtml) {
+                            try {
+                                value = URLDecoder.decode(value, charset.name());
+                            } catch (UnsupportedEncodingException uee) {
+                                LOG.error("Error decoding: " + value, uee);
+                            }
+                        }
 
-					}
+                        break;
 
-					if (name != null) {
+                    default:
+                        break;
 
-						nameValueMap.put(name, value);
-					}
-				}
-			}
+                    }
 
-			GridBagConstraints gbc2 = new GridBagConstraints();
-			gbc2.gridx = count;
-			gbc2.gridy = 1;
-			gbc2.weightx = 1.0D;
-			gbc2.weighty = 1.0D;
-			gbc2.fill = GridBagConstraints.BOTH;
-			gbc2.anchor = GridBagConstraints.NORTHWEST;
-			gbc2.insets = new Insets(1, 2, 1, 2);
+                    if (name != null) {
 
-			JTable nameValueTable = getTablefromMap(nodeName, nameValueMap, xmlNode.isSearchFound(index),
-					primarySearchArray[count], xmlNode.isSecondarySearchFound(index), secondarySearch);
+                        nameValueMap.put(name, value);
+                    }
+                }
+            }
 
-			JScrollPane valueComponent = new JScrollPane(nameValueTable,
-					ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-					ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+            GridBagConstraints gbc2 = new GridBagConstraints();
+            gbc2.gridx = count;
+            gbc2.gridy = 1;
+            gbc2.weightx = 1.0D;
+            gbc2.weighty = 1.0D;
+            gbc2.fill = GridBagConstraints.BOTH;
+            gbc2.anchor = GridBagConstraints.NORTHWEST;
+            gbc2.insets = new Insets(1, 2, 1, 2);
 
-			valueComponent.setBorder(border);
-			valueComponent.setPreferredSize(nameValueTable.getPreferredSize());
+            JTable nameValueTable = getTablefromMap(nameValueMap, xmlNode.isSearchFound(index),
+                    primarySearchArray[count], xmlNode.isSecondarySearchFound(index), secondarySearch);
 
-			xmlNodeTablePanel.add(valueComponent, gbc2);
-		}
+            JScrollPane valueComponent = new JScrollPane(nameValueTable,
+                    ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                    ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
-		return xmlNodeTablePanel;
-	}
+            valueComponent.setBorder(border);
+            valueComponent.setPreferredSize(nameValueTable.getPreferredSize());
 
-	private JTextArea getNameJTextArea(String text, Font font) {
+            xmlNodeTablePanel.add(valueComponent, gbc2);
+        }
 
-		final JTextArea nameJTextArea = new JTextArea();
-		nameJTextArea.setRows(1);
-		nameJTextArea.setEditable(false);
+        return xmlNodeTablePanel;
+    }
 
-		nameJTextArea.setText(text);
+    private JTextArea getNameJTextArea(String text, Font font) {
 
-		// Font font = getXMLTreeTable().getFont();
-		nameJTextArea.setFont(font);
-		nameJTextArea.setCursor(new Cursor(Cursor.TEXT_CURSOR));
+        final JTextArea nameJTextArea = new JTextArea();
+        nameJTextArea.setRows(1);
+        nameJTextArea.setEditable(false);
 
-		nameJTextArea.addMouseListener(new MouseAdapter() {
+        nameJTextArea.setText(text);
 
-			@Override
-			public void mouseClicked(MouseEvent e) {
+        // Font font = getXMLTreeTable().getFont();
+        nameJTextArea.setFont(font);
+        nameJTextArea.setCursor(new Cursor(Cursor.TEXT_CURSOR));
 
-				if (e.getButton() == MouseEvent.BUTTON3) {
+        nameJTextArea.addMouseListener(new MouseAdapter() {
 
-					final JPopupMenu popupMenu = new JPopupMenu();
+            @Override
+            public void mouseClicked(MouseEvent mouseEvent) {
 
-					RightClickMenuItem copy = new RightClickMenuItem("Copy");
+                if (mouseEvent.getButton() == MouseEvent.BUTTON3) {
 
-					copy.addActionListener(new ActionListener() {
+                    final JPopupMenu popupMenu = new JPopupMenu();
 
-						@Override
-						public void actionPerformed(ActionEvent e) {
-							nameJTextArea.copy();
-							popupMenu.setVisible(false);
-						}
-					});
+                    RightClickMenuItem copy = new RightClickMenuItem("Copy");
 
-					RightClickMenuItem selectAll = new RightClickMenuItem("Select All");
+                    copy.addActionListener(new ActionListener() {
 
-					selectAll.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent actionEvent) {
+                            nameJTextArea.copy();
+                            popupMenu.setVisible(false);
+                        }
+                    });
 
-						@Override
-						public void actionPerformed(ActionEvent e) {
-							nameJTextArea.selectAll();
-							popupMenu.setVisible(false);
+                    RightClickMenuItem selectAll = new RightClickMenuItem("Select All");
 
-						}
-					});
+                    selectAll.addActionListener(new ActionListener() {
 
-					popupMenu.add(copy);
-					popupMenu.add(selectAll);
+                        @Override
+                        public void actionPerformed(ActionEvent actionEvent) {
+                            nameJTextArea.selectAll();
+                            popupMenu.setVisible(false);
 
-					popupMenu.show(e.getComponent(), e.getX(), e.getY());
-				} else {
-					super.mouseClicked(e);
-				}
-			}
+                        }
+                    });
 
-		});
+                    popupMenu.add(copy);
+                    popupMenu.add(selectAll);
 
-		return nameJTextArea;
-	}
+                    popupMenu.show(mouseEvent.getComponent(), mouseEvent.getX(), mouseEvent.getY());
+                } else {
+                    super.mouseClicked(mouseEvent);
+                }
+            }
 
-	private JTextArea getValueJTextArea(String text, Font font) {
+        });
 
-		final JTextArea valueJTextArea = new JTextArea();
+        return nameJTextArea;
+    }
 
-		valueJTextArea.setRows(4);
-		valueJTextArea.setEditable(false);
-		valueJTextArea.setWrapStyleWord(true);
+    private JTextArea getValueJTextArea(String text, Font font) {
 
-		valueJTextArea.setText(text);
+        final JTextArea valueJTextArea = new JTextArea();
 
-		// Font font = getXMLTreeTable().getFont();
-		valueJTextArea.setFont(font);
-		valueJTextArea.setCursor(new Cursor(Cursor.TEXT_CURSOR));
+        valueJTextArea.setRows(4);
+        valueJTextArea.setEditable(false);
+        valueJTextArea.setWrapStyleWord(true);
 
-		valueJTextArea.addMouseListener(new MouseAdapter() {
+        valueJTextArea.setText(text);
 
-			@Override
-			public void mouseClicked(MouseEvent e) {
+        // Font font = getXMLTreeTable().getFont();
+        valueJTextArea.setFont(font);
+        valueJTextArea.setCursor(new Cursor(Cursor.TEXT_CURSOR));
 
-				if (e.getButton() == MouseEvent.BUTTON3) {
-					final JPopupMenu popupMenu = new JPopupMenu();
+        valueJTextArea.addMouseListener(new MouseAdapter() {
 
-					RightClickMenuItem copy = new RightClickMenuItem("Copy");
+            @Override
+            public void mouseClicked(MouseEvent mouseEvent) {
 
-					copy.addActionListener(new ActionListener() {
+                if (mouseEvent.getButton() == MouseEvent.BUTTON3) {
+                    final JPopupMenu popupMenu = new JPopupMenu();
 
-						@Override
-						public void actionPerformed(ActionEvent e) {
-							valueJTextArea.copy();
-							popupMenu.setVisible(false);
-						}
-					});
+                    RightClickMenuItem copy = new RightClickMenuItem("Copy");
 
-					RightClickMenuItem selectAll = new RightClickMenuItem("Select All");
+                    copy.addActionListener(new ActionListener() {
 
-					selectAll.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent actionEvent) {
+                            valueJTextArea.copy();
+                            popupMenu.setVisible(false);
+                        }
+                    });
 
-						@Override
-						public void actionPerformed(ActionEvent e) {
-							valueJTextArea.selectAll();
-							popupMenu.setVisible(false);
+                    RightClickMenuItem selectAll = new RightClickMenuItem("Select All");
 
-						}
-					});
+                    selectAll.addActionListener(new ActionListener() {
 
-					final boolean currentWrap = valueJTextArea.getLineWrap();
-					String menuItemText = currentWrap ? "Undo word wrap" : "Word wrap";
+                        @Override
+                        public void actionPerformed(ActionEvent actionEvent) {
+                            valueJTextArea.selectAll();
+                            popupMenu.setVisible(false);
 
-					RightClickMenuItem wordWrap = new RightClickMenuItem(menuItemText);
+                        }
+                    });
 
-					wordWrap.addActionListener(new ActionListener() {
+                    final boolean currentWrap = valueJTextArea.getLineWrap();
+                    String menuItemText = currentWrap ? "Undo word wrap" : "Word wrap";
 
-						@Override
-						public void actionPerformed(ActionEvent e) {
+                    RightClickMenuItem wordWrap = new RightClickMenuItem(menuItemText);
 
-							valueJTextArea.setLineWrap(!currentWrap);
+                    wordWrap.addActionListener(new ActionListener() {
 
-							popupMenu.setVisible(false);
+                        @Override
+                        public void actionPerformed(ActionEvent actionEvent) {
 
-						}
-					});
+                            valueJTextArea.setLineWrap(!currentWrap);
 
-					popupMenu.add(copy);
-					popupMenu.add(selectAll);
-					popupMenu.add(wordWrap);
+                            popupMenu.setVisible(false);
 
-					popupMenu.show(e.getComponent(), e.getX(), e.getY());
-				} else {
-					super.mouseClicked(e);
-				}
-			}
+                        }
+                    });
 
-		});
+                    popupMenu.add(copy);
+                    popupMenu.add(selectAll);
+                    popupMenu.add(wordWrap);
 
-		return valueJTextArea;
-	}
+                    popupMenu.show(mouseEvent.getComponent(), mouseEvent.getX(), mouseEvent.getY());
+                } else {
+                    super.mouseClicked(mouseEvent);
+                }
+            }
 
-	private JTable getTablefromMap(String nodeName, TreeMap<String, String> nameValueMap, boolean primarySearchFound,
-			String primarySearch, boolean secondarySearchFound, String secondarySearch) {
+        });
 
-		DefaultTableModel dtm = new DefaultTableModel(new String[] { "Name", "Value" }, 0);
+        return valueJTextArea;
+    }
 
-		for (Map.Entry<String, String> entrySet : nameValueMap.entrySet()) {
+    private JTable getTablefromMap(TreeMap<String, String> nameValueMap, boolean primarySearchFound,
+            String primarySearch, boolean secondarySearchFound, String secondarySearch) {
 
-			dtm.addRow(new String[] { entrySet.getKey(), entrySet.getValue() });
-		}
+        DefaultTableModel dtm = new DefaultTableModel(new String[] { "Name", "Value" }, 0);
 
-		final JTable nameValueTable = new JTable(dtm);
+        for (Map.Entry<String, String> entrySet : nameValueMap.entrySet()) {
 
-		nameValueTable.setRowHeight(20);
+            dtm.addRow(new String[] { entrySet.getKey(), entrySet.getValue() });
+        }
 
-		JTableHeader tableHeader = nameValueTable.getTableHeader();
+        final JTable nameValueTable = new JTable(dtm);
 
-		DefaultTableCellRenderer dtcr = (DefaultTableCellRenderer) tableHeader.getDefaultRenderer();
-		dtcr.setHorizontalAlignment(SwingConstants.CENTER);
+        nameValueTable.setRowHeight(20);
 
-		Font existingFont = tableHeader.getFont();
-		String existingFontName = existingFont.getName();
-		int existFontSize = existingFont.getSize();
-		Font newFont = new Font(existingFontName, Font.BOLD, existFontSize);
-		tableHeader.setFont(newFont);
+        JTableHeader tableHeader = nameValueTable.getTableHeader();
 
-		tableHeader.setReorderingAllowed(false);
+        DefaultTableCellRenderer dtcr = (DefaultTableCellRenderer) tableHeader.getDefaultRenderer();
+        dtcr.setHorizontalAlignment(SwingConstants.CENTER);
 
-		TableColumnModel tcm = nameValueTable.getColumnModel();
+        Font existingFont = tableHeader.getFont();
+        String existingFontName = existingFont.getName();
+        int existFontSize = existingFont.getSize();
+        Font newFont = new Font(existingFontName, Font.BOLD, existFontSize);
+        tableHeader.setFont(newFont);
 
-		for (int column = 0; column < dtm.getColumnCount(); column++) {
+        tableHeader.setReorderingAllowed(false);
 
-			TableColumn tc = tcm.getColumn(column);
-			DefaultTableCellRenderer cdtcr = getDefaultTableCellRenderer(primarySearchFound, primarySearch,
-					secondarySearchFound, secondarySearch);
+        TableColumnModel tcm = nameValueTable.getColumnModel();
 
-			tc.setCellRenderer(cdtcr);
-		}
+        for (int column = 0; column < dtm.getColumnCount(); column++) {
 
-		nameValueTable.setTransferHandler(new TransferHandler() {
+            TableColumn tc = tcm.getColumn(column);
+            DefaultTableCellRenderer cdtcr = getDefaultTableCellRenderer(primarySearchFound, primarySearch,
+                    secondarySearchFound, secondarySearch);
 
-			private static final long serialVersionUID = -985293381481032831L;
+            tc.setCellRenderer(cdtcr);
+        }
 
-			@SuppressWarnings("unchecked")
-			@Override
-			protected Transferable createTransferable(JComponent c) {
+        nameValueTable.setTransferHandler(new TransferHandler() {
 
-				int[] selectedRows = nameValueTable.getSelectedRows();
+            private static final long serialVersionUID = -985293381481032831L;
 
-				StringBuffer dataSB = new StringBuffer();
+            @SuppressWarnings("unchecked")
+            @Override
+            protected Transferable createTransferable(JComponent component) {
 
-				if (selectedRows != null) {
+                int[] selectedRows = nameValueTable.getSelectedRows();
 
-					for (int selectedRow : selectedRows) {
+                StringBuilder dataSB = new StringBuilder();
 
-						DefaultTableModel dtm = (DefaultTableModel) nameValueTable.getModel();
+                if (selectedRows != null) {
 
-						Vector<String> row = (Vector<String>) dtm.getDataVector().elementAt(selectedRow);
+                    for (int selectedRow : selectedRows) {
 
-						for (String col : row) {
-							dataSB.append(col);
-							dataSB.append("\t");
-						}
+                        DefaultTableModel dtm = (DefaultTableModel) nameValueTable.getModel();
 
-						dataSB.append(System.getProperty("line.separator"));
-					}
+                        Vector<String> row = (Vector<String>) dtm.getDataVector().elementAt(selectedRow);
 
-				}
+                        for (String col : row) {
+                            dataSB.append(col);
+                            dataSB.append("\t");
+                        }
 
-				return new StringSelection(dataSB.toString());
-			}
+                        dataSB.append(System.getProperty("line.separator"));
+                    }
 
-			@Override
-			public int getSourceActions(JComponent c) {
-				return TransferHandler.COPY;
-			}
+                }
 
-		});
+                return new StringSelection(dataSB.toString());
+            }
 
-		nameValueTable.addMouseListener(new MouseAdapter() {
+            @Override
+            public int getSourceActions(JComponent component) {
+                return TransferHandler.COPY;
+            }
 
-			@Override
-			public void mouseClicked(MouseEvent e) {
+        });
 
-				if (SwingUtilities.isRightMouseButton(e) && e.getSource().equals(nameValueTable)) {
+        nameValueTable.addMouseListener(new MouseAdapter() {
 
-					final List<Integer> selectedRowList = new ArrayList<Integer>();
+            @Override
+            public void mouseClicked(MouseEvent mouseEvent) {
 
-					int[] selectedRows = nameValueTable.getSelectedRows();
+                if (SwingUtilities.isRightMouseButton(mouseEvent) && mouseEvent.getSource().equals(nameValueTable)) {
 
-					// in case the row was not selected when right clicking then
-					// based on the point, select the row.
-					Point point = e.getPoint();
+                    final List<Integer> selectedRowList = new ArrayList<Integer>();
 
-					if ((selectedRows != null) && (selectedRows.length <= 1)) {
+                    int[] selectedRows = nameValueTable.getSelectedRows();
 
-						int selectedRow = nameValueTable.rowAtPoint(point);
+                    // in case the row was not selected when right clicking then
+                    // based on the point, select the row.
+                    Point point = mouseEvent.getPoint();
 
-						if (selectedRow != -1) {
-							// select the row first
-							nameValueTable.setRowSelectionInterval(selectedRow, selectedRow);
-							selectedRows = new int[] { selectedRow };
-						}
-					}
+                    if ((selectedRows != null) && (selectedRows.length <= 1)) {
 
-					for (int selectedRow : selectedRows) {
-						selectedRowList.add(selectedRow);
-					}
+                        int selectedRow = nameValueTable.rowAtPoint(point);
 
-					final int size = selectedRowList.size();
+                        if (selectedRow != -1) {
+                            // select the row first
+                            nameValueTable.setRowSelectionInterval(selectedRow, selectedRow);
+                            selectedRows = new int[] { selectedRow };
+                        }
+                    }
 
-					if (size > 0) {
+                    for (int selectedRow : selectedRows) {
+                        selectedRowList.add(selectedRow);
+                    }
 
-						final DefaultTableModel dtm = (DefaultTableModel) nameValueTable.getModel();
+                    final int size = selectedRowList.size();
 
-						final JPopupMenu popupMenu = new JPopupMenu();
+                    if (size > 0) {
 
-						final RightClickMenuItem copyRow = new RightClickMenuItem("Copy");
+                        final DefaultTableModel dtm = (DefaultTableModel) nameValueTable.getModel();
 
-						copyRow.addActionListener(new ActionListener() {
+                        final JPopupMenu popupMenu = new JPopupMenu();
 
-							@SuppressWarnings("unchecked")
-							@Override
-							public void actionPerformed(ActionEvent e) {
+                        final RightClickMenuItem copyRow = new RightClickMenuItem("Copy");
 
-								Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                        copyRow.addActionListener(new ActionListener() {
 
-								StringBuffer dataSB = new StringBuffer();
+                            @SuppressWarnings("unchecked")
+                            @Override
+                            public void actionPerformed(ActionEvent actionEvent) {
 
-								for (int selectedRow : selectedRowList) {
+                                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 
-									Vector<String> row = (Vector<String>) dtm.getDataVector().elementAt(selectedRow);
+                                StringBuilder dataSB = new StringBuilder();
 
-									for (String col : row) {
-										dataSB.append(col);
-										dataSB.append("\t");
-									}
+                                for (int selectedRow : selectedRowList) {
 
-									dataSB.append(System.getProperty("line.separator"));
-								}
+                                    Vector<String> row = (Vector<String>) dtm.getDataVector().elementAt(selectedRow);
 
-								clipboard.setContents(new StringSelection(dataSB.toString()), copyRow);
+                                    for (String col : row) {
+                                        dataSB.append(col);
+                                        dataSB.append("\t");
+                                    }
 
-								popupMenu.setVisible(false);
-							}
+                                    dataSB.append(System.getProperty("line.separator"));
+                                }
 
-						});
+                                clipboard.setContents(new StringSelection(dataSB.toString()), copyRow);
 
-						popupMenu.add(copyRow);
+                                popupMenu.setVisible(false);
+                            }
 
-						final RightClickMenuItem copyTable = new RightClickMenuItem("Copy Table");
+                        });
 
-						copyTable.addActionListener(new ActionListener() {
+                        popupMenu.add(copyRow);
 
-							@SuppressWarnings("unchecked")
-							@Override
-							public void actionPerformed(ActionEvent e) {
+                        final RightClickMenuItem copyTable = new RightClickMenuItem("Copy Table");
 
-								Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                        copyTable.addActionListener(new ActionListener() {
 
-								StringBuffer dataSB = new StringBuffer();
+                            @SuppressWarnings("unchecked")
+                            @Override
+                            public void actionPerformed(ActionEvent actionEvent) {
 
-								Vector<Vector<String>> rows = dtm.getDataVector();
+                                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 
-								for (Vector<String> row : rows) {
+                                StringBuilder dataSB = new StringBuilder();
 
-									for (String col : row) {
-										dataSB.append(col);
-										dataSB.append("\t");
-									}
+                                Iterator<?> dataIt = dtm.getDataVector().iterator();
 
-									dataSB.append(System.getProperty("line.separator"));
-								}
+                                while (dataIt.hasNext()) {
 
-								clipboard.setContents(new StringSelection(dataSB.toString()), copyTable);
+                                    Vector<String> row = (Vector<String>) dataIt.next();
 
-								popupMenu.setVisible(false);
-							}
+                                    for (String col : row) {
+                                        dataSB.append(col);
+                                        dataSB.append("\t");
+                                    }
 
-						});
+                                    dataSB.append(System.getProperty("line.separator"));
+                                }
 
-						popupMenu.add(copyTable);
+                                clipboard.setContents(new StringSelection(dataSB.toString()), copyTable);
 
-						popupMenu.show(e.getComponent(), e.getX(), e.getY());
-					}
+                                popupMenu.setVisible(false);
+                            }
 
-				}
-			}
+                        });
 
-		});
+                        popupMenu.add(copyTable);
 
-		return nameValueTable;
-	}
+                        popupMenu.show(mouseEvent.getComponent(), mouseEvent.getX(), mouseEvent.getY());
+                    }
 
-	private DefaultTableCellRenderer getDefaultTableCellRenderer(final boolean primarySearchFound,
-			final String primarySearch, final boolean secondarySearchFound, final String secondarySearch) {
+                }
+            }
 
-		DefaultTableCellRenderer dtcr = new DefaultTableCellRenderer() {
+        });
 
-			private static final long serialVersionUID = 7231010655893711987L;
+        return nameValueTable;
+    }
 
-			@Override
-			public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-					boolean hasFocus, int row, int column) {
+    private DefaultTableCellRenderer getDefaultTableCellRenderer(final boolean primarySearchFound,
+            final String primarySearch, final boolean secondarySearchFound, final String secondarySearch) {
 
-				super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+        DefaultTableCellRenderer dtcr = new DefaultTableCellRenderer() {
 
-				setBorder(new EmptyBorder(1, 5, 1, 1));
+            private static final long serialVersionUID = 7231010655893711987L;
 
-				if (!isSelected) {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+                    boolean hasFocus, int row, int column) {
 
-					if (primarySearchFound || secondarySearchFound) {
+                super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 
-						boolean isBackgroundSet = false;
+                setBorder(new EmptyBorder(1, 5, 1, 1));
 
-						if ((value != null) && (!"".equals(value)) && (primarySearchFound)) {
+                if (!isSelected) {
 
-							String upperText = ((String) value).toUpperCase();
-							String upperPrimarySearch = primarySearch.toUpperCase();
+                    if (primarySearchFound || secondarySearchFound) {
 
-							if (upperText.indexOf(upperPrimarySearch) > -1) {
-								setBackground(MyColor.LIGHT_YELLOW);
-								isBackgroundSet = true;
-							}
-						}
+                        boolean isBackgroundSet = false;
 
-						if ((value != null) && (!"".equals(value)) && (secondarySearchFound)) {
-							String upperText = ((String) value).toUpperCase();
-							String upperSecondarySearch = secondarySearch.toUpperCase();
+                        if ((value != null) && (!"".equals(value)) && (primarySearchFound)) {
 
-							if (upperText.indexOf(upperSecondarySearch) > -1) {
-								setBackground(MyColor.LIME);
-								isBackgroundSet = true;
-							}
-						}
+                            String upperText = ((String) value).toUpperCase();
+                            String upperPrimarySearch = primarySearch.toUpperCase();
 
-						if (!isBackgroundSet) {
-							if ((row % 2) == 0) {
-								setBackground(MyColor.LIGHTEST_LIGHT_GRAY);
-							} else {
-								setBackground(Color.WHITE);
-							}
-						}
+                            if (upperText.indexOf(upperPrimarySearch) > -1) {
+                                setBackground(MyColor.LIGHT_YELLOW);
+                                isBackgroundSet = true;
+                            }
+                        }
 
-					} else if ((row % 2) == 0) {
-						setBackground(MyColor.LIGHTEST_LIGHT_GRAY);
-					} else {
-						setBackground(Color.WHITE);
-					}
-				}
-				return this;
-			}
+                        if ((value != null) && (!"".equals(value)) && (secondarySearchFound)) {
+                            String upperText = ((String) value).toUpperCase();
+                            String upperSecondarySearch = secondarySearch.toUpperCase();
 
-		};
+                            if (upperText.indexOf(upperSecondarySearch) > -1) {
+                                setBackground(MyColor.LIME);
+                                isBackgroundSet = true;
+                            }
+                        }
 
-		return dtcr;
-	}
+                        if (!isBackgroundSet) {
+                            if ((row % 2) == 0) {
+                                setBackground(MyColor.LIGHTEST_LIGHT_GRAY);
+                            } else {
+                                setBackground(Color.WHITE);
+                            }
+                        }
 
-	private void performTextAreaHighlight(XMLNode xmlNode, int index, JTextArea jTextArea, String[] primarySearchArray,
-			String secondarySearch) {
+                    } else if ((row % 2) == 0) {
+                        setBackground(MyColor.LIGHTEST_LIGHT_GRAY);
+                    } else {
+                        setBackground(Color.WHITE);
+                    }
+                }
+                return this;
+            }
 
-		boolean searchFound = xmlNode.isSearchFound(index);
+        };
 
-		if (searchFound) {
+        return dtcr;
+    }
 
-			for (String searchText : primarySearchArray) {
-				highlightSearchText(jTextArea, searchText, primarySearchHighlightPainter);
-			}
-		}
+    private void performTextAreaHighlight(XMLNode xmlNode, int index, JTextArea textArea, String[] primarySearchArray,
+            String secondarySearch) {
 
-		searchFound = xmlNode.isSecondarySearchFound(index);
+        boolean searchFound = xmlNode.isSearchFound(index);
 
-		if (searchFound) {
-			highlightSearchText(jTextArea, secondarySearch, secondarySearchHighlightPainter);
-		}
+        if (searchFound) {
 
-	}
+            for (String searchText : primarySearchArray) {
+                highlightSearchText(textArea, searchText, primarySearchHighlightPainter);
+            }
+        }
 
-	private void highlightSearchText(JTextArea jTextArea, String searchStr,
-			Highlighter.HighlightPainter highlightPainter) {
+        searchFound = xmlNode.isSecondarySearchFound(index);
 
-		Highlighter highlighter = jTextArea.getHighlighter();
+        if (searchFound) {
+            highlightSearchText(textArea, secondarySearch, secondarySearchHighlightPainter);
+        }
 
-		// highlighter.removeAllHighlights();
+    }
 
-		if ((searchStr != null) && (!"".equals(searchStr))) {
+    private void highlightSearchText(JTextArea textArea, String searchStr,
+            Highlighter.HighlightPainter highlightPainter) {
 
-			String searchText = searchStr;
-			String textAreaText = jTextArea.getText();
-			textAreaText = textAreaText.toUpperCase();
+        Highlighter highlighter = textArea.getHighlighter();
 
-			searchText = searchText.toUpperCase();
+        // highlighter.removeAllHighlights();
 
-			byte[] textAreaTextBytes = textAreaText.getBytes();
-			byte[] searchTextBytes = searchText.getBytes();
+        if ((searchStr != null) && (!"".equals(searchStr))) {
 
-			try {
+            String searchText = searchStr;
+            String textAreaText = textArea.getText();
+            textAreaText = textAreaText.toUpperCase();
 
-				int index = KnuthMorrisPrattAlgorithm.indexOf(textAreaTextBytes, searchTextBytes);
+            searchText = searchText.toUpperCase();
 
-				while (index != -1) {
+            byte[] textAreaTextBytes = textAreaText.getBytes(charset);
+            byte[] searchTextBytes = searchText.getBytes(charset);
 
-					int endPos = index + searchTextBytes.length;
+            try {
 
-					highlighter.addHighlight(index, endPos, highlightPainter);
+                int index = KnuthMorrisPrattAlgorithm.indexOf(textAreaTextBytes, searchTextBytes);
 
-					index = KnuthMorrisPrattAlgorithm.indexOf(textAreaTextBytes, searchTextBytes, endPos);
-				}
+                while (index != -1) {
 
-			} catch (BadLocationException ble) {
-				LOG.error("Error in highlight Search Text: " + searchStr, ble);
-			}
-		}
-	}
+                    int endPos = index + searchTextBytes.length;
+
+                    highlighter.addHighlight(index, endPos, highlightPainter);
+
+                    index = KnuthMorrisPrattAlgorithm.indexOf(textAreaTextBytes, searchTextBytes, endPos);
+                }
+
+            } catch (BadLocationException ble) {
+                LOG.error("Error in highlight Search Text: " + searchStr, ble);
+            }
+        }
+    }
 }

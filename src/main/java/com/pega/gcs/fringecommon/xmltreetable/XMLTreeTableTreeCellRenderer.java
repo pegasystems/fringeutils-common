@@ -4,13 +4,14 @@
  * Contributors:
  *     Manu Varghese
  *******************************************************************************/
+
 package com.pega.gcs.fringecommon.xmltreetable;
 
 import java.awt.Component;
 
 import javax.swing.JTree;
 
-import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 
 import com.pega.gcs.fringecommon.guiutilities.treetable.AbstractTreeTable;
 import com.pega.gcs.fringecommon.guiutilities.treetable.AbstractTreeTableNode;
@@ -18,31 +19,31 @@ import com.pega.gcs.fringecommon.guiutilities.treetable.DefaultTreeTableTreeCell
 
 public class XMLTreeTableTreeCellRenderer extends DefaultTreeTableTreeCellRenderer {
 
-	private static final long serialVersionUID = -942338087585748532L;
+    private static final long serialVersionUID = -942338087585748532L;
 
-	public XMLTreeTableTreeCellRenderer(AbstractTreeTable treeTable) {
-		super(treeTable);
-	}
+    public XMLTreeTableTreeCellRenderer(AbstractTreeTable treeTable) {
+        super(treeTable);
+    }
 
-	@Override
-	public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf,
-			int row, boolean hasFocus) {
+    @Override
+    public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf,
+            int row, boolean hasFocus) {
 
-		Component component = super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+        Component component = super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
 
-		AbstractTreeTableNode abstractTreeTableNode = (AbstractTreeTableNode) value;
-		String text = abstractTreeTableNode.getNodeName();
+        AbstractTreeTableNode abstractTreeTableNode = (AbstractTreeTableNode) value;
+        String text = abstractTreeTableNode.getNodeName();
 
-		XMLTreeTable xmlTreeTable = (XMLTreeTable) getTreeTable();
+        XMLTreeTable xmlTreeTable = (XMLTreeTable) getTreeTable();
 
-		if (xmlTreeTable.isUnescapeHTMLText()) {
-			text = StringEscapeUtils.unescapeHtml4(text);
-		}
+        if (xmlTreeTable.isUnescapeHtmlText()) {
+            text = StringEscapeUtils.unescapeHtml4(text);
+        }
 
-		setText(text);
+        setText(text);
 
-		return component;
+        return component;
 
-	}
+    }
 
 }

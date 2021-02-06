@@ -1,2 +1,12 @@
-/target/
+.classpath
+.project
+*.log
+*.txt
 /.settings/
+/.DS_Store
+/.gradle/
+/.idea/
+/build/
+/bin/
+/target/
+/logs/

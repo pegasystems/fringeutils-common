@@ -4,6 +4,7 @@
  * Contributors:
  *     Manu Varghese
  *******************************************************************************/
+
 package com.pega.gcs.fringecommon.utilities.kyro;
 
 import java.io.ByteArrayInputStream;
@@ -19,73 +20,65 @@ import net.jpountz.lz4.LZ4BlockOutputStream;
 
 public class KryoSerializer {
 
-	private static final Log4j2Helper LOG = new Log4j2Helper(KryoSerializer.class);
+    private static final Log4j2Helper LOG = new Log4j2Helper(KryoSerializer.class);
 
-	private static final ThreadLocal<Kryo> kryoThreadLocal = new ThreadLocal<Kryo>() {
+    private static final ThreadLocal<Kryo> kryoThreadLocal = new ThreadLocal<Kryo>() {
 
-		@Override
-		protected Kryo initialValue() {
-			Kryo kryo = new Kryo();
-			return kryo;
-		}
+        @Override
+        protected Kryo initialValue() {
+            Kryo kryo = new Kryo();
+            return kryo;
+        }
 
-	};
+    };
 
-	public static byte[] compress(Object object) throws Exception {
+    public static byte[] compress(Object object) throws Exception {
 
-		byte[] byteArray = null;
+        byte[] byteArray = null;
 
-		if (object != null) {
+        if (object != null) {
 
-			// Serialise to a byte array
-			try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            // Serialise to a byte array
+            try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
 
-				try (LZ4BlockOutputStream lz4bos = new LZ4BlockOutputStream(baos); Output output = new Output(lz4bos)) {
+                try (LZ4BlockOutputStream lz4bos = new LZ4BlockOutputStream(baos); Output output = new Output(lz4bos)) {
 
-					Kryo kryo = kryoThreadLocal.get();
-					kryo.register(object.getClass());
-					kryo.writeObject(output, object);
+                    Kryo kryo = kryoThreadLocal.get();
+                    kryo.register(object.getClass());
+                    kryo.writeObject(output, object);
 
-				} catch (Exception e) {
-					LOG.error("Error compressing object", e);
-					throw e;
-				} finally {
-					baos.close();
-					byteArray = baos.toByteArray();
-				}
-			}
-		} else {
-			LOG.info("compress Object is null");
-		}
+                } finally {
+                    baos.close();
+                    byteArray = baos.toByteArray();
+                }
+            }
+        } else {
+            LOG.info("compress Object is null");
+        }
 
-		LOG.debug("Object compressed to: " + byteArray.length);
+        LOG.debug("Object compressed to: " + byteArray.length);
 
-		return byteArray;
-	}
+        return byteArray;
+    }
 
-	public static <T> T decompress(byte[] serialized, Class<T> clazz) throws Exception {
+    public static <T> T decompress(byte[] serialized, Class<T> clazz) throws Exception {
 
-		T object = null;
+        T object = null;
 
-		if (serialized != null) {
+        if (serialized != null) {
 
-			// deserialize from a byte array
-			try (ByteArrayInputStream bais = new ByteArrayInputStream(serialized);
-					LZ4BlockInputStream lz4bis = new LZ4BlockInputStream(bais);
-					Input input = new Input(lz4bis)) {
+            // deserialize from a byte array
+            try (ByteArrayInputStream bais = new ByteArrayInputStream(serialized);
+                    LZ4BlockInputStream lz4bis = new LZ4BlockInputStream(bais);
+                    Input input = new Input(lz4bis)) {
 
-				Kryo kryo = kryoThreadLocal.get();
-				object = kryo.readObject(input, clazz);
+                Kryo kryo = kryoThreadLocal.get();
+                object = kryo.readObject(input, clazz);
+            }
+        } else {
+            LOG.info("decompress Object is null");
+        }
 
-			} catch (Exception e) {
-				LOG.error("Error decompressing object", e);
-				throw e;
-			}
-		} else {
-			LOG.info("decompress Object is null");
-
-		}
-
-		return object;
-	}
+        return object;
+    }
 }

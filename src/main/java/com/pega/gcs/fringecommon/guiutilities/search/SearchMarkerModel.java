@@ -4,6 +4,7 @@
  * Contributors:
  *     Manu Varghese
  *******************************************************************************/
+
 package com.pega.gcs.fringecommon.guiutilities.search;
 
 import java.awt.Color;
@@ -18,68 +19,69 @@ import com.pega.gcs.fringecommon.log4j2.Log4j2Helper;
 
 public class SearchMarkerModel<T> extends MarkerModel<T> {
 
-	private static final Log4j2Helper LOG = new Log4j2Helper(SearchMarkerModel.class);
+    private static final Log4j2Helper LOG = new Log4j2Helper(SearchMarkerModel.class);
 
-	public SearchMarkerModel(FilterTableModel<? super T> filterTableModel) {
+    public SearchMarkerModel(FilterTableModel<? super T> filterTableModel) {
 
-		super(Color.YELLOW, filterTableModel);
+        super(Color.YELLOW, filterTableModel);
 
-		resetFilteredMarkerMap();
+        resetFilteredMarkerMap();
 
-	}
+    }
 
-	@Override
-	protected void resetFilteredMarkerMap() {
+    @Override
+    protected void resetFilteredMarkerMap() {
 
-		clearFilteredMarkerMap();
+        clearFilteredMarkerMap();
 
-		FilterTableModel<? super T> filterTableModel;
-		filterTableModel = getFilterTableModel();
+        FilterTableModel<? super T> filterTableModel;
+        filterTableModel = getFilterTableModel();
 
-		SearchModel<T> searchModel = (SearchModel<T>) filterTableModel.getSearchModel();
+        @SuppressWarnings("unchecked")
+        SearchModel<T> searchModel = (SearchModel<T>) filterTableModel.getSearchModel();
 
-		Object searchStrObj = searchModel.getSearchStrObj();
+        Object searchStrObj = searchModel.getSearchStrObj();
 
-		List<? super T> searchResultList = searchModel.getSearchResultList(searchStrObj);
+        List<? super T> searchResultList = searchModel.getSearchResultList(searchStrObj);
 
-		if (searchResultList != null) {
-			Iterator<? super T> iterator = searchResultList.iterator();
+        if (searchResultList != null) {
+            Iterator<? super T> iterator = searchResultList.iterator();
 
-			while (iterator.hasNext()) {
+            while (iterator.hasNext()) {
 
-				@SuppressWarnings("unchecked")
-				T key = (T) iterator.next();
+                @SuppressWarnings("unchecked")
+                T key = (T) iterator.next();
 
-				addToFilteredMarkerMap(key);
-			}
-		}
-	}
+                addToFilteredMarkerMap(key);
+            }
+        }
+    }
 
-	@Override
-	public List<Marker<T>> getMarkers(T key) {
+    @Override
+    public List<Marker<T>> getMarkers(T key) {
 
-		Marker<T> marker = new Marker<T>(key, key.toString());
+        Marker<T> marker = new Marker<T>(key, key.toString());
 
-		List<Marker<T>> markerList = new ArrayList<>();
-		markerList.add(marker);
+        List<Marker<T>> markerList = new ArrayList<>();
+        markerList.add(marker);
 
-		return markerList;
-	}
+        return markerList;
+    }
 
-	@Override
-	public void addMarker(Marker<T> marker) {
-		LOG.info("Error: SearchMarkerModel doesnt explictly add marker.");
-	}
+    @Override
+    public void addMarker(Marker<T> marker) {
+        LOG.info("Error: SearchMarkerModel doesnt explictly add marker.");
+    }
 
-	@Override
-	public void removeMarker(T key, int index) {
-		LOG.info("Error: SearchMarkerModel doesnt explictly remove marker.");
-	}
+    @Override
+    public void removeMarker(T key, int index) {
+        LOG.info("Error: SearchMarkerModel doesnt explictly remove marker.");
+    }
 
-	@Override
-	public void clearMarkers() {
-		LOG.info("Error: SearchMarkerModel doesnt explictly clear markers.");
+    @Override
+    public void clearMarkers() {
+        LOG.info("Error: SearchMarkerModel doesnt explictly clear markers.");
 
-	}
+    }
 
 }

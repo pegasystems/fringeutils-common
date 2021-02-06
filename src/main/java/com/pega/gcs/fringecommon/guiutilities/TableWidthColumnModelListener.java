@@ -4,6 +4,7 @@
  * Contributors:
  *     Manu Varghese
  *******************************************************************************/
+
 package com.pega.gcs.fringecommon.guiutilities;
 
 import java.util.ArrayList;
@@ -18,64 +19,64 @@ import javax.swing.table.TableColumnModel;
 
 public class TableWidthColumnModelListener implements TableColumnModelListener {
 
-	private List<JTable> tableList;
+    private List<JTable> tableList;
 
-	public TableWidthColumnModelListener() {
-		super();
+    public TableWidthColumnModelListener() {
+        super();
 
-		tableList = new ArrayList<JTable>();
+        tableList = new ArrayList<JTable>();
 
-	}
+    }
 
-	@Override
-	public void columnAdded(TableColumnModelEvent e) {
-		// do nothing
-	}
+    @Override
+    public void columnAdded(TableColumnModelEvent tableColumnModelEvent) {
+        // do nothing
+    }
 
-	@Override
-	public void columnRemoved(TableColumnModelEvent e) {
-		// do nothing
-	}
+    @Override
+    public void columnRemoved(TableColumnModelEvent tableColumnModelEvent) {
+        // do nothing
+    }
 
-	@Override
-	public void columnMoved(TableColumnModelEvent e) {
-		// do nothing
-	}
+    @Override
+    public void columnMoved(TableColumnModelEvent tableColumnModelEvent) {
+        // do nothing
+    }
 
-	@Override
-	public void columnMarginChanged(ChangeEvent e) {
+    @Override
+    public void columnMarginChanged(ChangeEvent changeEvent) {
 
-		TableColumnModel tableColumnModel = (TableColumnModel) e.getSource();
+        TableColumnModel tableColumnModel = (TableColumnModel) changeEvent.getSource();
 
-		for (JTable table : tableList) {
+        for (JTable table : tableList) {
 
-			TableColumnModel tcm = table.getColumnModel();
+            TableColumnModel tcm = table.getColumnModel();
 
-			// exclude the source
-			if (tableColumnModel != tcm) {
+            // exclude the source
+            if (tableColumnModel != tcm) {
 
-				// disable the listener temporarily while the width is changed
-				tcm.removeColumnModelListener(this);
+                // disable the listener temporarily while the width is changed
+                tcm.removeColumnModelListener(this);
 
-				for (int i = 0; i < tcm.getColumnCount(); i++) {
-					tcm.getColumn(i).setPreferredWidth(tableColumnModel.getColumn(i).getWidth());
-				}
+                for (int i = 0; i < tcm.getColumnCount(); i++) {
+                    tcm.getColumn(i).setPreferredWidth(tableColumnModel.getColumn(i).getWidth());
+                }
 
-				tcm.addColumnModelListener(this);
-			}
+                tcm.addColumnModelListener(this);
+            }
 
-		}
-	}
+        }
+    }
 
-	@Override
-	public void columnSelectionChanged(ListSelectionEvent e) {
-		// do nothing
-	}
+    @Override
+    public void columnSelectionChanged(ListSelectionEvent listSelectionEvent) {
+        // do nothing
+    }
 
-	public void addTable(JTable jTable) {
+    public void addTable(JTable table) {
 
-		tableList.add(jTable);
+        tableList.add(table);
 
-	}
+    }
 
 }

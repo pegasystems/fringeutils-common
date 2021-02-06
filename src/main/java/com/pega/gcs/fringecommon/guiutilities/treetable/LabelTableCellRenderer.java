@@ -4,6 +4,7 @@
  * Contributors:
  *     Manu Varghese
  *******************************************************************************/
+
 package com.pega.gcs.fringecommon.guiutilities.treetable;
 
 import java.awt.Component;
@@ -14,45 +15,45 @@ import javax.swing.table.DefaultTableCellRenderer;
 
 public class LabelTableCellRenderer extends DefaultTableCellRenderer {
 
-	private static final long serialVersionUID = -5126251432557378970L;
+    private static final long serialVersionUID = -5126251432557378970L;
 
-	public LabelTableCellRenderer() {
+    public LabelTableCellRenderer() {
 
-		super();
+        super();
 
-		setBorder(new EmptyBorder(2, 5, 2, 2));
-		setOpaque(true);
+        setBorder(new EmptyBorder(2, 5, 2, 2));
+        setOpaque(true);
 
-	}
+    }
 
-	@Override
-	public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
-			int row, int column) {
+    @Override
+    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
+            int row, int column) {
 
-		AbstractTreeTableNode abstractTreeTableNode = (AbstractTreeTableNode) value;
+        AbstractTreeTableNode abstractTreeTableNode = (AbstractTreeTableNode) value;
 
-		if (isSelected) {
-			setBackground(table.getSelectionBackground());
-			setForeground(table.getSelectionForeground());
-		} else {
-			setBackground(table.getBackground());
-			setForeground(table.getForeground());
+        if (isSelected) {
+            setBackground(table.getSelectionBackground());
+            setForeground(table.getSelectionForeground());
+        } else {
+            setBackground(table.getBackground());
+            setForeground(table.getForeground());
 
-		}
+        }
 
-		if (abstractTreeTableNode != null) {
-			String text = abstractTreeTableNode.getNodeValue(column);
+        if (abstractTreeTableNode != null) {
+            String text = abstractTreeTableNode.getNodeValue(column);
 
-			setFont(table.getFont());
+            setFont(table.getFont());
 
-			setText(text);
+            setText(text);
 
-			if ((text != null) && (!"".equals(text))) {
-				setToolTipText(text);
-			}
-		}
-		return this;
+            if ((text != null) && (!"".equals(text))) {
+                setToolTipText(text);
+            }
+        }
+        return this;
 
-	}
+    }
 
 }

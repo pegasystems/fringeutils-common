@@ -4,6 +4,7 @@
  * Contributors:
  *     Manu Varghese
  *******************************************************************************/
+
 package com.pega.gcs.fringecommon.guiutilities.bookmark;
 
 import java.awt.Color;
@@ -33,286 +34,260 @@ import com.pega.gcs.fringecommon.guiutilities.markerbar.Marker;
 
 public abstract class BookmarkAddDialog<T> extends JDialog {
 
-	private static final long serialVersionUID = -2026873336640757377L;
+    private static final long serialVersionUID = -2026873336640757377L;
 
-	private BookmarkModel<T> bookmarkModel;
+    private BookmarkModel<T> bookmarkModel;
 
-	private List<T> keyList;
+    private List<T> keyList;
 
-	private JLabel keyJLabel;
+    private JLabel keyLabel;
 
-	private JTextField textJTextField;
+    private JTextField valueTextField;
 
-	private JButton okJButton;
+    private JButton okButton;
 
-	private JButton cancelJButton;
+    private JButton cancelButton;
 
-	private JLabel messageJLabel;
+    public abstract List<Marker<T>> getMarkerList(List<T> keyList, String text);
 
-	public abstract List<Marker<T>> getMarkerList(List<T> keyList, String text);
+    public BookmarkAddDialog(String defaultText, BookmarkModel<T> bookmarkModel, List<T> keyList, ImageIcon appIcon,
+            Component parent) {
 
-	public BookmarkAddDialog(ImageIcon appIcon, Component parent, BookmarkModel<T> bookMarkModel, List<T> keyList) {
+        super();
 
-		super();
+        this.bookmarkModel = bookmarkModel;
+        this.keyList = keyList;
 
-		this.bookmarkModel = bookMarkModel;
-		this.keyList = keyList;
+        setIconImage(appIcon.getImage());
 
-		setIconImage(appIcon.getImage());
+        setPreferredSize(new Dimension(350, 170));
 
-		setPreferredSize(new Dimension(350, 170));
+        setTitle("Add Bookmark");
 
-		setTitle("Add Bookmark");
+        setModalityType(ModalityType.APPLICATION_MODAL);
 
-		setModalityType(ModalityType.APPLICATION_MODAL);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
-		setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setContentPane(getMainPanel());
 
-		setContentPane(getMainJPanel());
+        pack();
 
-		pack();
+        setLocationRelativeTo(parent);
 
-		setLocationRelativeTo(parent);
+        populateDefaultText(defaultText);
 
-		// setVisible called by caller.
-		// setVisible(true);
-	}
+        // setVisible called by caller.
+        // setVisible(true);
+    }
 
-	private JPanel getMainJPanel() {
+    private JPanel getMainPanel() {
 
-		JPanel mainJPanel = new JPanel();
-		LayoutManager layout = new BoxLayout(mainJPanel, BoxLayout.Y_AXIS);
-		mainJPanel.setLayout(layout);
+        JPanel mainPanel = new JPanel();
+        LayoutManager layout = new BoxLayout(mainPanel, BoxLayout.Y_AXIS);
+        mainPanel.setLayout(layout);
 
-		JPanel bookmarkJPanel = getBookmarkJPanel();
-		JLabel messageJLabel = getMessageJLabel();
-		JPanel buttonsJPanel = getButtonsJPanel();
+        JPanel bookmarkPanel = getBookmarkPanel();
+        JPanel buttonsPanel = getButtonsPanel();
 
-		mainJPanel.add(bookmarkJPanel);
-		mainJPanel.add(messageJLabel);
-		mainJPanel.add(buttonsJPanel);
+        mainPanel.add(bookmarkPanel);
+        mainPanel.add(buttonsPanel);
 
-		return mainJPanel;
-	}
+        return mainPanel;
+    }
 
-	private JPanel getBookmarkJPanel() {
+    private JPanel getBookmarkPanel() {
 
-		JPanel bookmarkJPanel = new JPanel();
-		bookmarkJPanel.setLayout(new GridBagLayout());
+        JPanel bookmarkPanel = new JPanel();
 
-		GridBagConstraints gbc1 = new GridBagConstraints();
-		gbc1.gridx = 0;
-		gbc1.gridy = 0;
-		gbc1.weightx = 0.0D;
-		gbc1.weighty = 0.0D;
-		gbc1.fill = GridBagConstraints.BOTH;
-		gbc1.anchor = GridBagConstraints.NORTHWEST;
-		gbc1.insets = new Insets(5, 5, 5, 5);
+        bookmarkPanel.setLayout(new GridBagLayout());
 
-		GridBagConstraints gbc2 = new GridBagConstraints();
-		gbc2.gridx = 1;
-		gbc2.gridy = 0;
-		gbc2.weightx = 1.0D;
-		gbc2.weighty = 0.0D;
-		gbc2.fill = GridBagConstraints.BOTH;
-		gbc2.anchor = GridBagConstraints.NORTHWEST;
-		gbc2.insets = new Insets(5, 5, 5, 5);
+        GridBagConstraints gbc1 = new GridBagConstraints();
+        gbc1.gridx = 0;
+        gbc1.gridy = 0;
+        gbc1.weightx = 0.0D;
+        gbc1.weighty = 0.0D;
+        gbc1.fill = GridBagConstraints.BOTH;
+        gbc1.anchor = GridBagConstraints.NORTHWEST;
+        gbc1.insets = new Insets(10, 10, 3, 2);
 
-		GridBagConstraints gbc3 = new GridBagConstraints();
-		gbc3.gridx = 0;
-		gbc3.gridy = 1;
-		gbc3.weightx = 0.0D;
-		gbc3.weighty = 0.0D;
-		gbc3.fill = GridBagConstraints.BOTH;
-		gbc3.anchor = GridBagConstraints.NORTHWEST;
-		gbc3.insets = new Insets(5, 5, 5, 5);
+        GridBagConstraints gbc2 = new GridBagConstraints();
+        gbc2.gridx = 1;
+        gbc2.gridy = 0;
+        gbc2.weightx = 1.0D;
+        gbc2.weighty = 0.0D;
+        gbc2.fill = GridBagConstraints.BOTH;
+        gbc2.anchor = GridBagConstraints.NORTHWEST;
+        gbc2.insets = new Insets(10, 2, 3, 10);
 
-		GridBagConstraints gbc4 = new GridBagConstraints();
-		gbc4.gridx = 1;
-		gbc4.gridy = 1;
-		gbc4.weightx = 1.0D;
-		gbc4.weighty = 0.0D;
-		gbc4.fill = GridBagConstraints.BOTH;
-		gbc4.anchor = GridBagConstraints.NORTHWEST;
-		gbc4.insets = new Insets(5, 5, 5, 5);
+        GridBagConstraints gbc3 = new GridBagConstraints();
+        gbc3.gridx = 0;
+        gbc3.gridy = 1;
+        gbc3.weightx = 0.0D;
+        gbc3.weighty = 0.0D;
+        gbc3.fill = GridBagConstraints.BOTH;
+        gbc3.anchor = GridBagConstraints.NORTHWEST;
+        gbc3.insets = new Insets(3, 10, 10, 2);
 
-		JLabel label = new JLabel("Key:");
-		JLabel keyJLabel = getKeyJLabel();
-		JLabel textLabel = new JLabel("Bookmark:");
-		JTextField textJTextField = getTextJTextField();
+        GridBagConstraints gbc4 = new GridBagConstraints();
+        gbc4.gridx = 1;
+        gbc4.gridy = 1;
+        gbc4.weightx = 1.0D;
+        gbc4.weighty = 0.0D;
+        gbc4.fill = GridBagConstraints.BOTH;
+        gbc4.anchor = GridBagConstraints.NORTHWEST;
+        gbc4.insets = new Insets(3, 2, 10, 10);
 
-		bookmarkJPanel.add(label, gbc1);
-		bookmarkJPanel.add(keyJLabel, gbc2);
-		bookmarkJPanel.add(textLabel, gbc3);
-		bookmarkJPanel.add(textJTextField, gbc4);
+        JLabel label = new JLabel("Key:");
+        JLabel keyJLabel = getKeyLabel();
+        JLabel textLabel = new JLabel("Bookmark:");
+        JTextField textJTextField = getValueTextField();
 
-		bookmarkJPanel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
-		return bookmarkJPanel;
-	}
+        bookmarkPanel.add(label, gbc1);
+        bookmarkPanel.add(keyJLabel, gbc2);
+        bookmarkPanel.add(textLabel, gbc3);
+        bookmarkPanel.add(textJTextField, gbc4);
 
-	private JPanel getButtonsJPanel() {
-		JPanel buttonsJPanel = new JPanel();
+        bookmarkPanel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
 
-		LayoutManager layout = new BoxLayout(buttonsJPanel, BoxLayout.X_AXIS);
-		buttonsJPanel.setLayout(layout);
+        return bookmarkPanel;
+    }
 
-		JButton okJButton = getOkJButton();
-		JButton cancelJButton = getCancelJButton();
+    private JPanel getButtonsPanel() {
 
-		Dimension dim = new Dimension(5, 30);
-		buttonsJPanel.add(Box.createHorizontalGlue());
-		buttonsJPanel.add(Box.createRigidArea(dim));
-		buttonsJPanel.add(okJButton);
-		buttonsJPanel.add(Box.createRigidArea(dim));
-		buttonsJPanel.add(cancelJButton);
-		buttonsJPanel.add(Box.createRigidArea(dim));
-		buttonsJPanel.add(Box.createHorizontalGlue());
+        JPanel buttonsPanel = new JPanel();
 
-		buttonsJPanel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
-		return buttonsJPanel;
-	}
+        LayoutManager layout = new BoxLayout(buttonsPanel, BoxLayout.X_AXIS);
+        buttonsPanel.setLayout(layout);
 
-	private JLabel getKeyJLabel() {
+        JButton okButton = getOkButton();
+        JButton cancelButton = getCancelButton();
 
-		if (keyJLabel == null) {
+        Dimension dim = new Dimension(20, 40);
 
-			StringBuffer sb = new StringBuffer();
+        buttonsPanel.add(Box.createHorizontalGlue());
+        buttonsPanel.add(Box.createRigidArea(dim));
+        buttonsPanel.add(okButton);
+        buttonsPanel.add(Box.createRigidArea(dim));
+        buttonsPanel.add(cancelButton);
+        buttonsPanel.add(Box.createRigidArea(dim));
+        buttonsPanel.add(Box.createHorizontalGlue());
 
-			boolean isfirst = true;
+        buttonsPanel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
 
-			for (T key : keyList) {
+        return buttonsPanel;
+    }
 
-				if (!isfirst) {
-					sb.append(",");
-				}
+    private JLabel getKeyLabel() {
 
-				isfirst = false;
-				sb.append(key.toString());
+        if (keyLabel == null) {
 
-			}
+            StringBuilder sb = new StringBuilder();
 
-			keyJLabel = new JLabel(sb.toString());
-		}
+            boolean isfirst = true;
 
-		return keyJLabel;
-	}
+            for (T key : keyList) {
 
-	private JTextField getTextJTextField() {
+                if (!isfirst) {
+                    sb.append(",");
+                }
 
-		if (textJTextField == null) {
-			textJTextField = new JTextField();
+                isfirst = false;
+                sb.append(key.toString());
 
-			Dimension size = new Dimension(140, 20);
+            }
 
-			textJTextField.setMinimumSize(size);
-			textJTextField.setPreferredSize(size);
-			textJTextField.setMaximumSize(size);
+            keyLabel = new JLabel(sb.toString());
+        }
 
-			textJTextField.addKeyListener(new KeyAdapter() {
+        return keyLabel;
+    }
 
-				@Override
-				public void keyReleased(KeyEvent event) {
-					if (event.getKeyChar() == KeyEvent.VK_ENTER) {
-						performAddBookMark();
-					}
-				}
-			});
-		}
+    private JTextField getValueTextField() {
 
-		return textJTextField;
-	}
+        if (valueTextField == null) {
 
-	private JButton getOkJButton() {
+            valueTextField = new JTextField();
 
-		if (okJButton == null) {
+            valueTextField.addKeyListener(new KeyAdapter() {
 
-			okJButton = new JButton("OK");
-			okJButton.setToolTipText("OK");
+                @Override
+                public void keyReleased(KeyEvent event) {
+                    if (event.getKeyChar() == KeyEvent.VK_ENTER) {
+                        performAddBookMark();
+                    }
+                }
+            });
+        }
 
-			Dimension size = new Dimension(70, 26);
-			okJButton.setPreferredSize(size);
-			okJButton.setSize(size);
+        return valueTextField;
+    }
 
-			okJButton.addActionListener(new ActionListener() {
+    private JButton getOkButton() {
 
-				@Override
-				public void actionPerformed(ActionEvent event) {
-					performAddBookMark();
-				}
-			});
-		}
+        if (okButton == null) {
 
-		return okJButton;
-	}
+            okButton = new JButton("OK");
+            okButton.setToolTipText("OK");
 
-	/**
-	 * @return the cancelJButton
-	 */
-	private JButton getCancelJButton() {
+            Dimension size = new Dimension(70, 26);
+            okButton.setPreferredSize(size);
 
-		if (cancelJButton == null) {
+            okButton.addActionListener(new ActionListener() {
 
-			cancelJButton = new JButton("Cancel");
-			cancelJButton.setToolTipText("Cancel");
+                @Override
+                public void actionPerformed(ActionEvent event) {
+                    performAddBookMark();
+                }
+            });
+        }
 
-			Dimension size = new Dimension(70, 26);
-			cancelJButton.setPreferredSize(size);
-			cancelJButton.setSize(size);
+        return okButton;
+    }
 
-			cancelJButton.addActionListener(new ActionListener() {
+    private JButton getCancelButton() {
 
-				@Override
-				public void actionPerformed(ActionEvent event) {
-					dispose();
-				}
-			});
-		}
+        if (cancelButton == null) {
 
-		return cancelJButton;
-	}
+            cancelButton = new JButton("Cancel");
+            cancelButton.setToolTipText("Cancel");
 
-	private JLabel getMessageJLabel() {
+            Dimension size = new Dimension(70, 26);
+            cancelButton.setPreferredSize(size);
 
-		if (messageJLabel == null) {
-			messageJLabel = new JLabel();
+            cancelButton.addActionListener(new ActionListener() {
 
-			Dimension dim = new Dimension(100, 16);
-			messageJLabel.setPreferredSize(dim);
-			messageJLabel.setMinimumSize(dim);
+                @Override
+                public void actionPerformed(ActionEvent event) {
+                    dispose();
+                }
+            });
+        }
 
-			messageJLabel.setAlignmentX(CENTER_ALIGNMENT);
-			messageJLabel.setForeground(Color.RED);
+        return cancelButton;
+    }
 
-		}
+    private void performAddBookMark() {
 
-		return messageJLabel;
-	}
+        JTextField textJTextField = getValueTextField();
+        String text = textJTextField.getText();
+        text = text.trim();
 
-	protected void performAddBookMark() {
+        List<Marker<T>> bookmarkList = getMarkerList(keyList, text);
 
-		// Marker<T> existingBookmark;
+        for (Marker<T> bookmark : bookmarkList) {
+            bookmarkModel.addMarker(bookmark);
+        }
 
-		// existingBookmark = bookmarkModel.getMarker(key);
+        dispose();
+    }
 
-		// if (existingBookmark == null) {
+    private void populateDefaultText(String defaultText) {
 
-		JTextField textJTextField = getTextJTextField();
-		String text = textJTextField.getText();
-		text = text.trim();
+        if ((defaultText != null) && (!"".equals(defaultText))) {
 
-		List<Marker<T>> bookmarkList = getMarkerList(keyList, text);
+            JTextField textJTextField = getValueTextField();
 
-		for (Marker<T> bookmark : bookmarkList) {
-			bookmarkModel.addMarker(bookmark);
-		}
-
-		dispose();
-		// } else {
-		// String text = existingBookmark.getText();
-		// text = "A bookmark on this key already exists having text: " + text;
-		//
-		// JLabel messageJLabel = getMessageJLabel();
-		// messageJLabel.setText(text);
-		// }
-	}
+            textJTextField.setText(defaultText);
+        }
+    }
 }

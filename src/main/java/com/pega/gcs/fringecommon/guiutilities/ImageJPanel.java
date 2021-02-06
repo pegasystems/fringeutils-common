@@ -4,6 +4,7 @@
  * Contributors:
  *     Manu Varghese
  *******************************************************************************/
+
 package com.pega.gcs.fringecommon.guiutilities;
 
 import java.awt.Color;
@@ -17,157 +18,158 @@ import javax.swing.JPanel;
 
 public class ImageJPanel extends JPanel {
 
-	private static final long serialVersionUID = 1576961618259416647L;
+    private static final long serialVersionUID = 1576961618259416647L;
 
-	private Image image;
+    private Image image;
 
-	private Image scaledImage;
+    private Image scaledImage;
 
-	private int imageWidth;
+    private int imageWidth;
 
-	private int imageHeight;
+    private int imageHeight;
 
-	private boolean scaling;
+    private boolean scaling;
 
-	private boolean drawBorder;
+    private boolean drawBorder;
 
-	private Color borderColor;
+    private Color borderColor;
 
-	public ImageJPanel(Image image) {
-		this(image, true);
-	}
+    public ImageJPanel(Image image) {
+        this(image, true);
+    }
 
-	public ImageJPanel(Image image, boolean scaling) {
-		this(image, scaling, false, null);
-	}
+    public ImageJPanel(Image image, boolean scaling) {
+        this(image, scaling, false, null);
+    }
 
-	public ImageJPanel(Image image, boolean scaling, boolean drawBorder, Color borderColor) {
-		super();
+    public ImageJPanel(Image image, boolean scaling, boolean drawBorder, Color borderColor) {
+        super();
 
-		this.image = image;
-		this.scaling = scaling;
-		this.drawBorder = drawBorder;
-		this.borderColor = borderColor;
+        this.image = image;
+        this.scaling = scaling;
+        this.drawBorder = drawBorder;
+        this.borderColor = borderColor;
 
-		if (borderColor == null) {
-			borderColor = Color.BLACK;
-		}
+        if (borderColor == null) {
+            borderColor = Color.BLACK;
+        }
 
-		imageWidth = image.getWidth(this);
-		imageHeight = image.getHeight(this);
+        imageWidth = image.getWidth(this);
+        imageHeight = image.getHeight(this);
 
-		Dimension preferredSize = new Dimension(imageWidth, imageHeight);
+        Dimension preferredSize = new Dimension(imageWidth, imageHeight);
 
-		setPreferredSize(preferredSize);
+        setPreferredSize(preferredSize);
 
-		addComponentListener(new ComponentListener() {
+        addComponentListener(new ComponentListener() {
 
-			@Override
-			public void componentShown(ComponentEvent e) {
-				// do nothing
-			}
+            @Override
+            public void componentShown(ComponentEvent componentEvent) {
+                // do nothing
+            }
 
-			@Override
-			public void componentResized(ComponentEvent e) {
-				setScaledImage();
-			}
+            @Override
+            public void componentResized(ComponentEvent componentEvent) {
+                setScaledImage();
+            }
 
-			@Override
-			public void componentMoved(ComponentEvent e) {
-				// do nothing
-			}
+            @Override
+            public void componentMoved(ComponentEvent componentEvent) {
+                // do nothing
+            }
 
-			@Override
-			public void componentHidden(ComponentEvent e) {
-				// do nothing
-			}
-		});
+            @Override
+            public void componentHidden(ComponentEvent componentEvent) {
+                // do nothing
+            }
+        });
 
-	}
+    }
 
-	@Override
-	public void paintComponent(Graphics g) {
-		super.paintComponent(g);
+    @Override
+    public void paintComponent(Graphics graphics) {
 
-		if (scaledImage != null) {
+        super.paintComponent(graphics);
 
-			int x = 0;
-			int y = 0;
-			int scaledWidth = scaledImage.getWidth(this);
-			int scaledHeight = scaledImage.getHeight(this);
-			int panelWidth = this.getWidth();
-			int panelHeight = this.getHeight();
+        if (scaledImage != null) {
 
-			// centre image in panel
-			if (panelWidth > scaledWidth) {
-				x = (panelWidth - scaledWidth) / 2;
-			}
-			if (panelHeight > scaledHeight) {
-				y = (panelHeight - scaledHeight) / 2;
-			}
+            int xpos = 0;
+            int ypos = 0;
+            int scaledWidth = scaledImage.getWidth(this);
+            int scaledHeight = scaledImage.getHeight(this);
+            int panelWidth = this.getWidth();
+            int panelHeight = this.getHeight();
 
-			g.drawImage(scaledImage, x, y, this);
+            // centre image in panel
+            if (panelWidth > scaledWidth) {
+                xpos = (panelWidth - scaledWidth) / 2;
+            }
+            if (panelHeight > scaledHeight) {
+                ypos = (panelHeight - scaledHeight) / 2;
+            }
 
-			if (drawBorder) {
-				g.setColor(borderColor);
-				// top line
-				g.drawLine(x, y, (x + scaledWidth), y);
-				// bottom line
-				g.drawLine(x, (y + scaledHeight), (x + scaledWidth), (y + scaledHeight));
-				// left line
-				g.drawLine(x, y, x, (y + scaledHeight));
-				// right line
-				g.drawLine((x + scaledWidth), y, (x + scaledWidth), (y + scaledHeight));
-			}
-		} else {
-			g.setColor(Color.BLACK);
-			g.drawString("No Image", this.getWidth() / 3, this.getHeight() / 3);
-		}
-	}
+            graphics.drawImage(scaledImage, xpos, ypos, this);
 
-	protected void setScaledImage() {
+            if (drawBorder) {
+                graphics.setColor(borderColor);
+                // top line
+                graphics.drawLine(xpos, ypos, (xpos + scaledWidth), ypos);
+                // bottom line
+                graphics.drawLine(xpos, (ypos + scaledHeight), (xpos + scaledWidth), (ypos + scaledHeight));
+                // left line
+                graphics.drawLine(xpos, ypos, xpos, (ypos + scaledHeight));
+                // right line
+                graphics.drawLine((xpos + scaledWidth), ypos, (xpos + scaledWidth), (ypos + scaledHeight));
+            }
+        } else {
+            graphics.setColor(Color.BLACK);
+            graphics.drawString("No Image", this.getWidth() / 3, this.getHeight() / 3);
+        }
+    }
 
-		if (image != null) {
+    protected void setScaledImage() {
 
-			if (scaling) {
-				// use floats so division below won't round
-				float iw = imageWidth;
-				float ih = imageHeight;
-				float pw = this.getWidth(); // panel width
-				float ph = this.getHeight(); // panel height
+        if (image != null) {
 
-				if (pw < iw || ph < ih) {
+            if (scaling) {
+                // use floats so division below won't round
+                float iw = imageWidth;
+                float ih = imageHeight;
+                float pw = this.getWidth(); // panel width
+                float ph = this.getHeight(); // panel height
 
-					if ((pw / ph) > (iw / ih)) {
-						iw = -1;
-						ih = ph;
-					} else {
-						iw = pw;
-						ih = -1;
-					}
+                if (pw < iw || ph < ih) {
 
-					// prevent errors if panel is 0 wide or high
-					if (iw == 0) {
-						iw = -1;
-					}
-					if (ih == 0) {
-						ih = -1;
-					}
+                    if ((pw / ph) > (iw / ih)) {
+                        iw = -1;
+                        ih = ph;
+                    } else {
+                        iw = pw;
+                        ih = -1;
+                    }
 
-					scaledImage = image.getScaledInstance(new Float(iw).intValue(), new Float(ih).intValue(),
-							Image.SCALE_DEFAULT);
+                    // prevent errors if panel is 0 wide or high
+                    if (iw == 0) {
+                        iw = -1;
+                    }
+                    if (ih == 0) {
+                        ih = -1;
+                    }
 
-				} else {
-					scaledImage = image;
-				}
-			} else {
-				scaledImage = image;
-			}
+                    scaledImage = image.getScaledInstance(Float.valueOf(iw).intValue(), Float.valueOf(ih).intValue(),
+                            Image.SCALE_DEFAULT);
 
-		}
+                } else {
+                    scaledImage = image;
+                }
+            } else {
+                scaledImage = image;
+            }
 
-		revalidate();
-		repaint();
-	}
+        }
+
+        revalidate();
+        repaint();
+    }
 
 }

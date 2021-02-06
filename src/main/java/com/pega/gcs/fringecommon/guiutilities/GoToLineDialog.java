@@ -4,6 +4,7 @@
  * Contributors:
  *     Manu Varghese
  *******************************************************************************/
+
 package com.pega.gcs.fringecommon.guiutilities;
 
 import java.awt.Color;
@@ -28,329 +29,320 @@ import javax.swing.JTextField;
 
 public class GoToLineDialog extends JDialog {
 
-	private static final long serialVersionUID = -4228477923073243444L;
+    private static final long serialVersionUID = -4228477923073243444L;
 
-	private static final String message = "Selected value is outside of range.";
+    private static final String message = "Selected value is outside of range.";
 
-	private int startIndex;
+    private int startIndex;
 
-	private int endIndex;
+    private int endIndex;
 
-	private Integer selectedInteger;
+    private Integer selectedInteger;
 
-	private JTextField goToLineJTextField;
+    private JTextField goToLineTextField;
 
-	private JButton goToFirstJButton;
+    private JButton goToFirstButton;
 
-	private JButton goToLastJButton;
+    private JButton goToLastButton;
 
-	private JButton okJButton;
+    private JButton okButton;
 
-	private JButton cancelJButton;
+    private JButton cancelButton;
 
-	private JLabel messageJLabel;
+    private JLabel messageLabel;
 
-	public GoToLineDialog(int startIndex, int endIndex, ImageIcon appIcon, Component parent) throws HeadlessException {
+    public GoToLineDialog(int startIndex, int endIndex, ImageIcon appIcon, Component parent) throws HeadlessException {
 
-		super();
+        super();
 
-		this.startIndex = startIndex;
-		this.endIndex = endIndex;
-		this.selectedInteger = null;
+        this.startIndex = startIndex;
+        this.endIndex = endIndex;
+        this.selectedInteger = null;
 
-		setIconImage(appIcon.getImage());
+        setIconImage(appIcon.getImage());
 
-		setPreferredSize(new Dimension(300, 133));
+        setTitle("Go to line");
 
-		setTitle("Go to line");
-		// setResizable(true);
-		setModalityType(ModalityType.APPLICATION_MODAL);
-		setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-		// setAlwaysOnTop(true);
+        setModalityType(ModalityType.APPLICATION_MODAL);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
-		setContentPane(getMainJPanel());
+        setContentPane(getMainPanel());
 
-		pack();
+        pack();
 
-		setLocationRelativeTo(parent);
+        setLocationRelativeTo(parent);
 
-		// setVisible called by caller.
-		// setVisible(true);
-	}
+        // setVisible called by caller.
+        // setVisible(true);
+    }
 
-	protected int getStartIndex() {
-		return startIndex;
-	}
+    protected int getStartIndex() {
+        return startIndex;
+    }
 
-	protected int getEndIndex() {
-		return endIndex;
-	}
+    protected int getEndIndex() {
+        return endIndex;
+    }
 
-	protected void setSelectedInteger(Integer aSelectedInteger) {
-		selectedInteger = aSelectedInteger;
-	}
+    protected void setSelectedInteger(Integer selectedInteger) {
+        this.selectedInteger = selectedInteger;
+    }
 
-	private JPanel getMainJPanel() {
+    public Integer getSelectedInteger() {
+        return selectedInteger;
+    }
 
-		JPanel mainJPanel = new JPanel();
+    private JTextField getGoToLineTextField() {
 
-		LayoutManager layout = new BoxLayout(mainJPanel, BoxLayout.Y_AXIS);
-		mainJPanel.setLayout(layout);
+        if (goToLineTextField == null) {
+            goToLineTextField = new JTextField();
 
-		JPanel goToLineJPanel = getGoToLineJPanel();
+            goToLineTextField.addKeyListener(new KeyAdapter() {
 
-		String text = "Range - First Line: [" + startIndex + "] Last Line: [" + endIndex + "]";
+                @Override
+                public void keyReleased(KeyEvent keyEvent) {
+                    if (keyEvent.getKeyChar() == KeyEvent.VK_ENTER) {
+                        executeGoToLine();
+                    }
+                }
+            });
+        }
 
-		JLabel goToTextJLabel = new JLabel(text);
-		goToTextJLabel.setAlignmentX(CENTER_ALIGNMENT);
+        return goToLineTextField;
+    }
 
-		JLabel messageJLabel = getMessageJLabel();
+    private JButton getGoToFirstButton() {
 
-		JPanel buttonsJPanel = getButtonsJPanel();
+        if (goToFirstButton == null) {
 
-		// mainJPanel.add(Box.createVerticalGlue());
-		mainJPanel.add(Box.createRigidArea(new Dimension(4, 5)));
-		mainJPanel.add(goToLineJPanel);
-		mainJPanel.add(Box.createRigidArea(new Dimension(4, 4)));
-		mainJPanel.add(goToTextJLabel);
-		mainJPanel.add(Box.createRigidArea(new Dimension(4, 1)));
-		mainJPanel.add(messageJLabel);
-		mainJPanel.add(Box.createRigidArea(new Dimension(4, 2)));
-		mainJPanel.add(Box.createVerticalGlue());
-		mainJPanel.add(buttonsJPanel);
-		mainJPanel.add(Box.createRigidArea(new Dimension(4, 4)));
-		// mainJPanel.add(Box.createHorizontalGlue());
+            goToFirstButton = new JButton("First");
+            goToFirstButton.setToolTipText("First Line");
 
-		return mainJPanel;
-	}
+            Dimension size = new Dimension(70, 26);
+            goToFirstButton.setPreferredSize(size);
+            goToFirstButton.setSize(size);
 
-	/**
-	 * @return the selectedInteger
-	 */
-	public Integer getSelectedInteger() {
-		return selectedInteger;
-	}
+            goToFirstButton.addActionListener(new ActionListener() {
 
-	/**
-	 * @return the goToLineJTextField
-	 */
-	private JTextField getGoToLineJTextField() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    setSelectedInteger(getStartIndex());
+                    dispose();
+                }
+            });
+        }
 
-		if (goToLineJTextField == null) {
-			goToLineJTextField = new JTextField();
+        return goToFirstButton;
+    }
 
-			goToLineJTextField.addKeyListener(new KeyAdapter() {
+    private JButton getGoToLastButton() {
 
-				@Override
-				public void keyReleased(KeyEvent event) {
-					if (event.getKeyChar() == KeyEvent.VK_ENTER) {
-						executeGoToLine();
-					}
-				}
-			});
-		}
+        if (goToLastButton == null) {
 
-		return goToLineJTextField;
-	}
+            goToLastButton = new JButton("Last");
+            goToLastButton.setToolTipText("Last Line");
 
-	/**
-	 * @return the goToFirstJButton
-	 */
-	private JButton getGoToFirstJButton() {
+            Dimension size = new Dimension(70, 26);
+            goToLastButton.setPreferredSize(size);
+            goToLastButton.setSize(size);
 
-		if (goToFirstJButton == null) {
+            goToLastButton.addActionListener(new ActionListener() {
 
-			goToFirstJButton = new JButton("First");
-			goToFirstJButton.setToolTipText("First Line");
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    setSelectedInteger(getEndIndex());
+                    dispose();
+                }
+            });
+        }
 
-			Dimension size = new Dimension(70, 26);
-			goToFirstJButton.setPreferredSize(size);
-			goToFirstJButton.setSize(size);
+        return goToLastButton;
+    }
 
-			goToFirstJButton.addActionListener(new ActionListener() {
+    private JButton getOkButton() {
 
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					setSelectedInteger(getStartIndex());
-					dispose();
-				}
-			});
-		}
+        if (okButton == null) {
 
-		return goToFirstJButton;
-	}
+            okButton = new JButton("OK");
+            okButton.setToolTipText("OK");
 
-	/**
-	 * @return the goToLastJButton
-	 */
-	private JButton getGoToLastJButton() {
+            Dimension size = new Dimension(70, 26);
+            okButton.setPreferredSize(size);
+            okButton.setSize(size);
 
-		if (goToLastJButton == null) {
+            okButton.addActionListener(new ActionListener() {
 
-			goToLastJButton = new JButton("Last");
-			goToLastJButton.setToolTipText("Last Line");
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    executeGoToLine();
+                }
+            });
 
-			Dimension size = new Dimension(70, 26);
-			goToLastJButton.setPreferredSize(size);
-			goToLastJButton.setSize(size);
+        }
 
-			goToLastJButton.addActionListener(new ActionListener() {
+        return okButton;
+    }
 
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					setSelectedInteger(getEndIndex());
-					dispose();
-				}
-			});
-		}
+    private JButton getCancelButton() {
 
-		return goToLastJButton;
-	}
+        if (cancelButton == null) {
 
-	/**
-	 * @return the okJButton
-	 */
-	private JButton getOkJButton() {
+            cancelButton = new JButton("Cancel");
+            cancelButton.setToolTipText("Cancel");
 
-		if (okJButton == null) {
+            Dimension size = new Dimension(70, 26);
+            cancelButton.setPreferredSize(size);
+            cancelButton.setSize(size);
 
-			okJButton = new JButton("OK");
-			okJButton.setToolTipText("OK");
+            cancelButton.addActionListener(new ActionListener() {
 
-			Dimension size = new Dimension(70, 26);
-			okJButton.setPreferredSize(size);
-			okJButton.setSize(size);
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    dispose();
+                }
+            });
+        }
 
-			okJButton.addActionListener(new ActionListener() {
+        return cancelButton;
+    }
 
-				@Override
-				public void actionPerformed(ActionEvent event) {
-					executeGoToLine();
-				}
-			});
+    private JLabel getMessageLabel() {
 
-		}
+        if (messageLabel == null) {
+            messageLabel = new JLabel();
 
-		return okJButton;
-	}
+            Dimension dim = new Dimension(100, 16);
+            messageLabel.setPreferredSize(dim);
+            messageLabel.setMinimumSize(dim);
 
-	/**
-	 * @return the cancelJButton
-	 */
-	private JButton getCancelJButton() {
+            messageLabel.setAlignmentX(CENTER_ALIGNMENT);
+            messageLabel.setForeground(Color.RED);
+        }
 
-		if (cancelJButton == null) {
+        return messageLabel;
+    }
 
-			cancelJButton = new JButton("Cancel");
-			cancelJButton.setToolTipText("Cancel");
+    private JPanel getMainPanel() {
 
-			Dimension size = new Dimension(70, 26);
-			cancelJButton.setPreferredSize(size);
-			cancelJButton.setSize(size);
+        JPanel mainPanel = new JPanel();
 
-			cancelJButton.addActionListener(new ActionListener() {
+        LayoutManager layout = new BoxLayout(mainPanel, BoxLayout.Y_AXIS);
+        mainPanel.setLayout(layout);
 
-				@Override
-				public void actionPerformed(ActionEvent event) {
-					dispose();
-				}
-			});
-		}
+        JPanel gotoPanel = getGotoPanel();
+        JPanel buttonsJPanel = getButtonsJPanel();
 
-		return cancelJButton;
-	}
+        mainPanel.add(gotoPanel);
+        mainPanel.add(buttonsJPanel);
 
-	private JLabel getMessageJLabel() {
+        return mainPanel;
+    }
 
-		if (messageJLabel == null) {
-			messageJLabel = new JLabel();
+    private JPanel getGotoPanel() {
 
-			Dimension dim = new Dimension(100, 16);
-			messageJLabel.setPreferredSize(dim);
-			messageJLabel.setMinimumSize(dim);
+        JPanel gotoPanel = new JPanel();
 
-			messageJLabel.setAlignmentX(CENTER_ALIGNMENT);
-			messageJLabel.setForeground(Color.RED);
-		}
+        LayoutManager layout = new BoxLayout(gotoPanel, BoxLayout.Y_AXIS);
+        gotoPanel.setLayout(layout);
 
-		return messageJLabel;
-	}
+        JPanel goToLinePanel = getGoToLinePanel();
 
-	private JPanel getGoToLineJPanel() {
-		JPanel goToLineJPanel = new JPanel();
-		LayoutManager layout = new BoxLayout(goToLineJPanel, BoxLayout.X_AXIS);
-		goToLineJPanel.setLayout(layout);
+        String text = "Range - First Line: [" + startIndex + "]        Last Line: [" + endIndex + "]";
 
-		JLabel goToLineJLabel = new JLabel("Go to line:");
+        JLabel goToTextLabel = new JLabel(text);
+        goToTextLabel.setAlignmentX(CENTER_ALIGNMENT);
 
-		JTextField goToLineJTextField = getGoToLineJTextField();
+        JLabel messageJLabel = getMessageLabel();
 
-		Dimension dim = new Dimension(10, 1);
-		goToLineJPanel.add(Box.createHorizontalGlue());
-		goToLineJPanel.add(Box.createRigidArea(dim));
-		goToLineJPanel.add(goToLineJLabel);
-		goToLineJPanel.add(Box.createRigidArea(dim));
-		goToLineJPanel.add(goToLineJTextField);
-		goToLineJPanel.add(Box.createRigidArea(dim));
-		goToLineJPanel.add(Box.createHorizontalGlue());
+        gotoPanel.add(Box.createRigidArea(new Dimension(10, 10)));
+        gotoPanel.add(goToLinePanel);
+        gotoPanel.add(Box.createRigidArea(new Dimension(10, 4)));
+        gotoPanel.add(goToTextLabel);
+        gotoPanel.add(Box.createRigidArea(new Dimension(10, 3)));
+        gotoPanel.add(messageJLabel);
+        gotoPanel.add(Box.createRigidArea(new Dimension(10, 3)));
+        gotoPanel.add(Box.createVerticalGlue());
 
-		// goToLineJPanel.setBorder(BorderFactory.createLineBorder(
-		// MyColor.LIGHT_GRAY, 1));
+        gotoPanel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
 
-		return goToLineJPanel;
-	}
+        return gotoPanel;
+    }
 
-	private JPanel getButtonsJPanel() {
+    private JPanel getGoToLinePanel() {
 
-		JPanel buttonsJPanel = new JPanel();
+        JPanel goToLineJPanel = new JPanel();
 
-		LayoutManager layout = new BoxLayout(buttonsJPanel, BoxLayout.X_AXIS);
-		buttonsJPanel.setLayout(layout);
+        LayoutManager layout = new BoxLayout(goToLineJPanel, BoxLayout.X_AXIS);
+        goToLineJPanel.setLayout(layout);
 
-		JButton goToFirstJButton = getGoToFirstJButton();
-		JButton goToLastJButton = getGoToLastJButton();
-		JButton okJButton = getOkJButton();
-		JButton cancelJButton = getCancelJButton();
+        JLabel goToLineJLabel = new JLabel("Go to line:");
 
-		Dimension dim = new Dimension(5, 30);
-		buttonsJPanel.add(Box.createHorizontalGlue());
-		buttonsJPanel.add(Box.createRigidArea(dim));
-		buttonsJPanel.add(goToFirstJButton);
-		buttonsJPanel.add(Box.createRigidArea(dim));
-		buttonsJPanel.add(goToLastJButton);
-		buttonsJPanel.add(Box.createRigidArea(dim));
-		buttonsJPanel.add(okJButton);
-		buttonsJPanel.add(Box.createRigidArea(dim));
-		buttonsJPanel.add(cancelJButton);
-		buttonsJPanel.add(Box.createRigidArea(dim));
-		buttonsJPanel.add(Box.createHorizontalGlue());
+        JTextField goToLineJTextField = getGoToLineTextField();
 
-		buttonsJPanel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
-		return buttonsJPanel;
-	}
+        Dimension dim = new Dimension(10, 26);
+        goToLineJPanel.add(Box.createHorizontalGlue());
+        goToLineJPanel.add(Box.createRigidArea(dim));
+        goToLineJPanel.add(goToLineJLabel);
+        goToLineJPanel.add(Box.createRigidArea(dim));
+        goToLineJPanel.add(goToLineJTextField);
+        goToLineJPanel.add(Box.createRigidArea(dim));
+        goToLineJPanel.add(Box.createHorizontalGlue());
 
-	protected void executeGoToLine() {
+        return goToLineJPanel;
+    }
 
-		try {
+    private JPanel getButtonsJPanel() {
 
-			JTextField goToLineJTextField = getGoToLineJTextField();
-			String goToLineText = goToLineJTextField.getText();
-			goToLineText = goToLineText.trim();
-			selectedInteger = Integer.parseInt(goToLineText);
+        JPanel buttonsJPanel = new JPanel();
 
-			if ((selectedInteger >= startIndex) && (selectedInteger <= endIndex)) {
-				dispose();
-			} else {
+        LayoutManager layout = new BoxLayout(buttonsJPanel, BoxLayout.X_AXIS);
+        buttonsJPanel.setLayout(layout);
 
-				messageJLabel = getMessageJLabel();
-				messageJLabel.setText(message);
-				selectedInteger = null;
-			}
-		} catch (Exception e) {
-			messageJLabel = getMessageJLabel();
-			messageJLabel.setText(message);
-			selectedInteger = null;
-		}
+        JButton goToFirstJButton = getGoToFirstButton();
+        JButton goToLastJButton = getGoToLastButton();
+        JButton okJButton = getOkButton();
+        JButton cancelJButton = getCancelButton();
 
-	}
+        Dimension dim = new Dimension(10, 40);
+        buttonsJPanel.add(Box.createHorizontalGlue());
+        buttonsJPanel.add(Box.createRigidArea(dim));
+        buttonsJPanel.add(goToFirstJButton);
+        buttonsJPanel.add(Box.createRigidArea(dim));
+        buttonsJPanel.add(goToLastJButton);
+        buttonsJPanel.add(Box.createRigidArea(dim));
+        buttonsJPanel.add(okJButton);
+        buttonsJPanel.add(Box.createRigidArea(dim));
+        buttonsJPanel.add(cancelJButton);
+        buttonsJPanel.add(Box.createRigidArea(dim));
+        buttonsJPanel.add(Box.createHorizontalGlue());
+
+        buttonsJPanel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
+
+        return buttonsJPanel;
+    }
+
+    protected void executeGoToLine() {
+
+        try {
+
+            JTextField goToLineJTextField = getGoToLineTextField();
+            String goToLineText = goToLineJTextField.getText();
+            goToLineText = goToLineText.trim();
+            selectedInteger = Integer.parseInt(goToLineText);
+
+            if ((selectedInteger >= startIndex) && (selectedInteger <= endIndex)) {
+                dispose();
+            } else {
+
+                messageLabel = getMessageLabel();
+                messageLabel.setText(message);
+                selectedInteger = null;
+            }
+        } catch (Exception e) {
+            messageLabel = getMessageLabel();
+            messageLabel.setText(message);
+            selectedInteger = null;
+        }
+
+    }
 }

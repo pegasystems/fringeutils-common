@@ -4,6 +4,7 @@
  * Contributors:
  *     Manu Varghese
  *******************************************************************************/
+
 package com.pega.gcs.fringecommon.guiutilities;
 
 import java.awt.Dimension;
@@ -17,157 +18,150 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
 /**
- * shows an entry like <code>[x] text (123)<code>
+ * Shows an entry like <code>[x] text (123)</code>.
  */
 public class CheckBoxLabelMenuItem<T> extends JPanel {
 
-	private static final long serialVersionUID = 1915104163331004973L;
+    private static final long serialVersionUID = 1915104163331004973L;
 
-	private JCheckBox itemJCheckBox;
+    private JCheckBox itemJCheckBox;
 
-	private JLabel countJLabel;
+    private JLabel countJLabel;
 
-	private CheckBoxMenuItemPopupEntry<T> checkBoxMenuItemPopupEntry;
+    private CheckBoxMenuItemPopupEntry<T> checkBoxMenuItemPopupEntry;
 
-	private boolean showCount;
+    private boolean showCount;
 
-	/**
-	 * @param isSelected
-	 * @param objectMenuItem
-	 */
-	public CheckBoxLabelMenuItem(CheckBoxMenuItemPopupEntry<T> checkBoxMenuItemPopupEntry, boolean showCount) {
+    public CheckBoxLabelMenuItem(CheckBoxMenuItemPopupEntry<T> checkBoxMenuItemPopupEntry, boolean showCount) {
 
-		super();
+        super();
 
-		this.checkBoxMenuItemPopupEntry = checkBoxMenuItemPopupEntry;
-		this.showCount = showCount;
+        this.checkBoxMenuItemPopupEntry = checkBoxMenuItemPopupEntry;
+        this.showCount = showCount;
 
-		JCheckBox checkBox = getItemJCheckBox();
-		JLabel countJLabel = getCountJLabel();
+        JCheckBox checkBox = getItemJCheckBox();
+        JLabel countJLabel = getCountJLabel();
 
-		GridBagConstraints gbc1 = new GridBagConstraints();
-		gbc1.gridx = 0;
-		gbc1.gridy = 0;
-		gbc1.weightx = 1.0D;
-		gbc1.weighty = 1.0D;
-		gbc1.fill = GridBagConstraints.BOTH;
-		gbc1.anchor = GridBagConstraints.WEST;
+        GridBagConstraints gbc1 = new GridBagConstraints();
+        gbc1.gridx = 0;
+        gbc1.gridy = 0;
+        gbc1.weightx = 1.0D;
+        gbc1.weighty = 1.0D;
+        gbc1.fill = GridBagConstraints.BOTH;
+        gbc1.anchor = GridBagConstraints.WEST;
 
-		GridBagConstraints gbc2 = new GridBagConstraints();
-		gbc2.gridx = 1;
-		gbc2.gridy = 0;
-		gbc2.weightx = 1.0D;
-		gbc2.weighty = 1.0D;
-		gbc2.fill = GridBagConstraints.BOTH;
-		gbc2.anchor = GridBagConstraints.EAST;
-		gbc2.insets = new Insets(0, 0, 0, 5);
+        GridBagConstraints gbc2 = new GridBagConstraints();
+        gbc2.gridx = 1;
+        gbc2.gridy = 0;
+        gbc2.weightx = 1.0D;
+        gbc2.weighty = 1.0D;
+        gbc2.fill = GridBagConstraints.BOTH;
+        gbc2.anchor = GridBagConstraints.EAST;
+        gbc2.insets = new Insets(0, 0, 0, 5);
 
-		setLayout(new GridBagLayout());
+        setLayout(new GridBagLayout());
 
-		add(checkBox, gbc1);
-		add(countJLabel, gbc2);
+        add(checkBox, gbc1);
+        add(countJLabel, gbc2);
 
-		setMaximumSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE));
-	}
+        setMaximumSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE));
+    }
 
-	protected CheckBoxMenuItemPopupEntry<T> getCheckBoxMenuItemPopupEntry() {
-		return checkBoxMenuItemPopupEntry;
-	}
+    protected CheckBoxMenuItemPopupEntry<T> getCheckBoxMenuItemPopupEntry() {
+        return checkBoxMenuItemPopupEntry;
+    }
 
-	protected boolean isShowCount() {
-		return showCount;
-	}
+    protected boolean isShowCount() {
+        return showCount;
+    }
 
-	private JCheckBox getItemJCheckBox() {
+    private JCheckBox getItemJCheckBox() {
 
-		if (itemJCheckBox == null) {
-			itemJCheckBox = new JCheckBox();
+        if (itemJCheckBox == null) {
+            itemJCheckBox = new JCheckBox();
 
-			itemJCheckBox.setText(checkBoxMenuItemPopupEntry.getText());
-			itemJCheckBox.setSelected(checkBoxMenuItemPopupEntry.isSelected());
+            itemJCheckBox.setText(checkBoxMenuItemPopupEntry.getItemText());
+            itemJCheckBox.setSelected(checkBoxMenuItemPopupEntry.isSelected());
 
-			// not using the item listener because we want to set the
-			// checkBoxMenuItemPopupEntry only when the user selects apply.
+            // not using the item listener because we want to set the
+            // checkBoxMenuItemPopupEntry only when the user selects apply.
 
-			// itemJCheckBox.addItemListener(new ItemListener() {
-			//
-			// @Override
-			// public void itemStateChanged(ItemEvent e) {
-			//
-			// if (e.getStateChange() == ItemEvent.SELECTED) {
-			//
-			// checkBoxMenuItemPopupEntry.setSelected(true);
-			// checkBoxMenuItemPopupEntry.setVisible(true);
-			// } else {
-			// checkBoxMenuItemPopupEntry.setSelected(false);
-			// checkBoxMenuItemPopupEntry.setVisible(false);
-			// }
-			//
-			// }
-			// });
-		}
+            // itemJCheckBox.addItemListener(new ItemListener() {
+            //
+            // @Override
+            // public void itemStateChanged(ItemEvent e) {
+            //
+            // if (e.getStateChange() == ItemEvent.SELECTED) {
+            //
+            // checkBoxMenuItemPopupEntry.setSelected(true);
+            // checkBoxMenuItemPopupEntry.setVisible(true);
+            // } else {
+            // checkBoxMenuItemPopupEntry.setSelected(false);
+            // checkBoxMenuItemPopupEntry.setVisible(false);
+            // }
+            //
+            // }
+            // });
+        }
 
-		return itemJCheckBox;
-	}
+        return itemJCheckBox;
+    }
 
-	private JLabel getCountJLabel() {
+    private JLabel getCountJLabel() {
 
-		if (countJLabel == null) {
+        if (countJLabel == null) {
 
-			countJLabel = new JLabel() {
+            countJLabel = new JLabel() {
 
-				private static final long serialVersionUID = -6727122479133920624L;
+                private static final long serialVersionUID = -6727122479133920624L;
 
-				@Override
-				public String getText() {
+                @Override
+                public String getText() {
 
-					String text = null;
+                    String text = null;
 
-					if (isShowCount()) {
+                    if (isShowCount()) {
 
-						String count = String.valueOf(getCheckBoxMenuItemPopupEntry().getFilteredCount());
+                        String count = String.valueOf(getCheckBoxMenuItemPopupEntry().getFilteredCount());
 
-						text = "(" + count + ")";
+                        text = "(" + count + ")";
 
-					} else {
+                    } else {
 
-						text = null;
+                        text = null;
 
-					}
+                    }
 
-					return text;
-				}
+                    return text;
+                }
 
-			};
+            };
 
-			countJLabel.setHorizontalAlignment(SwingConstants.TRAILING);
+            countJLabel.setHorizontalAlignment(SwingConstants.TRAILING);
 
-		}
+        }
 
-		return countJLabel;
-	}
+        return countJLabel;
+    }
 
-	public CheckBoxMenuItemPopupEntry<T> getFilterTableHeaderPopupEntry() {
-		return checkBoxMenuItemPopupEntry;
-	}
+    public CheckBoxMenuItemPopupEntry<T> getFilterTableHeaderPopupEntry() {
+        return checkBoxMenuItemPopupEntry;
+    }
 
-	/**
-	 * @return the isSelected
-	 */
-	public boolean isSelected() {
-		return itemJCheckBox.isSelected();
-	}
-	//
-	// /**
-	// * @param isSelected
-	// * the isSelected to set
-	// */
-	// public void setSelected(boolean isSelected) {
-	// checkBox.setSelected(isSelected);
-	// }
+    public boolean isSelected() {
+        return itemJCheckBox.isSelected();
+    }
+    //
+    // /**
+    // * @param isSelected
+    // * the isSelected to set
+    // */
+    // public void setSelected(boolean isSelected) {
+    // checkBox.setSelected(isSelected);
+    // }
 
-	// public void setLabelText(int traceEventTypeCount) {
-	// label.setText("(" + traceEventTypeCount + ")");
-	// }
+    // public void setLabelText(int traceEventTypeCount) {
+    // label.setText("(" + traceEventTypeCount + ")");
+    // }
 
 }

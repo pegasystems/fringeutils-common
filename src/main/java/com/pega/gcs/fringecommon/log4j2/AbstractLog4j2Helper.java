@@ -4,6 +4,7 @@
  * Contributors:
  *     Manu Varghese
  *******************************************************************************/
+
 package com.pega.gcs.fringecommon.log4j2;
 
 import org.apache.logging.log4j.LogManager;
@@ -11,189 +12,169 @@ import org.apache.logging.log4j.core.Logger;
 
 public abstract class AbstractLog4j2Helper {
 
-	private static boolean initialized = false;
+    private static boolean initialized = false;
 
-	private Logger theLogger;
+    private Logger theLogger;
 
-	protected abstract void initLoggerContext();
+    protected abstract void initLoggerContext();
 
-	public AbstractLog4j2Helper(Class<?> loggerClass) {
+    public AbstractLog4j2Helper(Class<?> loggerClass) {
 
-		if (!isInitialized()) {
-			initLoggerContext();
-		}
+        if (!isInitialized()) {
+            initLoggerContext();
+        }
 
-		try {
-			theLogger = (Logger) LogManager.getLogger(loggerClass.getName());
-		} catch (Exception e) {
-			e.printStackTrace(System.out);
-		}
-	}
+        try {
+            theLogger = (Logger) LogManager.getLogger(loggerClass.getName());
+        } catch (Exception e) {
+            e.printStackTrace(System.out);
+        }
+    }
 
-	protected static boolean isInitialized() {
-		return initialized;
-	}
+    protected static boolean isInitialized() {
+        return initialized;
+    }
 
-	protected static void setInitialized(boolean initialized) {
-		AbstractLog4j2Helper.initialized = initialized;
-	}
+    protected static void setInitialized(boolean initialized) {
+        AbstractLog4j2Helper.initialized = initialized;
+    }
 
-	public void entry() {
-		if (theLogger.isTraceEnabled()) {
-			theLogger.entry();
-		}
-	}
+    public void entry(Object... params) {
+        if (theLogger.isTraceEnabled()) {
+            theLogger.entry(params);
+        }
+    }
 
-	public void entry(Object... params) {
-		if (theLogger.isTraceEnabled()) {
-			theLogger.entry(params);
-		}
-	}
+    public void trace(String str, Object... object) {
+        if (theLogger.isTraceEnabled()) {
+            theLogger.trace(String.format(str, object));
+        }
+    }
 
-	public void exit() {
-		if (theLogger.isTraceEnabled()) {
-			theLogger.exit();
-		}
-	}
+    public void trace(Throwable throwable, String str, Object... object) {
+        if (theLogger.isTraceEnabled()) {
+            String message = String.format(str, object);
+            theLogger.trace(message, throwable);
+        }
+    }
 
-	public <R> R exit(final R result) {
-		if (theLogger.isTraceEnabled()) {
-			theLogger.exit(result);
-		}
+    public void trace(Object object) {
+        if (theLogger.isTraceEnabled()) {
+            theLogger.trace(object);
+        }
+    }
 
-		return result;
-	}
+    public void trace(Object object, Throwable throwable) {
+        if (theLogger.isTraceEnabled()) {
+            theLogger.trace(object, throwable);
+        }
+    }
 
-	public void trace(String f, Object... o) {
-		if (theLogger.isTraceEnabled()) {
-			theLogger.trace(String.format(f, o));
-		}
-	}
+    public void debug(String str, Object... object) {
+        if (theLogger.isDebugEnabled()) {
+            theLogger.debug(String.format(str, object));
+        }
+    }
 
-	public void trace(Throwable t, String f, Object... o) {
-		if (theLogger.isTraceEnabled()) {
-			String message = String.format(f, o);
-			theLogger.trace(message, t);
-		}
-	}
+    public void debug(Throwable throwable, String str, Object... object) {
+        if (theLogger.isDebugEnabled()) {
+            theLogger.debug(String.format(str, object), throwable);
+        }
+    }
 
-	public void trace(Object o) {
-		if (theLogger.isTraceEnabled()) {
-			theLogger.trace(o);
-		}
-	}
+    public void debug(Object object) {
+        if (theLogger.isDebugEnabled()) {
+            theLogger.debug(object);
+        }
+    }
 
-	public void trace(Object o, Throwable t) {
-		if (theLogger.isTraceEnabled()) {
-			theLogger.trace(o, t);
-		}
-	}
+    public void debug(Object object, Throwable throwable) {
+        if (theLogger.isDebugEnabled()) {
+            theLogger.debug(object, throwable);
+        }
+    }
 
-	public void debug(String f, Object... o) {
-		if (theLogger.isDebugEnabled()) {
-			theLogger.debug(String.format(f, o));
-		}
-	}
+    public void info(String str, Object... object) {
+        if (theLogger.isInfoEnabled()) {
+            theLogger.info(String.format(str, object));
+        }
+    }
 
-	public void debug(Throwable t, String f, Object... o) {
-		if (theLogger.isDebugEnabled()) {
-			theLogger.debug(String.format(f, o), t);
-		}
-	}
+    public void info(Throwable throwable, String str, Object... object) {
+        if (theLogger.isInfoEnabled()) {
+            theLogger.info(String.format(str, object), throwable);
+        }
+    }
 
-	public void debug(Object o) {
-		if (theLogger.isDebugEnabled()) {
-			theLogger.debug(o);
-		}
-	}
+    public void info(Object object) {
+        if (theLogger.isInfoEnabled()) {
+            theLogger.info(object);
+        }
+    }
 
-	public void debug(Object o, Throwable t) {
-		if (theLogger.isDebugEnabled()) {
-			theLogger.debug(o, t);
-		}
-	}
+    public void info(Object object, Throwable throwable) {
+        if (theLogger.isInfoEnabled()) {
+            theLogger.info(object, throwable);
+        }
+    }
 
-	public void info(String f, Object... o) {
-		if (theLogger.isInfoEnabled()) {
-			theLogger.info(String.format(f, o));
-		}
-	}
+    public void warn(String str, Object... object) {
+        if (theLogger.isWarnEnabled()) {
+            theLogger.warn(String.format(str, object));
+        }
+    }
 
-	public void info(Throwable t, String f, Object... o) {
-		if (theLogger.isInfoEnabled()) {
-			theLogger.info(String.format(f, o), t);
-		}
-	}
+    public void warn(Throwable throwable, String str, Object... object) {
+        if (theLogger.isWarnEnabled()) {
+            String message = String.format(str, object);
+            theLogger.warn(message, throwable);
+        }
+    }
 
-	public void info(Object o) {
-		if (theLogger.isInfoEnabled()) {
-			theLogger.info(o);
-		}
-	}
+    public void warn(Object object) {
+        if (theLogger.isWarnEnabled()) {
+            theLogger.warn(object);
+        }
+    }
 
-	public void info(Object o, Throwable t) {
-		if (theLogger.isInfoEnabled()) {
-			theLogger.info(o, t);
-		}
-	}
+    public void warn(Object object, Throwable throwable) {
+        if (theLogger.isWarnEnabled()) {
+            theLogger.warn(object, throwable);
+        }
+    }
 
-	public void warn(String f, Object... o) {
-		if (theLogger.isWarnEnabled()) {
-			theLogger.warn(String.format(f, o));
-		}
-	}
+    public void error(String str, Object... object) {
+        theLogger.error(String.format(str, object));
+    }
 
-	public void warn(Throwable t, String f, Object... o) {
-		if (theLogger.isWarnEnabled()) {
-			String message = String.format(f, o);
-			theLogger.warn(message, t);
-		}
-	}
+    public void error(Throwable throwable, String str, Object... object) {
+        String message = String.format(str, object);
+        theLogger.error(message, throwable);
+    }
 
-	public void warn(Object o) {
-		if (theLogger.isWarnEnabled()) {
-			theLogger.warn(o);
-		}
-	}
+    public void error(Object object) {
+        theLogger.error(object);
+    }
 
-	public void warn(Object o, Throwable t) {
-		if (theLogger.isWarnEnabled()) {
-			theLogger.warn(o, t);
-		}
-	}
+    public void error(Object object, Throwable throwable) {
+        theLogger.error(object, throwable);
+    }
 
-	public void error(String f, Object... o) {
-		theLogger.error(String.format(f, o));
-	}
+    public void fatal(String str, Object... object) {
+        theLogger.fatal(String.format(str, object));
+    }
 
-	public void error(Throwable t, String f, Object... o) {
-		String message = String.format(f, o);
-		theLogger.error(message, t);
-	}
+    public void fatal(Throwable throwable, String str, Object... object) {
+        String message = String.format(str, object);
+        theLogger.fatal(message, throwable);
+    }
 
-	public void error(Object o) {
-		theLogger.error(o);
-	}
+    public void fatal(Object object) {
+        theLogger.fatal(object);
+    }
 
-	public void error(Object o, Throwable t) {
-		theLogger.error(o, t);
-	}
-
-	public void fatal(String f, Object... o) {
-		theLogger.fatal(String.format(f, o));
-	}
-
-	public void fatal(Throwable t, String f, Object... o) {
-		String message = String.format(f, o);
-		theLogger.fatal(message, t);
-	}
-
-	public void fatal(Object o) {
-		theLogger.fatal(o);
-	}
-
-	public void fatal(Object o, Throwable t) {
-		theLogger.fatal(o, t);
-	}
+    public void fatal(Object object, Throwable throwable) {
+        theLogger.fatal(object, throwable);
+    }
 
 }

@@ -4,12 +4,11 @@
  * Contributors:
  *     Manu Varghese
  *******************************************************************************/
+
 package com.pega.gcs.fringecommon.guiutilities.treetable;
 
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.datatransfer.StringSelection;
-import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.Enumeration;
@@ -18,365 +17,275 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.InputMap;
-import javax.swing.JComponent;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
-import javax.swing.TransferHandler;
-import javax.swing.border.EmptyBorder;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
+import com.pega.gcs.fringecommon.guiutilities.ClickablePathPanel;
 import com.pega.gcs.fringecommon.guiutilities.CustomJTable;
+import com.pega.gcs.fringecommon.log4j2.Log4j2Helper;
 
 public abstract class AbstractTreeTable extends CustomJTable {
 
-	private static final long serialVersionUID = 567268590479849300L;
+    private static final long serialVersionUID = 567268590479849300L;
 
-	private DefaultTreeTableTree tree;
+    private static final Log4j2Helper LOG = new Log4j2Helper(AbstractTreeTable.class);
 
-	protected abstract DefaultTreeTableTree constructTree(AbstractTreeTableTreeModel abstractTreeTableTreeModel);
+    private DefaultTreeTableTree tree;
 
-	protected TreeTableModelAdapter getTreeTableModelAdapter(DefaultTreeTableTree tree) {
+    protected abstract DefaultTreeTableTree constructTree(AbstractTreeTableTreeModel abstractTreeTableTreeModel);
 
-		return new TreeTableModelAdapter(tree);
-	}
+    protected TreeTableModelAdapter getTreeTableModelAdapter(DefaultTreeTableTree tree) {
 
-	public AbstractTreeTable(final AbstractTreeTableTreeModel abstractTreeTableTreeModel, int rowHeight,
-			final int headerHeight) {
+        return new TreeTableModelAdapter(tree) {
 
-		tree = constructTree(abstractTreeTableTreeModel);
+            private static final long serialVersionUID = -8097577959363303883L;
 
-		TableModel tableModel = getTreeTableModelAdapter(tree);
+            @Override
+            public DefaultTableCellRenderer getTreeTableCellRenderer() {
+                return new LabelTableCellRenderer();
+            }
 
-		// tableModel.addTableModelListener(new TableModelListener() {
-		//
-		// @Override
-		// public void tableChanged(TableModelEvent e) {
-		//
-		// // only updating the tree when a full model is updated. updating
-		// // when performing row inserted need to be handled specifically
-		// if (e.getType() == TableModelEvent.UPDATE) {
-		//// abstractTreeTableTreeModel.reload();
-		// LOG.info("AbstractTreeTable: UPDATE called");
-		// }
-		// }
-		// });
+        };
+    }
 
-		setAutoCreateColumnsFromModel(false);
+    public AbstractTreeTable(AbstractTreeTableTreeModel abstractTreeTableTreeModel, int rowHeight,
+            final int headerHeight) {
 
-		setModel(tableModel);
+        super();
 
-		setTreeTableColumnModel();
+        tree = constructTree(abstractTreeTableTreeModel);
 
-		// ListSelectionModel tableListSelectionModel = getSelectionModel();
+        TableModel tableModel = getTreeTableModelAdapter(tree);
 
-		// tableListSelectionModel
-		// .setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        setAutoCreateColumnsFromModel(false);
 
-		TreeTableSelectionModel selectionModel = new TreeTableSelectionModel(tree);
+        setModel(tableModel);
 
-		// add a selection listener to the tree event for updating the table
-		selectionModel.addTreeSelectionListener(new TreeSelectionListener() {
+        setTreeTableColumnModel();
 
-			@Override
-			public void valueChanged(TreeSelectionEvent e) {
-				// TreePath treePath = e.getPath();
-				// AbstractTreeTableNode node = (AbstractTreeTableNode) treePath
-				// .getLastPathComponent();
+        TreeTableSelectionModel selectionModel = new TreeTableSelectionModel(tree);
 
-				// Object userObject = node.getUserObject();
+        // add a selection listener to the tree event for updating the table
+        selectionModel.addTreeSelectionListener(new TreeSelectionListener() {
 
-				// LOG.info("TreeSelectionListener: " + e);
-			}
-		});
+            @Override
+            public void valueChanged(TreeSelectionEvent treeSelectionEvent) {
+                // TreePath treePath = e.getPath();
+                // AbstractTreeTableNode node = (AbstractTreeTableNode) treePath
+                // .getLastPathComponent();
 
-		tree.setSelectionModel(selectionModel);
+                // Object userObject = node.getUserObject();
 
-		setSelectionModel(selectionModel.getListSelectionModel());
+                // LOG.info("TreeSelectionListener: " + e);
+            }
+        });
 
-		setTableHeader(new JTableHeader(getColumnModel()) {
+        tree.setSelectionModel(selectionModel);
 
-			private static final long serialVersionUID = 4853598300124836115L;
+        setSelectionModel(selectionModel.getListSelectionModel());
 
-			{
-				setReorderingAllowed(false);
-				setResizingAllowed(true);
-			}
+        setTableHeader(new JTableHeader(getColumnModel()) {
 
-			@Override
-			public TableCellRenderer getDefaultRenderer() {
-				TableCellRenderer tcr = super.getDefaultRenderer();
+            private static final long serialVersionUID = 4853598300124836115L;
 
-				((DefaultTableCellRenderer) tcr).setHorizontalAlignment(SwingConstants.CENTER);
-				return tcr;
-			}
+            {
+                setReorderingAllowed(false);
+                setResizingAllowed(true);
+            }
 
-			@Override
-			public Dimension getPreferredSize() {
-				Dimension d = super.getPreferredSize();
-				d.height = headerHeight;
-				return d;
-			}
+            @Override
+            public TableCellRenderer getDefaultRenderer() {
+                TableCellRenderer tcr = super.getDefaultRenderer();
 
-			@Override
-			public Font getFont() {
-				Font existingFont = AbstractTreeTable.this.getFont();
-				String existingFontName = existingFont.getName();
-				int existFontSize = existingFont.getSize();
-				Font newFont = new Font(existingFontName, Font.BOLD, existFontSize);
+                ((DefaultTableCellRenderer) tcr).setHorizontalAlignment(SwingConstants.CENTER);
+                return tcr;
+            }
 
-				return newFont;
-			}
+            @Override
+            public Dimension getPreferredSize() {
+                Dimension dim = super.getPreferredSize();
+                dim.height = headerHeight;
+                return dim;
+            }
 
-		});
+            @Override
+            public Font getFont() {
+                Font existingFont = AbstractTreeTable.this.getFont();
+                String existingFontName = existingFont.getName();
+                int existFontSize = existingFont.getSize();
+                Font newFont = new Font(existingFontName, Font.BOLD, existFontSize);
 
-		setTransferHandler(new TransferHandler() {
+                return newFont;
+            }
 
-			private static final long serialVersionUID = 3100522454592832897L;
+        });
 
-			@Override
-			protected Transferable createTransferable(JComponent c) {
+        if (rowHeight > 0) {
+            setRowHeight(rowHeight);
+            tree.setRowHeight(rowHeight);
+        }
 
-				int[] selectedRows = AbstractTreeTable.this.getSelectedRows();
+        // setup the side arrows to expand and collapse tree
+        final KeyStroke leftKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0);
+        final KeyStroke rightKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0);
 
-				StringBuffer dataSB = new StringBuffer();
+        getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(leftKeyStroke, leftKeyStroke);
 
-				if (selectedRows != null) {
+        getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(rightKeyStroke, rightKeyStroke);
 
-					for (int selectedRow : selectedRows) {
+        getActionMap().put(leftKeyStroke, new AbstractAction() {
 
-						AbstractTreeTableNode xmlNode = (AbstractTreeTableNode) AbstractTreeTable.this
-								.getValueAt(selectedRow, 0);
+            private static final long serialVersionUID = 3842190208048171536L;
 
-						dataSB.append(xmlNode.getNodeName());
-						dataSB.append("\t");
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                JTree tree = getTree();
 
-						int size = xmlNode.getNodeElements().length;
+                InputMap map = tree.getInputMap(WHEN_FOCUSED);
+                ActionMap am = tree.getActionMap();
 
-						for (int i = 0; i < size; i++) {
+                if (map != null && am != null && isEnabled()) {
+                    Object binding = map.get(leftKeyStroke);
+                    Action action = (binding == null) ? null : am.get(binding);
+                    if (action != null) {
 
-							dataSB.append(xmlNode.getNodeValue(i));
-							dataSB.append("\t");
-						}
+                        KeyEvent ke = new KeyEvent(tree, KeyEvent.KEY_PRESSED, actionEvent.getWhen(), 0,
+                                KeyEvent.VK_LEFT, KeyEvent.CHAR_UNDEFINED);
 
-						dataSB.append(System.getProperty("line.separator"));
-					}
+                        SwingUtilities.notifyAction(action, leftKeyStroke, ke, tree, actionEvent.getModifiers());
+                    }
+                }
+            }
+        });
 
-				}
-				return new StringSelection(dataSB.toString());
-			}
+        getActionMap().put(rightKeyStroke, new AbstractAction() {
 
-			@Override
-			public int getSourceActions(JComponent c) {
-				return TransferHandler.COPY;
-			}
+            private static final long serialVersionUID = -5850337082346665414L;
 
-		});
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                JTree tree = getTree();
 
-		if (rowHeight > 0) {
-			setRowHeight(rowHeight);
-			tree.setRowHeight(rowHeight);
-		}
+                InputMap map = tree.getInputMap(WHEN_FOCUSED);
+                ActionMap am = tree.getActionMap();
 
-		// setup the side arrows to expand and collapse tree
-		final KeyStroke leftKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0);
-		final KeyStroke rightKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0);
+                if (map != null && am != null && isEnabled()) {
+                    Object binding = map.get(rightKeyStroke);
+                    Action action = (binding == null) ? null : am.get(binding);
+                    if (action != null) {
 
-		getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(leftKeyStroke, leftKeyStroke);
+                        KeyEvent ke = new KeyEvent(tree, KeyEvent.KEY_PRESSED, actionEvent.getWhen(), 0,
+                                KeyEvent.VK_RIGHT, KeyEvent.CHAR_UNDEFINED);
 
-		getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(rightKeyStroke, rightKeyStroke);
+                        SwingUtilities.notifyAction(action, rightKeyStroke, ke, tree, actionEvent.getModifiers());
+                    }
+                }
+            }
+        });
 
-		getActionMap().put(leftKeyStroke, new AbstractAction() {
+    }
 
-			private static final long serialVersionUID = 3842190208048171536L;
+    public DefaultTreeTableTree getTree() {
+        return tree;
+    }
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				JTree tree = getTree();
+    protected void setTreeTableColumnModel() {
 
-				InputMap map = tree.getInputMap(WHEN_FOCUSED);
-				ActionMap am = tree.getActionMap();
+        TreeTableModelAdapter model = (TreeTableModelAdapter) getModel();
 
-				if (map != null && am != null && isEnabled()) {
-					Object binding = map.get(leftKeyStroke);
-					Action action = (binding == null) ? null : am.get(binding);
-					if (action != null) {
+        TableColumnModel tableColumnModel = model.getTableColumnModel();
 
-						KeyEvent ke = new KeyEvent(tree, KeyEvent.KEY_PRESSED, e.getWhen(), 0, KeyEvent.VK_LEFT,
-								KeyEvent.CHAR_UNDEFINED);
+        setColumnModel(tableColumnModel);
+    }
 
-						SwingUtilities.notifyAction(action, leftKeyStroke, ke, tree, e.getModifiers());
-					}
-				}
-			}
-		});
+    public void expandAll(boolean expand) {
 
-		getActionMap().put(rightKeyStroke, new AbstractAction() {
+        DefaultTreeTableTree treeTableTree = getTree();
 
-			private static final long serialVersionUID = -5850337082346665414L;
+        Object rootNode = treeTableTree.getModel().getRoot();
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				JTree tree = getTree();
+        TreePath rootPath = new TreePath(rootNode);
 
-				InputMap map = tree.getInputMap(WHEN_FOCUSED);
-				ActionMap am = tree.getActionMap();
+        expandAll(rootPath, expand, 0);
+    }
 
-				if (map != null && am != null && isEnabled()) {
-					Object binding = map.get(rightKeyStroke);
-					Action action = (binding == null) ? null : am.get(binding);
-					if (action != null) {
+    @SuppressWarnings("rawtypes")
+    public void expandAll(TreePath parent, boolean expand, int level) {
 
-						KeyEvent ke = new KeyEvent(tree, KeyEvent.KEY_PRESSED, e.getWhen(), 0, KeyEvent.VK_RIGHT,
-								KeyEvent.CHAR_UNDEFINED);
+        DefaultTreeTableTree treeTableTree = getTree();
 
-						SwingUtilities.notifyAction(action, rightKeyStroke, ke, tree, e.getModifiers());
-					}
-				}
-			}
-		});
+        AbstractTreeTableNode node = (AbstractTreeTableNode) parent.getLastPathComponent();
 
-	}
+        if (node.getChildCount() > 0) {
 
-	public DefaultTreeTableTree getTree() {
-		return tree;
-	}
+            for (Enumeration e = node.children(); e.hasMoreElements();) {
+                TreeNode childNode = (TreeNode) e.nextElement();
+                TreePath path = parent.pathByAddingChild(childNode);
 
-	protected void setTreeTableColumnModel() {
+                expandAll(path, expand, level + 1);
+            }
 
-		TreeTableModelAdapter model = (TreeTableModelAdapter) getModel();
-		TableColumnModel tableColumnModel = new DefaultTableColumnModel();
+            // restricting expand/collapse to 1 level onwards
+            if (level > 0) {
+                // Expansion or collapse must be done bottom-up
+                if (expand) {
+                    treeTableTree.expandPath(parent);
+                } else {
+                    treeTableTree.collapsePath(parent);
+                }
+            }
+        }
+    }
 
-		for (int i = 0; i < model.getColumnCount(); i++) {
+    public void selectTreeNodeTableRow(AbstractTreeTableNode abstractTreeTableNode) {
 
-			TableColumn tableColumn = new TableColumn(i);
+        TreeTableModelAdapter treeTableModelAdapter;
 
-			TreeTableColumn treeTableColumn = model.getColumn(i);
+        treeTableModelAdapter = (TreeTableModelAdapter) getModel();
 
-			String text = treeTableColumn.getDisplayName();
+        int rowIndex = -1;
+        int rowCount = treeTableModelAdapter.getRowCount();
 
-			Class<?> columnClass = treeTableColumn.getColumnClass();
+        for (int i = 0; i < rowCount; i++) {
 
-			int preferredWidth = treeTableColumn.getPrefColumnWidth();
+            Object obj = treeTableModelAdapter.getValueAt(i, 0);
 
-			tableColumn.setHeaderValue(text);
-			tableColumn.setPreferredWidth(preferredWidth);
+            if (obj != null) {
 
-			TableCellRenderer tcr = null;
+                if (abstractTreeTableNode.equals(obj)) {
+                    rowIndex = i;
+                    break;
+                }
+            }
+        }
 
-			if (TreeTableColumn.TREE_COLUMN_CLASS.equals(columnClass)) {
+        if (rowIndex != -1) {
+            setRowSelectionInterval(rowIndex, rowIndex);
+            scrollRowToVisible(rowIndex);
+        }
+    }
 
-				DefaultTreeTableTree treeTableTree = getTree();
-				tcr = treeTableTree;
-				tableColumn.setCellEditor(new TreeTableCellEditor(treeTableTree));
-			} else {
+    public void scrollNodeToVisible(AbstractTreeTableNode abstractTreeTableNode) {
 
-				LabelTableCellRenderer ltcr = new LabelTableCellRenderer();
-				ltcr.setBorder(new EmptyBorder(1, 3, 1, 1));
-				ltcr.setHorizontalAlignment(treeTableColumn.getHorizontalAlignment());
+        DefaultTreeTableTree treeTableTree = getTree();
 
-				tableColumn.setCellEditor(new TreeTableCellEditor(ltcr));
+        TreePath treePath = new TreePath(abstractTreeTableNode.getPath());
 
-				tcr = ltcr;
-			}
-
-			tableColumn.setCellRenderer(tcr);
-
-			tableColumn.setResizable(true);
-
-			tableColumnModel.addColumn(tableColumn);
-		}
-
-		setColumnModel(tableColumnModel);
-	}
-
-	public void expandAll(boolean expand) {
-
-		DefaultTreeTableTree treeTableTree = getTree();
-
-		Object rootNode = treeTableTree.getModel().getRoot();
-
-		TreePath rootPath = new TreePath(rootNode);
-
-		expandAll(rootPath, expand, 0);
-	}
-
-	@SuppressWarnings("rawtypes")
-	public void expandAll(TreePath parent, boolean expand, int level) {
-
-		DefaultTreeTableTree treeTableTree = getTree();
-
-		AbstractTreeTableNode node = (AbstractTreeTableNode) parent.getLastPathComponent();
-
-		if (node.getChildCount() > 0) {
-
-			for (Enumeration e = node.children(); e.hasMoreElements();) {
-				TreeNode childNode = (TreeNode) e.nextElement();
-				TreePath path = parent.pathByAddingChild(childNode);
-
-				expandAll(path, expand, level + 1);
-			}
-
-			// restricting expand/collapse to 1 level onwards
-			if (level > 0) {
-				// Expansion or collapse must be done bottom-up
-				if (expand) {
-					treeTableTree.expandPath(parent);
-				} else {
-					treeTableTree.collapsePath(parent);
-				}
-			}
-		}
-	}
-
-	public void selectTreeNodeTableRow(AbstractTreeTableNode abstractTreeTableNode) {
-
-		TreeTableModelAdapter treeTableModelAdapter;
-
-		treeTableModelAdapter = (TreeTableModelAdapter) getModel();
-
-		int rowIndex = -1;
-		int rowCount = treeTableModelAdapter.getRowCount();
-
-		for (int i = 0; i < rowCount; i++) {
-
-			Object obj = treeTableModelAdapter.getValueAt(i, 0);
-
-			if (obj != null) {
-
-				if (abstractTreeTableNode.equals(obj)) {
-					rowIndex = i;
-					break;
-				}
-			}
-		}
-
-		if (rowIndex != -1) {
-			setRowSelectionInterval(rowIndex, rowIndex);
-			scrollRowToVisible(rowIndex);
-		}
-	}
-
-	public void scrollNodeToVisible(AbstractTreeTableNode abstractTreeTableNode) {
-
-		DefaultTreeTableTree treeTableTree = getTree();
-
-		TreePath treePath = new TreePath(abstractTreeTableNode.getPath());
-
-		treeTableTree.setSelectionPath(treePath);
-		// treeTableTree.scrollPathToVisible(treePath);
-		selectTreeNodeTableRow(abstractTreeTableNode);
-	}
+        LOG.debug("scrollNodeToVisible - treePath: " + treePath);
+        treeTableTree.setSelectionPath(treePath);
+        // treeTableTree.scrollPathToVisible(treePath);
+        selectTreeNodeTableRow(abstractTreeTableNode);
+    }
 
 }

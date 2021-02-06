@@ -4,37 +4,38 @@
  * Contributors:
  *     Manu Varghese
  *******************************************************************************/
+
 package com.pega.gcs.fringecommon.utilities;
 
 import java.nio.ByteBuffer;
 
 public class ArchiveMemoryFile {
 
-	private final String path;
+    private final String path;
 
-	private final ByteBuffer data;
+    private final ByteBuffer data;
 
-	public ArchiveMemoryFile(String path, ByteBuffer data) {
-		// normalize folder separator
-		this.path = path.replace('\\', '/');
-		this.data = data;
-	}
+    public ArchiveMemoryFile(String path, ByteBuffer data) {
+        // normalize folder separator
+        this.path = path.replace('\\', '/');
+        this.data = data;
+    }
 
-	public String getName() {
-		return path.substring(path.lastIndexOf("/") + 1);
-	}
+    public String getName() {
+        return path.substring(path.lastIndexOf("/") + 1);
+    }
 
-	public String getPath() {
-		return path;
-	}
+    public String getPath() {
+        return path;
+    }
 
-	public ByteBuffer getData() {
-		return data.duplicate();
-	}
+    public ByteBuffer getData() {
+        return data.duplicate();
+    }
 
-	@Override
-	public String toString() {
-		return path;
-	}
+    @Override
+    public String toString() {
+        return path;
+    }
 
 }

@@ -4,6 +4,7 @@
  * Contributors:
  *     Manu Varghese
  *******************************************************************************/
+
 package com.pega.gcs.fringecommon.guiutilities.bookmark;
 
 import java.io.Serializable;
@@ -17,57 +18,57 @@ import com.pega.gcs.fringecommon.guiutilities.markerbar.Marker;
 
 public class BookmarkContainer<T> implements Serializable {
 
-	private static final long serialVersionUID = 7824515896380123970L;
+    private static final long serialVersionUID = 7824515896380123970L;
 
-	private Map<T, List<Marker<T>>> bookmarkMap;
+    private Map<T, List<Marker<T>>> bookmarkMap;
 
-	public BookmarkContainer() {
-		super();
+    public BookmarkContainer() {
+        super();
 
-		bookmarkMap = new TreeMap<T, List<Marker<T>>>();
-	}
+        bookmarkMap = new TreeMap<T, List<Marker<T>>>();
+    }
 
-	public List<Marker<T>> getBookmarkList(T key) {
+    public List<Marker<T>> getBookmarkList(T key) {
 
-		return bookmarkMap.get(key);
-	}
+        return bookmarkMap.get(key);
+    }
 
-	public boolean containsKey(T key) {
-		return bookmarkMap.containsKey(key);
-	}
+    public boolean containsKey(T key) {
+        return bookmarkMap.containsKey(key);
+    }
 
-	public void addBookmark(Marker<T> bookmark) {
+    public void addBookmark(Marker<T> bookmark) {
 
-		List<Marker<T>> bookmarkList = getBookmarkList(bookmark.getKey());
+        List<Marker<T>> bookmarkList = getBookmarkList(bookmark.getKey());
 
-		if (bookmarkList == null) {
-			bookmarkList = new ArrayList<>();
-			bookmarkMap.put(bookmark.getKey(), bookmarkList);
-		}
+        if (bookmarkList == null) {
+            bookmarkList = new ArrayList<>();
+            bookmarkMap.put(bookmark.getKey(), bookmarkList);
+        }
 
-		bookmarkList.add(bookmark);
-	}
+        bookmarkList.add(bookmark);
+    }
 
-	public void removeBookmark(T key, int index) {
+    public void removeBookmark(T key, int index) {
 
-		List<Marker<T>> bookmarkList = getBookmarkList(key);
+        List<Marker<T>> bookmarkList = getBookmarkList(key);
 
-		if (bookmarkList != null) {
-			bookmarkList.remove(index);
+        if (bookmarkList != null) {
+            bookmarkList.remove(index);
 
-			if (bookmarkList.size() == 0) {
-				bookmarkMap.remove(key);
-			}
-		}
+            if (bookmarkList.size() == 0) {
+                bookmarkMap.remove(key);
+            }
+        }
 
-	}
+    }
 
-	public void clearBookmarks() {
-		bookmarkMap.clear();
-	}
+    public void clearBookmarks() {
+        bookmarkMap.clear();
+    }
 
-	public Iterator<T> getIterator() {
-		return bookmarkMap.keySet().iterator();
-	}
+    public Iterator<T> getIterator() {
+        return bookmarkMap.keySet().iterator();
+    }
 
 }

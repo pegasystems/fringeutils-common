@@ -4,10 +4,9 @@
  * Contributors:
  *     Manu Varghese
  *******************************************************************************/
+
 package com.pega.gcs.fringecommon.xmltreetable;
 
-import java.io.IOException;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -15,12 +14,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.dom4j.Attribute;
 import org.dom4j.DocumentFactory;
 import org.dom4j.Element;
-import org.dom4j.io.OutputFormat;
-import org.dom4j.io.XMLWriter;
 
 import com.pega.gcs.fringecommon.guiutilities.treetable.AbstractTreeTableNode;
 import com.pega.gcs.fringecommon.log4j2.Log4j2Helper;
@@ -30,581 +27,550 @@ import com.pega.gcs.fringecommon.utilities.diff.MyersDifferenceAlgorithm;
 
 public class XMLNode extends AbstractTreeTableNode {
 
-	private static final long serialVersionUID = 3799173551035007030L;
+    private static final long serialVersionUID = 3799173551035007030L;
 
-	private static final Log4j2Helper LOG = new Log4j2Helper(XMLNode.class);
+    private static final Log4j2Helper LOG = new Log4j2Helper(XMLNode.class);
 
-	private Integer id;
+    private Integer id;
 
-	private Element[] nodeArray;
+    private Element[] nodeArray;
 
-	private String[] nodeValue;
+    private String[] nodeValue;
 
-	private boolean[] hasMessage;
+    private boolean[] hasMessage;
 
-	private String[] dataField;
+    private String[] dataField;
 
-	private boolean[] searchFound;
+    private boolean[] searchFound;
 
-	private String[] searchStr;
+    private String[] searchStr;
 
-	private boolean[] parentSearchFound;
+    private boolean[] parentSearchFound;
 
-	private boolean[] secondarySearchFound;
+    private boolean[] secondarySearchFound;
 
-	private boolean[] secondaryParentSearchFound;
+    private boolean[] secondaryParentSearchFound;
 
-	// 0 based indexes.
-	private Map<Integer, Integer> compareIndexMap;
+    // 0 based indexes.
+    private Map<Integer, Integer> compareIndexMap;
 
-	public XMLNode(Element nodeArray, String searchStr) {
+    public XMLNode(Element nodeArray, String searchStr) {
 
-		this(new Element[] { nodeArray }, new String[] { searchStr });
-	}
+        this(new Element[] { nodeArray }, new String[] { searchStr });
+    }
 
-	public XMLNode(Element[] nodeArray, String[] searchStr) {
-		super();
+    public XMLNode(Element[] nodeArray, String[] searchStr) {
+        super();
 
-		this.nodeArray = nodeArray;
-		this.searchStr = searchStr;
+        this.nodeArray = nodeArray;
+        this.searchStr = searchStr;
 
-		this.compareIndexMap = new HashMap<>();
+        this.compareIndexMap = new HashMap<>();
 
-		int length = nodeArray.length;
+        int length = nodeArray.length;
 
-		// for 2 entries compare them
-		if (length == 2) {
-			compareIndexMap.put(0, 1);
-		}
-		// by default comparison done on 0=>1 and 2=>3 and so on.
-		else if (length > 2) {
+        // for 2 entries compare them
+        if (length == 2) {
 
-			if (length % 2 != 0) {
-				// update nodeArray to make it even number array.
-				Element[] tmpNodeArray = new Element[length + 1];
+            compareIndexMap.put(0, 1);
 
-				System.arraycopy(nodeArray, 0, tmpNodeArray, 0, length);
+        } else if (length > 2) {
+            // by default comparison done on 0=>1 and 2=>3 and so on.
 
-				nodeArray = tmpNodeArray;
-				length = nodeArray.length;
-			}
+            if (length % 2 != 0) {
+                // update nodeArray to make it even number array.
+                Element[] tmpNodeArray = new Element[length + 1];
 
-			for (int i = 0; i < length; i = i + 2) {
-				compareIndexMap.put(i, i + 1);
-			}
+                System.arraycopy(nodeArray, 0, tmpNodeArray, 0, length);
 
-		}
+                nodeArray = tmpNodeArray;
+                length = nodeArray.length;
+            }
 
-		initialize();
-	}
+            for (int i = 0; i < length; i = i + 2) {
+                compareIndexMap.put(i, i + 1);
+            }
 
-	public Integer getId() {
-		return id;
-	}
+        }
 
-	public void setId(Integer id) {
-		this.id = id;
-	}
+        initialize();
+    }
 
-	@Override
-	public String getNodeName() {
-		return getNodeValue(0);
-	}
+    public Integer getId() {
+        return id;
+    }
 
-	@Override
-	public String getNodeValue(int column) {
-		return nodeValue[column];
-	}
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
-	@Override
-	public Element[] getNodeElements() {
-		return nodeArray;
-	}
+    @Override
+    public String getNodeName() {
+        return getNodeValue(0);
+    }
 
-	public boolean[] getHasMessageArray() {
-		return hasMessage;
-	}
+    @Override
+    public String getNodeValue(int column) {
+        return nodeValue[column];
+    }
 
-	public void setHasMessageArray(boolean[] hasMessage) {
-		this.hasMessage = hasMessage;
-	}
+    @Override
+    public Element[] getNodeElements() {
+        return nodeArray;
+    }
 
-	public boolean isHasMessage(int column) {
-		return hasMessage[column];
-	}
+    public boolean[] getHasMessageArray() {
+        return hasMessage;
+    }
 
-	public String getDataField(int column) {
-		return dataField[column];
-	}
+    public void setHasMessageArray(boolean[] hasMessage) {
+        this.hasMessage = hasMessage;
+    }
 
-	public boolean[] getSearchFoundArray() {
-		return searchFound;
-	}
+    public boolean isHasMessage(int column) {
+        return hasMessage[column];
+    }
 
-	public void setSearchFoundArray(boolean[] searchFound) {
-		this.searchFound = searchFound;
-	}
+    public String getDataField(int column) {
+        return dataField[column];
+    }
 
-	public boolean isSearchFound(int column) {
-		return searchFound[column];
-	}
+    public boolean[] getSearchFoundArray() {
+        return searchFound;
+    }
 
-	public boolean[] getParentSearchFoundArray() {
-		return parentSearchFound;
-	}
+    public void setSearchFoundArray(boolean[] searchFound) {
+        this.searchFound = searchFound;
+    }
 
-	public void setParentSearchFoundArray(boolean[] searchFound) {
-		this.parentSearchFound = searchFound;
-	}
+    public boolean isSearchFound(int column) {
+        return searchFound[column];
+    }
 
-	public boolean isParentSearchFound(int column) {
-		return parentSearchFound[column];
-	}
+    public boolean[] getParentSearchFoundArray() {
+        return parentSearchFound;
+    }
 
-	public boolean[] getSecondarySearchFoundArray() {
-		return secondarySearchFound;
-	}
+    public void setParentSearchFoundArray(boolean[] searchFound) {
+        this.parentSearchFound = searchFound;
+    }
 
-	public void setSecondarySearchFoundArray(boolean[] secondarySearchFound) {
-		this.secondarySearchFound = secondarySearchFound;
-	}
+    public boolean isParentSearchFound(int column) {
+        return parentSearchFound[column];
+    }
 
-	// check the tree column as well as the trace data column
-	public boolean isSecondarySearchFound(int column) {
+    public boolean[] getSecondarySearchFoundArray() {
+        return secondarySearchFound;
+    }
 
-		boolean secondarySearch = false;
+    public void setSecondarySearchFoundArray(boolean[] secondarySearchFound) {
+        this.secondarySearchFound = secondarySearchFound;
+    }
 
-		if ((column != 0) && (secondarySearchFound.length > 0)) {
-			secondarySearch = secondarySearchFound[0];
-		}
+    // check the tree column as well as the trace data column
+    public boolean isSecondarySearchFound(int column) {
 
-		secondarySearch = secondarySearch || secondarySearchFound[column];
+        boolean secondarySearch = false;
 
-		return secondarySearch;
-	}
+        if ((column != 0) && (secondarySearchFound.length > 0)) {
+            secondarySearch = secondarySearchFound[0];
+        }
 
-	public boolean[] getSecondaryParentSearchFoundArray() {
-		return secondaryParentSearchFound;
-	}
+        secondarySearch = secondarySearch || secondarySearchFound[column];
 
-	public void setSecondaryParentSearchFoundArray(boolean[] secondaryParentSearchFound) {
-		this.secondaryParentSearchFound = secondaryParentSearchFound;
-	}
+        return secondarySearch;
+    }
 
-	// check the tree column as well as the trace data column
-	public boolean isSecondaryParentSearchFound(int column) {
+    public boolean[] getSecondaryParentSearchFoundArray() {
+        return secondaryParentSearchFound;
+    }
 
-		boolean secondaryParentSearch = false;
+    public void setSecondaryParentSearchFoundArray(boolean[] secondaryParentSearchFound) {
+        this.secondaryParentSearchFound = secondaryParentSearchFound;
+    }
 
-		if ((column != 0) && (secondaryParentSearchFound.length > 0)) {
-			secondaryParentSearch = secondaryParentSearchFound[0];
-		}
+    // check the tree column as well as the trace data column
+    public boolean isSecondaryParentSearchFound(int column) {
 
-		secondaryParentSearch = secondaryParentSearch || secondaryParentSearchFound[column];
+        boolean secondaryParentSearch = false;
 
-		return secondaryParentSearch;
-	}
+        if ((column != 0) && (secondaryParentSearchFound.length > 0)) {
+            secondaryParentSearch = secondaryParentSearchFound[0];
+        }
 
-	private void initialize() {
+        secondaryParentSearch = secondaryParentSearch || secondaryParentSearchFound[column];
 
-		if (nodeArray != null) {
+        return secondaryParentSearch;
+    }
 
-			int size = nodeArray.length;
+    private void initialize() {
 
-			// xml tree table is node list + 1 columns
-			// 1st column for name, remaining columns for actual node data.
-			nodeValue = new String[size + 1];
-			hasMessage = new boolean[size + 1];
-			dataField = new String[size + 1];
-			searchFound = new boolean[size + 1];
-			parentSearchFound = new boolean[size + 1];
-			secondarySearchFound = new boolean[size + 1];
-			secondaryParentSearchFound = new boolean[size + 1];
-			// specialCharsInValue = new boolean[size + 1];
+        if (nodeArray != null) {
 
-			// column one is only node name
-			// column 2 onwards has column data
+            int size = nodeArray.length;
 
-			for (int i = 0; i < size; i++) {
+            // xml tree table is node list + 1 columns
+            // 1st column for name, remaining columns for actual node data.
+            nodeValue = new String[size + 1];
+            hasMessage = new boolean[size + 1];
+            dataField = new String[size + 1];
+            searchFound = new boolean[size + 1];
+            parentSearchFound = new boolean[size + 1];
+            secondarySearchFound = new boolean[size + 1];
+            secondaryParentSearchFound = new boolean[size + 1];
+            // specialCharsInValue = new boolean[size + 1];
 
-				hasMessage[i + 1] = false;
-				searchFound[i + 1] = false;
-				parentSearchFound[i + 1] = false;
-				secondarySearchFound[i + 1] = false;
-				secondaryParentSearchFound[i + 1] = false;
-				// specialCharsInValue[i + 1] = false;
+            // column one is only node name
+            // column 2 onwards has column data
 
-				Element node = nodeArray[i];
-				String search = searchStr[i];
+            for (int i = 0; i < size; i++) {
 
-				String nodeName = "";
+                hasMessage[i + 1] = false;
+                searchFound[i + 1] = false;
+                parentSearchFound[i + 1] = false;
+                secondarySearchFound[i + 1] = false;
+                secondaryParentSearchFound[i + 1] = false;
+                // specialCharsInValue[i + 1] = false;
 
-				if (node != null) {
+                Element node = nodeArray[i];
+                String search = searchStr[i];
 
-					nodeName = getElementName(node);
-					nodeValue[0] = nodeName;
+                String nodeName = "";
 
-					String nodeValueText = node.getText().trim();
-					nodeValue[i + 1] = nodeValueText;
+                if (node != null) {
 
-					if (("PZ__".equals(nodeName) || ("PZ__ERROR".equals(nodeName)))
-							|| (("pzStatus".equals(nodeName)) && ("false".equalsIgnoreCase(nodeValueText)))) {
+                    nodeName = getElementName(node);
+                    nodeValue[0] = nodeName;
 
-						hasMessage[i + 1] = true;
+                    String nodeValueText = node.getText().trim();
+                    nodeValue[i + 1] = nodeValueText;
 
-						if ("PZ__ERROR".equals(nodeName)) {
+                    if (("PZ__".equals(nodeName) || ("PZ__ERROR".equals(nodeName)))
+                            || (("pzStatus".equals(nodeName)) && ("false".equalsIgnoreCase(nodeValueText)))) {
 
-							Attribute attribute = node.attribute("DATAFLD");
+                        hasMessage[i + 1] = true;
 
-							if ((attribute != null) && (attribute.getText() != null)
-									&& (!"".equals(attribute.getText()))) {
-								dataField[i + 1] = attribute.getText();
-							}
-						}
-					}
+                        if ("PZ__ERROR".equals(nodeName)) {
 
-					if ((search != null) && (!"".equals(search))) {
+                            Attribute attribute = node.attribute("DATAFLD");
 
-						String lSearchStr = search.toLowerCase();
-						String lName = nodeName.toLowerCase();
-						String lValue = nodeValueText.toLowerCase();
+                            if ((attribute != null) && (attribute.getText() != null)
+                                    && (!"".equals(attribute.getText()))) {
+                                dataField[i + 1] = attribute.getText();
+                            }
+                        }
+                    }
 
-						if (lName.indexOf(lSearchStr) != -1) {
-							searchFound[0] = true;
-						}
+                    if ((search != null) && (!"".equals(search))) {
 
-						if (lValue.indexOf(lSearchStr) != -1) {
-							searchFound[i + 1] = true;
-						}
-					}
-				}
-			}
-		}
-	}
+                        String searchStr = search.toLowerCase();
+                        String name = nodeName.toLowerCase();
+                        String value = nodeValueText.toLowerCase();
 
-	protected String getElementName(Element element) {
+                        if (name.indexOf(searchStr) != -1) {
+                            searchFound[0] = true;
+                        }
 
-		String elementName = null;
+                        if (value.indexOf(searchStr) != -1) {
+                            searchFound[i + 1] = true;
+                        }
+                    }
+                }
+            }
+        }
+    }
 
-		Attribute attribute = element.attribute("name");
+    protected String getElementName(Element element) {
 
-		if ((attribute != null) && (attribute.getText() != null) && (!"".equals(attribute.getText()))) {
-			elementName = attribute.getText();
-		} else {
+        String elementName = null;
 
-			attribute = element.attribute("eventType");
+        Attribute attribute = element.attribute("name");
 
-			if ((attribute != null) && (attribute.getText() != null) && (!"".equals(attribute.getText()))) {
-				elementName = attribute.getText();
-			} else {
+        if ((attribute != null) && (attribute.getText() != null) && (!"".equals(attribute.getText()))) {
+            elementName = attribute.getText();
+        } else {
 
-				StringBuffer elementNameSB = new StringBuffer();
-				elementNameSB.append(element.getName());
+            attribute = element.attribute("eventType");
 
-				boolean added = false;
+            if ((attribute != null) && (attribute.getText() != null) && (!"".equals(attribute.getText()))) {
+                elementName = attribute.getText();
+            } else {
 
-				added = addAttribute(element, "REPEATINGINDEX", elementNameSB);
+                StringBuilder elementNameSB = new StringBuilder();
+                elementNameSB.append(element.getName());
 
-				if (!added) {
-					added = addAttribute(element, "REPEATINGTYPE", elementNameSB);
-				}
+                boolean added = addAttribute(element, "REPEATINGINDEX", elementNameSB);
 
-				if (!added) {
-					added = addAttribute(element, "referenceTo", elementNameSB);
-				}
+                if (!added) {
+                    added = addAttribute(element, "REPEATINGTYPE", elementNameSB);
+                }
 
-				elementName = elementNameSB.toString();
-			}
-		}
+                if (!added) {
+                    added = addAttribute(element, "referenceTo", elementNameSB);
+                }
 
-		return elementName;
-	}
+                elementName = elementNameSB.toString();
+            }
+        }
 
-	private boolean addAttribute(Element element, String attribName, StringBuffer elementNameSB) {
+        return elementName;
+    }
 
-		boolean added = false;
+    private boolean addAttribute(Element element, String attribName, StringBuilder elementNameSB) {
 
-		String attribValue = element.attributeValue(attribName);
+        boolean added = false;
 
-		if ((attribValue != null) && (!"".equals(attribValue))) {
+        String attribValue = element.attributeValue(attribName);
 
-			elementNameSB.append(" (");
-			elementNameSB.append(attribValue);
-			elementNameSB.append(")");
-		}
+        if ((attribValue != null) && (!"".equals(attribValue))) {
 
-		return added;
-	}
+            elementNameSB.append(" (");
+            elementNameSB.append(attribValue);
+            elementNameSB.append(")");
+        }
 
-	// only support 2 values column
-	@SuppressWarnings("unchecked")
-	public List<XMLNode> getChildNodeList() {
+        return added;
+    }
 
-		List<XMLNode> childNodeList = new ArrayList<XMLNode>();
+    // only support 2 values column
+    @SuppressWarnings("unchecked")
+    public List<XMLNode> getChildNodeList() {
 
-		if ((nodeArray != null)) {
+        List<XMLNode> childNodeList = new ArrayList<XMLNode>();
 
-			Comparator<Element> elementComparator = new Comparator<Element>() {
+        if ((nodeArray != null)) {
 
-				@Override
-				public int compare(Element o1, Element o2) {
+            Comparator<Element> elementComparator = new Comparator<Element>() {
 
-					String o1AttribStr = o1.attributeValue("REPEATINGINDEX");
-					String o2AttribStr = o2.attributeValue("REPEATINGINDEX");
+                @Override
+                public int compare(Element o1, Element o2) {
 
-					if ((o1AttribStr != null) && (o2AttribStr != null)) {
+                    String o1AttribStr = o1.attributeValue("REPEATINGINDEX");
+                    String o2AttribStr = o2.attributeValue("REPEATINGINDEX");
 
-						try {
-							Integer o1AttribInt = Integer.parseInt(o1AttribStr);
-							Integer o2AttribInt = Integer.parseInt(o2AttribStr);
+                    if ((o1AttribStr != null) && (o2AttribStr != null)) {
 
-							return o1AttribInt.compareTo(o2AttribInt);
+                        try {
+                            Integer o1AttribInt = Integer.parseInt(o1AttribStr);
+                            Integer o2AttribInt = Integer.parseInt(o2AttribStr);
 
-						} catch (NumberFormatException nfe) {
-							// repeating index can be strings
-							return o1AttribStr.compareTo(o2AttribStr);
-						}
-					}
+                            return o1AttribInt.compareTo(o2AttribInt);
 
-					String o1ElementName = getElementName(o1).trim();
-					String o2ElementName = getElementName(o2).trim();
+                        } catch (NumberFormatException nfe) {
+                            // repeating index can be strings
+                            return o1AttribStr.compareTo(o2AttribStr);
+                        }
+                    }
 
-					return o1ElementName.compareTo(o2ElementName);
-				}
-			};
+                    String o1ElementName = getElementName(o1).trim();
+                    String o2ElementName = getElementName(o2).trim();
 
-			int size = nodeArray.length;
+                    return o1ElementName.compareTo(o2ElementName);
+                }
+            };
 
-			if (size > 1) {
+            int size = nodeArray.length;
 
-				try {
+            if (size > 1) {
 
-					Map<Integer, List<Element>> childElemListMap = new HashMap<Integer, List<Element>>();
+                try {
 
-					for (int i = 0; i < size; i++) {
+                    Map<Integer, List<Element>> childElemListMap = new HashMap<Integer, List<Element>>();
 
-						Integer key = new Integer(i);
+                    for (int i = 0; i < size; i++) {
 
-						Element node = nodeArray[i];
+                        Integer key = Integer.valueOf(i);
 
-						List<Element> childElemList;
+                        Element node = nodeArray[i];
 
-						if (node != null) {
-							childElemList = new ArrayList<Element>(node.elements());
-						} else {
-							childElemList = new ArrayList<Element>();
-						}
+                        List<Element> childElemList;
 
-						Collections.sort(childElemList, elementComparator);
+                        if (node != null) {
+                            childElemList = new ArrayList<Element>(node.elements());
+                        } else {
+                            childElemList = new ArrayList<Element>();
+                        }
 
-						childElemListMap.put(key, childElemList);
-					}
+                        Collections.sort(childElemList, elementComparator);
 
-					Map<Integer, List<Element>> childElementListMap = new HashMap<>();
+                        childElemListMap.put(key, childElemList);
+                    }
 
-					for (Integer compareIndex : compareIndexMap.keySet()) {
+                    Map<Integer, List<Element>> childElementListMap = new HashMap<>();
 
-						List<Element> firstList = childElemListMap.get(compareIndex);
-						List<Element> secondList = childElemListMap.get(compareIndexMap.get(compareIndex));
+                    for (Integer compareIndex : compareIndexMap.keySet()) {
 
-						Matcher<Element> matcher = new Matcher<Element>() {
+                        List<Element> firstList = childElemListMap.get(compareIndex);
+                        List<Element> secondList = childElemListMap.get(compareIndexMap.get(compareIndex));
 
-							@Override
-							public boolean match(Element o1, Element o2) {
+                        Matcher<Element> matcher = new Matcher<Element>() {
 
-								String o1ElementName = getElementName(o1).trim();
-								String o2ElementName = getElementName(o2).trim();
+                            @Override
+                            public boolean match(Element o1, Element o2) {
 
-								return o1ElementName.equals(o2ElementName);
-							}
-						};
+                                String o1ElementName = getElementName(o1).trim();
+                                String o2ElementName = getElementName(o2).trim();
 
-						List<EditCommand> editScript = MyersDifferenceAlgorithm.diffGreedyLCS(null, firstList,
-								secondList, matcher);
+                                return o1ElementName.equals(o2ElementName);
+                            }
+                        };
 
-						int indexFirst = 0;
-						int indexSecond = 0;
+                        List<EditCommand> editScript = MyersDifferenceAlgorithm.diffGreedyLCS(null, firstList,
+                                secondList, matcher);
 
-						Element firstElement = null;
-						Element secondElement = null;
+                        int indexFirst = 0;
+                        int indexSecond = 0;
 
-						Integer index = 0;
+                        Element firstElement = null;
+                        Element secondElement = null;
 
-						for (EditCommand ec : editScript) {
+                        Integer index = 0;
 
-							switch (ec) {
-							case DELETE:
+                        for (EditCommand ec : editScript) {
 
-								firstElement = firstList.get(indexFirst);
-								secondElement = null;
+                            switch (ec) {
+                            case DELETE:
 
-								indexFirst++;
-								break;
-							case INSERT:
+                                firstElement = firstList.get(indexFirst);
+                                secondElement = null;
 
-								firstElement = null;
-								secondElement = secondList.get(indexSecond);
+                                indexFirst++;
+                                break;
+                            case INSERT:
 
-								indexSecond++;
-								break;
-							case SNAKE:
-								firstElement = firstList.get(indexFirst);
-								secondElement = secondList.get(indexSecond);
+                                firstElement = null;
+                                secondElement = secondList.get(indexSecond);
 
-								indexFirst++;
-								indexSecond++;
-								break;
-							default:
-								break;
+                                indexSecond++;
+                                break;
+                            case SNAKE:
+                                firstElement = firstList.get(indexFirst);
+                                secondElement = secondList.get(indexSecond);
 
-							}
+                                indexFirst++;
+                                indexSecond++;
+                                break;
+                            default:
+                                break;
 
-							List<Element> childElementList = childElementListMap.get(index);
+                            }
 
-							if (childElementList == null) {
-								childElementList = new ArrayList<>();
-								childElementListMap.put(index, childElementList);
-							}
+                            List<Element> childElementList = childElementListMap.get(index);
 
-							childElementList.add(firstElement);
-							childElementList.add(secondElement);
+                            if (childElementList == null) {
+                                childElementList = new ArrayList<>();
+                                childElementListMap.put(index, childElementList);
+                            }
 
-							index++;
-						}
-					}
+                            childElementList.add(firstElement);
+                            childElementList.add(secondElement);
 
-					for (Integer index : childElementListMap.keySet()) {
+                            index++;
+                        }
+                    }
 
-						List<Element> childElementList = childElementListMap.get(index);
+                    for (Integer index : childElementListMap.keySet()) {
 
-						Element[] childElements = childElementList.toArray(new Element[childElementList.size()]);
+                        List<Element> childElementList = childElementListMap.get(index);
 
-						Element[] childElementArray = new Element[nodeArray.length];
+                        Element[] childElements = childElementList.toArray(new Element[childElementList.size()]);
 
-						System.arraycopy(childElements, 0, childElementArray, 0, childElements.length);
+                        Element[] childElementArray = new Element[nodeArray.length];
 
-						childNodeList.add(new XMLNode(childElementArray, searchStr));
-					}
+                        System.arraycopy(childElements, 0, childElementArray, 0, childElements.length);
 
-				} catch (Exception e) {
-					LOG.error("Error creating child xml nodes", e);
-				}
+                        childNodeList.add(new XMLNode(childElementArray, searchStr));
+                    }
 
-			} else {
+                } catch (Exception e) {
+                    LOG.error("Error creating child xml nodes", e);
+                }
 
-				Element node = nodeArray[0];
-				String search = searchStr[0];
+            } else {
 
-				List<Element> childElemList = new ArrayList<Element>(node.elements());
+                Element node = nodeArray[0];
+                String search = searchStr[0];
 
-				Collections.sort(childElemList, elementComparator);
+                List<Element> childElemList = new ArrayList<Element>(node.elements());
 
-				for (Element childElem : childElemList) {
-					childNodeList.add(new XMLNode(childElem, search));
-				}
+                Collections.sort(childElemList, elementComparator);
 
-			}
+                for (Element childElem : childElemList) {
+                    childNodeList.add(new XMLNode(childElem, search));
+                }
 
-			// Collections.sort(childNodeList);
+            }
 
-		}
+            // Collections.sort(childNodeList);
 
-		return childNodeList;
-	}
+        }
 
-	private static Element getDummyElement() {
+        return childNodeList;
+    }
 
-		Element element = null;
+    @SuppressWarnings("unused")
+    private static Element getDummyElement() {
 
-		String elementName = "DUMMY";
-		DocumentFactory factory = DocumentFactory.getInstance();
-		element = factory.createElement(elementName);
-		element.addAttribute("name", elementName);
+        String elementName = "DUMMY";
+        DocumentFactory factory = DocumentFactory.getInstance();
+        Element element = factory.createElement(elementName);
+        element.addAttribute("name", elementName);
 
-		return element;
-	}
+        return element;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString() {
-		return getNodeName();
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return getNodeName();
+    }
 
-	@Override
-	public int compareTo(AbstractTreeTableNode o) {
-		return getNodeName().toLowerCase().compareTo(o.getNodeName().toLowerCase());
-	}
+    @Override
+    public int compareTo(AbstractTreeTableNode other) {
+        return getNodeName().toLowerCase().compareTo(other.getNodeName().toLowerCase());
+    }
 
-	public static String getElementsAsXML(List<Element> elementList) {
-		String xmlStr = "";
-		try {
+    public boolean[] secondarySearch(String searchStr) {
 
-			for (Element element : elementList) {
+        for (int i = 0; i < secondarySearchFound.length; i++) {
+            secondarySearchFound[i] = false;
+        }
 
-				StringWriter sw = new StringWriter();
-				OutputFormat format = new OutputFormat();
-				format.setIndentSize(2);
-				format.setNewlines(true);
-				// format.setTrimText(true);
-				format.setPadText(true);
+        if ((searchStr != null) && (!"".equals(searchStr))) {
 
-				XMLWriter writer = new XMLWriter(sw, format);
+            int size = nodeValue.length;
 
-				writer.write(element);
-				writer.flush();
+            for (int i = 0; i < size; i++) {
 
-				xmlStr = xmlStr + sw.toString();
-				xmlStr = xmlStr + "\n";
-			}
+                String searchStrLower = searchStr.toLowerCase();
 
-			return xmlStr;
+                String value = nodeValue[i];
 
-		} catch (IOException e) {
-			throw new RuntimeException("IOException while generating " + "textual representation: " + e.getMessage());
-		}
-	}
+                if (value != null) {
 
-	public boolean[] secondarySearch(String searchStr) {
+                    value = value.toLowerCase();
 
-		for (int i = 0; i < secondarySearchFound.length; i++) {
-			secondarySearchFound[i] = false;
-		}
+                    if (value.indexOf(searchStrLower) != -1) {
+                        secondarySearchFound[i] = true;
+                    }
 
-		if ((searchStr != null) && (!"".equals(searchStr))) {
+                    // double searching to handle escaped data
+                    if (!secondarySearchFound[i]) {
+                        value = StringEscapeUtils.unescapeHtml4(value);
 
-			int size = nodeValue.length;
+                        if (value.indexOf(searchStrLower) != -1) {
+                            secondarySearchFound[i] = true;
+                        }
 
-			for (int i = 0; i < size; i++) {
+                    }
+                }
+            }
+        }
 
-				String lSearchStr = searchStr.toLowerCase();
-
-				String lValue = nodeValue[i];
-
-				if (lValue != null) {
-
-					lValue = lValue.toLowerCase();
-
-					if (lValue.indexOf(lSearchStr) != -1) {
-						secondarySearchFound[i] = true;
-					}
-					
-					// double searching to handle escaped data
-					if(!secondarySearchFound[i]) {
-						lValue = StringEscapeUtils.unescapeHtml4(lValue);
-
-						if (lValue.indexOf(lSearchStr) != -1) {
-							secondarySearchFound[i] = true;
-						}
-
-					}
-				}
-			}
-		}
-
-		return secondarySearchFound;
-	}
+        return secondarySearchFound;
+    }
 }

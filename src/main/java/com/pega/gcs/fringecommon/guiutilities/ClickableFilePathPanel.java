@@ -4,6 +4,7 @@
  * Contributors:
  *     Manu Varghese
  *******************************************************************************/
+
 package com.pega.gcs.fringecommon.guiutilities;
 
 import java.awt.Dimension;
@@ -28,164 +29,166 @@ import com.pega.gcs.fringecommon.utilities.GeneralUtilities;
 
 public class ClickableFilePathPanel extends ClickablePathPanel {
 
-	private static final long serialVersionUID = 692503447362579736L;
+    private static final long serialVersionUID = 692503447362579736L;
 
-	private static final Log4j2Helper LOG = new Log4j2Helper(ClickableFilePathPanel.class);
+    private static final Log4j2Helper LOG = new Log4j2Helper(ClickableFilePathPanel.class);
 
-	private JButton openFolderJButton;
+    private JButton openFolderJButton;
 
-	private JLabel fileSizeJLabel;
+    private JLabel fileSizeJLabel;
 
-	private boolean showFileSize;
+    private boolean showFileSize;
 
-	public ClickableFilePathPanel(boolean showFileSize) {
+    public ClickableFilePathPanel(boolean showFileSize) {
 
-		this.showFileSize = showFileSize;
+        this.showFileSize = showFileSize;
 
-		setupUI();
-	}
+        setupUI();
+    }
 
-	@Override
-	protected void setupUI() {
+    @Override
+    protected void setupUI() {
 
-		setLayout(new GridBagLayout());
+        setLayout(new GridBagLayout());
 
-		GridBagConstraints gbc1 = new GridBagConstraints();
-		gbc1.gridx = 0;
-		gbc1.gridy = 0;
-		gbc1.weightx = 1.0D;
-		gbc1.weighty = 0.0D;
-		gbc1.fill = GridBagConstraints.BOTH;
-		gbc1.anchor = GridBagConstraints.NORTHWEST;
-		gbc1.insets = new Insets(2, 2, 2, 2);
+        GridBagConstraints gbc1 = new GridBagConstraints();
+        gbc1.gridx = 0;
+        gbc1.gridy = 0;
+        gbc1.weightx = 1.0D;
+        gbc1.weighty = 0.0D;
+        gbc1.fill = GridBagConstraints.BOTH;
+        gbc1.anchor = GridBagConstraints.NORTHWEST;
+        gbc1.insets = new Insets(2, 2, 2, 2);
 
-		GridBagConstraints gbc2 = new GridBagConstraints();
-		gbc2.gridx = 1;
-		gbc2.gridy = 0;
-		gbc2.weightx = 0.0D;
-		gbc2.weighty = 0.0D;
-		gbc2.fill = GridBagConstraints.BOTH;
-		gbc2.anchor = GridBagConstraints.NORTHWEST;
-		gbc2.insets = new Insets(2, 2, 2, 2);
+        GridBagConstraints gbc2 = new GridBagConstraints();
+        gbc2.gridx = 1;
+        gbc2.gridy = 0;
+        gbc2.weightx = 0.0D;
+        gbc2.weighty = 0.0D;
+        gbc2.fill = GridBagConstraints.BOTH;
+        gbc2.anchor = GridBagConstraints.NORTHWEST;
+        gbc2.insets = new Insets(2, 2, 2, 2);
 
-		JEditorPane filePathJEditorPane = getPathJEditorPane();
-		JButton openFolderJButton = getOpenFolderJButton();
+        JEditorPane filePathJEditorPane = getPathJEditorPane();
+        JButton openFolderJButton = getOpenFolderJButton();
 
-		add(filePathJEditorPane, gbc1);
-		add(openFolderJButton, gbc2);
+        add(filePathJEditorPane, gbc1);
+        add(openFolderJButton, gbc2);
 
-		if (showFileSize) {
+        if (showFileSize) {
 
-			GridBagConstraints gbc3 = new GridBagConstraints();
-			gbc3.gridx = 2;
-			gbc3.gridy = 0;
-			gbc3.weightx = 0.0D;
-			gbc3.weighty = 0.0D;
-			gbc3.fill = GridBagConstraints.BOTH;
-			gbc3.anchor = GridBagConstraints.NORTHWEST;
-			gbc3.insets = new Insets(2, 2, 2, 2);
+            GridBagConstraints gbc3 = new GridBagConstraints();
+            gbc3.gridx = 2;
+            gbc3.gridy = 0;
+            gbc3.weightx = 0.0D;
+            gbc3.weighty = 0.0D;
+            gbc3.fill = GridBagConstraints.BOTH;
+            gbc3.anchor = GridBagConstraints.NORTHWEST;
+            gbc3.insets = new Insets(2, 2, 2, 2);
 
-			JLabel fileSizeJLabel = getFileSizeJLabel();
-			add(fileSizeJLabel, gbc3);
-		}
-	}
+            JLabel fileSizeJLabel = getFileSizeJLabel();
+            add(fileSizeJLabel, gbc3);
+        }
+    }
 
-	private JButton getOpenFolderJButton() {
+    private JButton getOpenFolderJButton() {
 
-		if (openFolderJButton == null) {
+        if (openFolderJButton == null) {
 
-			openFolderJButton = new JButton("Open Folder");
+            openFolderJButton = new JButton("Open Folder");
 
-			openFolderJButton.setEnabled(false);
+            Dimension size = new Dimension(120, 26);
+            openFolderJButton.setPreferredSize(size);
 
-			openFolderJButton.addActionListener(new ActionListener() {
+            openFolderJButton.setEnabled(false);
 
-				@Override
-				public void actionPerformed(ActionEvent e) {
+            openFolderJButton.addActionListener(new ActionListener() {
 
-					String filePath = e.getActionCommand();
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
 
-					Runtime runtime = Runtime.getRuntime();
-					try {
-						if (SystemUtils.IS_OS_MAC) {
-							runtime.exec("open -R " + filePath);
-						} else if (SystemUtils.IS_OS_UNIX) {
-							runtime.exec("xdg-open " + filePath);
-						} else {
-							runtime.exec("explorer.exe /select," + filePath);
-						}
+                    String filePath = actionEvent.getActionCommand();
 
-					} catch (Exception ex) {
-						LOG.error("Error opening file explorer", ex);
-					}
-				}
-			});
+                    Runtime runtime = Runtime.getRuntime();
+                    try {
+                        if (SystemUtils.IS_OS_MAC) {
+                            runtime.exec("open -R " + filePath);
+                        } else if (SystemUtils.IS_OS_UNIX) {
+                            runtime.exec("xdg-open " + filePath);
+                        } else {
+                            runtime.exec("explorer.exe /select," + filePath);
+                        }
 
-		}
-		return openFolderJButton;
-	}
+                    } catch (Exception ex) {
+                        LOG.error("Error opening file explorer", ex);
+                    }
+                }
+            });
 
-	private JLabel getFileSizeJLabel() {
+        }
+        return openFolderJButton;
+    }
 
-		if (fileSizeJLabel == null) {
+    private JLabel getFileSizeJLabel() {
 
-			fileSizeJLabel = new JLabel();
+        if (fileSizeJLabel == null) {
 
-			Dimension dim = new Dimension(60, 20);
-			fileSizeJLabel.setPreferredSize(dim);
-			fileSizeJLabel.setMinimumSize(dim);
+            fileSizeJLabel = new JLabel();
 
-			fileSizeJLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-		}
+            Dimension dim = new Dimension(60, 26);
+            fileSizeJLabel.setPreferredSize(dim);
 
-		return fileSizeJLabel;
-	}
+            fileSizeJLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+        }
 
-	public void setFile(File aFile) {
+        return fileSizeJLabel;
+    }
 
-		JEditorPane filePathJEditorPane = getPathJEditorPane();
-		JButton openFolderJButton = getOpenFolderJButton();
+    public void setFile(File file) {
 
-		if ((aFile != null) && (aFile.exists())) {
+        JEditorPane filePathJEditorPane = getPathJEditorPane();
+        JButton openFolderJButton = getOpenFolderJButton();
 
-			String filePath = aFile.getAbsolutePath();
-			String filePathHtml = GUIUtilities.getFileHyperlinkText(filePath);
+        if ((file != null) && (file.exists())) {
 
-			filePathJEditorPane.setText(filePathHtml);
+            String filePath = file.getAbsolutePath();
+            String filePathHtml = GUIUtilities.getFileHyperlinkText(filePath);
 
-			openFolderJButton.setActionCommand(filePath);
-			openFolderJButton.setEnabled(true);
+            filePathJEditorPane.setText(filePathHtml);
 
-			if (showFileSize) {
+            openFolderJButton.setActionCommand(filePath);
+            openFolderJButton.setEnabled(true);
 
-				JLabel fileSizeJLabel = getFileSizeJLabel();
-				String fileSizeStr = null;
-				long fileSize = -1;
+            if (showFileSize) {
 
-				try (FileInputStream fis = new FileInputStream(aFile)) {
+                JLabel fileSizeJLabel = getFileSizeJLabel();
+                String fileSizeStr = null;
+                long fileSize = -1;
 
-					FileChannel fileChannel = fis.getChannel();
-					fileSize = fileChannel.size();
-					fileSizeStr = GeneralUtilities.humanReadableSize(fileSize, false);
+                try (FileInputStream fis = new FileInputStream(file)) {
 
-					fileSizeJLabel.setText(fileSizeStr);
+                    FileChannel fileChannel = fis.getChannel();
+                    fileSize = fileChannel.size();
+                    fileSizeStr = GeneralUtilities.humanReadableSize(fileSize, false);
 
-				} catch (Exception e) {
-					LOG.error("Error parsing filesize:" + fileSize, e);
+                    fileSizeJLabel.setText(fileSizeStr);
 
-					fileSizeJLabel.setText(fileSizeStr);
-				}
-			}
-		} else {
+                } catch (Exception e) {
+                    LOG.error("Error parsing filesize:" + fileSize, e);
 
-			filePathJEditorPane.setText(null);
-			openFolderJButton.setActionCommand(null);
-			openFolderJButton.setEnabled(false);
+                    fileSizeJLabel.setText(fileSizeStr);
+                }
+            }
+        } else {
 
-			if (showFileSize) {
-				JLabel fileSizeJLabel = getFileSizeJLabel();
-				fileSizeJLabel.setText(null);
-			}
-		}
-	}
+            filePathJEditorPane.setText(null);
+            openFolderJButton.setActionCommand(null);
+            openFolderJButton.setEnabled(false);
+
+            if (showFileSize) {
+                JLabel fileSizeJLabel = getFileSizeJLabel();
+                fileSizeJLabel.setText(null);
+            }
+        }
+    }
 }

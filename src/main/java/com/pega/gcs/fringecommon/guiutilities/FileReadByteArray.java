@@ -4,19 +4,20 @@
  * Contributors:
  *     Manu Varghese
  *******************************************************************************/
+
 package com.pega.gcs.fringecommon.guiutilities;
 
 public class FileReadByteArray {
 
-	private byte[] bytes;
+    private byte[] bytes;
 
-	public FileReadByteArray(byte[] bytes) {
-		super();
-		this.bytes = bytes;
-	}
+    public FileReadByteArray(byte[] bytes) {
+        super();
+        this.bytes = bytes;
+    }
 
-	public byte[] getBytes() {
-		return bytes;
-	}
+    public byte[] getBytes() {
+        return bytes;
+    }
 
 }

@@ -4,6 +4,7 @@
  * Contributors:
  *     Manu Varghese
  *******************************************************************************/
+
 package com.pega.gcs.fringecommon.utilities.diff;
 
 import java.util.ArrayList;
@@ -14,174 +15,167 @@ import javax.swing.ProgressMonitor;
 
 public class MyersDifferenceAlgorithm {
 
-	/**
-	 * using Longest Common Subsequence ( LCS ) Greedy Algorithm checks for
-	 * ObjectA.equals(ObjectB)
-	 * 
-	 * @param listA
-	 * @param listB
-	 * @throws Exception
-	 */
-	public static <T> List<EditCommand> diffGreedyLCS(ProgressMonitor mProgressMonitor, List<T> listA, List<T> listB,
-			Matcher<T> matcher) throws Exception {
+    /**
+     * Longest Common Subsequence ( LCS ) Greedy Algorithm checks for ObjectA.equals(ObjectB).
+     *
+     * @param                 <T> - entities type used in ListA and ListB
+     * @param progressMonitor - for monitor cancel action
+     * @param listA           - left Side list of entries
+     * @param listB           - right side list of entries
+     * @param matcher         - equals provider for comparing entries.
+     * @return - list of edit command (insert, delete, snake)
+     * @throws Exception  - error
+     */
+    public static <T> List<EditCommand> diffGreedyLCS(ProgressMonitor progressMonitor, List<T> listA, List<T> listB,
+            Matcher<T> matcher) throws Exception {
 
-		int listAsize = listA.size();
-		int listBsize = listB.size();
+        int listAsize = listA.size();
+        int listBsize = listB.size();
 
-		// long counter = 0;
+        // long counter = 0;
 
-		List<EditCommand> editScript = new ArrayList<EditCommand>();
+        List<EditCommand> editScript = new ArrayList<EditCommand>();
 
-		if ((listAsize > 0) || (listBsize > 0)) {
+        if ((listAsize > 0) || (listBsize > 0)) {
 
-			int N = listA.size();
-			int M = listB.size();
-			int MAX = N + M;
-			int size = (2 * MAX) + 1;
-			int offset = size / 2;
+            int totalListSize = listAsize + listBsize;
+            int size = (2 * totalListSize) + 1;
+            int offset = size / 2;
 
-			Path[] pathArray = new Path[size];
+            Path[] pathArray = new Path[size];
 
-			int[] V = new int[size];
+            int[] indexArray = new int[size];
 
-			V[1] = 0;
+            indexArray[1] = 0;
 
-			for (int D = 0; D <= MAX; D++) {
+            for (int d = 0; d <= totalListSize; d++) {
 
-				for (int k = -D; ((mProgressMonitor != null) ? (!mProgressMonitor.isCanceled()) : true)
-						&& (k <= D); k += 2) {
+                for (int k = -d; ((progressMonitor != null) ? (!progressMonitor.isCanceled()) : true)
+                        && (k <= d); k += 2) {
 
-					int x;
-					int kOffset = offset + k;
-					int kPlus = kOffset + 1;
-					int kMinus = kOffset - 1;
+                    int xindex;
+                    int koffset = offset + k;
+                    int kplus = koffset + 1;
+                    int kminus = koffset - 1;
 
-					EditCommand editCommand = null;
-					Path prev = null;
+                    EditCommand editCommand = null;
+                    Path prev = null;
 
-					if ((k == -D) || (k != D) && (V[kMinus] < V[kPlus])) {
-						x = V[kPlus];
-						prev = pathArray[kPlus];
-						editCommand = EditCommand.INSERT;
-					} else {
-						x = V[kMinus] + 1;
-						prev = pathArray[kMinus];
-						editCommand = EditCommand.DELETE;
-					}
+                    if ((k == -d) || ((k != d) && (indexArray[kminus] < indexArray[kplus]))) {
+                        xindex = indexArray[kplus];
+                        prev = pathArray[kplus];
+                        editCommand = EditCommand.INSERT;
+                    } else {
+                        xindex = indexArray[kminus] + 1;
+                        prev = pathArray[kminus];
+                        editCommand = EditCommand.DELETE;
+                    }
 
-					int y = x - k;
+                    int yindex = xindex - k;
 
-					if (kMinus > -1) {
-						// LOG.info("Setting kMinus: " + kMinus
-						// + " x:" + x + " y:" + y);
-						pathArray[kMinus] = null;
-					}
+                    if (kminus > -1) {
+                        // LOG.info("Setting kMinus: " + kMinus
+                        // + " x:" + x + " y:" + y);
+                        pathArray[kminus] = null;
+                    }
 
-					// counter++;
-					//
-					// if (counter % 10000000L == 0) {
-					// LOG.info("Counter: " + counter);
-					// }
+                    // counter++;
+                    //
+                    // if (counter % 10000000L == 0) {
+                    // LOG.info("Counter: " + counter);
+                    // }
 
-					Path path = new Path(editCommand, prev);
+                    Path path = new Path(editCommand, prev);
 
-					while ((x < N) && (y < M) && (matcher.match(listA.get(x), listB.get(y)))) {
+                    while ((xindex < listAsize) && (yindex < listBsize)
+                            && (matcher.match(listA.get(xindex), listB.get(yindex)))) {
 
-						x++;
-						y++;
+                        xindex++;
+                        yindex++;
 
-						path = new Path(EditCommand.SNAKE, path);
-					}
+                        path = new Path(EditCommand.SNAKE, path);
+                    }
 
-					V[kOffset] = x;
-					pathArray[kOffset] = path;
+                    indexArray[koffset] = xindex;
+                    pathArray[koffset] = path;
 
-					if ((x >= N) && (y >= M)) {
+                    if ((xindex >= listAsize) && (yindex >= listBsize)) {
 
-						// LOG.info("DONE!!!");
-						// path.print("");
+                        // LOG.info("DONE!!!");
+                        // path.print("");
 
-						path.getEditScript(editScript);
+                        path.getEditScript(editScript);
 
-						for (int i = 0; i < size; i++) {
+                        for (int i = 0; i < size; i++) {
 
-							// if (pathArray[i] != null) {
-							// pathArray[i].print("");
-							// } else {
-							// LOG.info("NULL: " + i);
-							// }
-							pathArray[i] = null;
-						}
+                            // if (pathArray[i] != null) {
+                            // pathArray[i].print("");
+                            // } else {
+                            // LOG.info("NULL: " + i);
+                            // }
+                            pathArray[i] = null;
+                        }
 
-						// for (EditCommand ec : editScript) {
-						// LOG.info(ec);
-						// }
+                        // for (EditCommand ec : editScript) {
+                        // LOG.info(ec);
+                        // }
 
-						// edit command list includes D + snakes
-						// LOG.info("Size of shortest edit script: "
-						// + D + " length of editCommandList: "
-						// + editScript.size());
+                        // edit command list includes D + snakes
+                        // LOG.info("Size of shortest edit script: "
+                        // + D + " length of editCommandList: "
+                        // + editScript.size());
 
-						return editScript;
-					}
+                        return editScript;
+                    }
 
-				}
+                }
 
-				// LOG.info("Setting (offset + D - 1): "
-				// + (offset + D - 1) + " offset:" + offset + " D:"
-				// + D);
+                // LOG.info("Setting (offset + D - 1): "
+                // + (offset + D - 1) + " offset:" + offset + " D:"
+                // + D);
 
-				pathArray[offset + D - 1] = null;
-			}
+                pathArray[offset + d - 1] = null;
+            }
 
-			throw new Exception("not able to find the LCS/SES");
+            throw new Exception("not able to find the LCS/SES");
 
-		}
+        }
 
-		return editScript;
+        return editScript;
 
-	}
+    }
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
 
-		Matcher<String> matcher = new Matcher<String>() {
+        Matcher<String> matcher = new Matcher<String>() {
 
-			@Override
-			public boolean match(String o1, String o2) {
-				return o1.equals(o2);
-			}
-		};
+            @Override
+            public boolean match(String o1, String o2) {
+                return o1.equals(o2);
+            }
+        };
 
-		// String[] A = { "A", "B", "C", "A", "B", "B", "A" };
-		// String[] B = { "C", "B", "A", "B", "A", "C" };
+        // String[] A = { "A", "B", "C", "A", "B", "B", "A" };
+        // String[] B = { "C", "B", "A", "B", "A", "C" };
 
-		String[] A = { "C", "D", "E", "F", "G", "H", "I" };
-		String[] B = { "A", "B", "C", "D", "E", "F", "G" };
+        String[] alist = { "C", "D", "E", "F", "G", "H", "I" };
+        String[] blist = { "A", "B", "C", "D", "E", "F", "G" };
 
-		// String[] B = { "A", "B", "E", "F", "G", "H", "I" };
-		// String[] A = { "A", "B", "C", "D", "G", "H", "I" };
+        // String[] B = { "A", "B", "E", "F", "G", "H", "I" };
+        // String[] A = { "A", "B", "C", "D", "G", "H", "I" };
 
-		// String[] A = { "A", "C", "E", "G", "I`", "L", "M" };
+        // String[] A = { "A", "B", "C", "D" };
+        // String[] B = { "E", "F", "G", "H" };
 
-		// String[] A = { "A", "B", "C", "D" };
-		// String[] B = { "E", "F", "G", "H" };
+        // String[] A = { "A", "B", "C", "D" };
+        // String[] B = { "E", "F", "G", "H", "I" };
 
-		// String[] A = { "A", "B", "C", "D" };
-		// String[] B = { "E", "F", "G", "H", "I" };
+        // String[] A = { "A", "B", "C", "D", "X", };
+        // String[] B = { "E", "F", "G", "H" };
 
-		// String[] A = { "A", "B", "C", "D", "X", };
-		// String[] B = { "E", "F", "G", "H" };
+        // String[] A = { "A", "B", "C", "D", "X", };
+        // String[] B = {};
 
-		// String[] A = { "A", "B", "C", "D", "X", };
-		// String[] B = {};
-
-		try {
-			diffGreedyLCS(null, Arrays.asList(A), Arrays.asList(B), matcher);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+        diffGreedyLCS(null, Arrays.asList(alist), Arrays.asList(blist), matcher);
+    }
 }

@@ -4,45 +4,46 @@
  * Contributors:
  *     Manu Varghese
  *******************************************************************************/
+
 package com.pega.gcs.fringecommon.guiutilities;
 
 public class FilterTableModelNavigation<T> {
 
-	private int navigationIndex;
+    private int navigationIndex;
 
-	private int navigationRowIndex;
+    private int navigationRowIndex;
 
-	// will be used to find range of records
-	private T navigationKey;
+    // will be used to find range of records
+    private T navigationKey;
 
-	public FilterTableModelNavigation() {
+    public FilterTableModelNavigation() {
 
-		navigationIndex = 0;
-		navigationRowIndex = 0;
-	}
+        navigationIndex = 0;
+        navigationRowIndex = 0;
+    }
 
-	public int getNavigationIndex() {
-		return navigationIndex;
-	}
+    public int getNavigationIndex() {
+        return navigationIndex;
+    }
 
-	public void setNavigationIndex(int navigationIndex) {
-		this.navigationIndex = navigationIndex;
-	}
+    public void setNavigationIndex(int navigationIndex) {
+        this.navigationIndex = navigationIndex;
+    }
 
-	public int getNavigationRowIndex() {
-		return navigationRowIndex;
-	}
+    public int getNavigationRowIndex() {
+        return navigationRowIndex;
+    }
 
-	public void setNavigationRowIndex(int navigationRowIndex) {
-		this.navigationRowIndex = navigationRowIndex;
-	}
+    public void setNavigationRowIndex(int navigationRowIndex) {
+        this.navigationRowIndex = navigationRowIndex;
+    }
 
-	public T getNavigationKey() {
-		return navigationKey;
-	}
+    public T getNavigationKey() {
+        return navigationKey;
+    }
 
-	public void setNavigationKey(T navigationKey) {
-		this.navigationKey = navigationKey;
-	}
+    public void setNavigationKey(T navigationKey) {
+        this.navigationKey = navigationKey;
+    }
 
 }

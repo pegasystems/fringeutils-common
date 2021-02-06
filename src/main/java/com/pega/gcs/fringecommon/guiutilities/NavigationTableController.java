@@ -4,6 +4,7 @@
  * Contributors:
  *     Manu Varghese
  *******************************************************************************/
+
 package com.pega.gcs.fringecommon.guiutilities;
 
 import java.util.ArrayList;
@@ -14,65 +15,67 @@ import com.pega.gcs.fringecommon.guiutilities.treetable.AbstractTreeTableNode;
 
 public class NavigationTableController<T> implements NavigationController<T> {
 
-	// the same model is referenced/used by tables in the following list.
-	private FilterTableModel<? super T> filterTableModel;
+    // the same model is referenced/used by tables in the following list.
+    private FilterTableModel<? super T> filterTableModel;
 
-	private List<CustomJTable> customJTableList;
+    private List<CustomJTable> customJTableList;
 
-	public NavigationTableController(FilterTableModel<? super T> filterTableModel) {
-		super();
+    public NavigationTableController(FilterTableModel<? super T> filterTableModel) {
+        super();
 
-		this.filterTableModel = filterTableModel;
-		this.customJTableList = new ArrayList<CustomJTable>();
-	}
+        this.filterTableModel = filterTableModel;
+        this.customJTableList = new ArrayList<CustomJTable>();
+    }
 
-	protected FilterTableModel<? super T> getFilterTableModel() {
-		return filterTableModel;
-	}
+    protected FilterTableModel<? super T> getFilterTableModel() {
+        return filterTableModel;
+    }
 
-	protected List<CustomJTable> getCustomJTableList() {
-		return customJTableList;
-	}
+    protected List<CustomJTable> getCustomJTableList() {
+        return customJTableList;
+    }
 
-	public void addCustomJTable(CustomJTable customJTable) {
-		customJTableList.add(customJTable);
-	}
+    public void addCustomJTable(CustomJTable customJTable) {
+        customJTableList.add(customJTable);
+    }
 
-	@Override
-	public void navigateToRow(int startRowIndex, int endRowIndex) {
+    @Override
+    public void navigateToRow(int startRowIndex, int endRowIndex) {
 
-		for (CustomJTable customJTable : getCustomJTableList()) {
+        for (CustomJTable customJTable : getCustomJTableList()) {
 
-			customJTable.setRowSelectionInterval(startRowIndex, endRowIndex);
-			customJTable.scrollRowToVisible(startRowIndex);
+            customJTable.setRowSelectionInterval(startRowIndex, endRowIndex);
+            customJTable.scrollRowToVisible(startRowIndex);
 
-			customJTable.updateUI();
+            customJTable.updateUI();
 
-		}
-	}
+        }
+    }
 
-	@Override
-	public void scrollToKey(T key) {
+    @Override
+    public void scrollToKey(T key) {
 
-		FilterTableModel<? super T> filterTableModel = getFilterTableModel();
+        FilterTableModel<? super T> filterTableModel = getFilterTableModel();
 
-		int rowNumber = filterTableModel.getIndexOfKey(key);
+        int rowNumber = filterTableModel.getIndexOfKey(key);
 
-		for (CustomJTable customJTable : getCustomJTableList()) {
+        for (CustomJTable customJTable : getCustomJTableList()) {
 
-			if (customJTable instanceof AbstractTreeTable) {
-				AbstractTreeTableNode treeNode = filterTableModel.getTreeNodeForKey(key);
+            if (customJTable instanceof AbstractTreeTable) {
+                AbstractTreeTableNode treeNode = filterTableModel.getTreeNodeForKey(key);
 
-				if (treeNode != null) {
-					((AbstractTreeTable) customJTable).scrollNodeToVisible(treeNode);
-				}
-			} else {
+                if (treeNode != null) {
+                    ((AbstractTreeTable) customJTable).scrollNodeToVisible(treeNode);
+                }
+            } else {
 
-				if (rowNumber != -1) {
-					customJTable.setRowSelectionInterval(rowNumber, rowNumber);
-					customJTable.scrollRowToVisible(rowNumber);
-				}
-			}
-		}
-	}
+                int rowCount = customJTable.getRowCount();
+
+                if (!((rowNumber < 0) || (rowNumber >= rowCount))) {
+                    customJTable.setRowSelectionInterval(rowNumber, rowNumber);
+                    customJTable.scrollRowToVisible(rowNumber);
+                }
+            }
+        }
+    }
 }

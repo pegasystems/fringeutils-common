@@ -4,9 +4,11 @@
  * Contributors:
  *     Manu Varghese
  *******************************************************************************/
+
 package com.pega.gcs.fringecommon.guiutilities;
 
 import java.awt.Desktop;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -23,92 +25,95 @@ import com.pega.gcs.fringecommon.utilities.FileUtilities;
 
 public class ClickablePathPanel extends JPanel {
 
-	private static final long serialVersionUID = 692503447362579736L;
+    private static final long serialVersionUID = 692503447362579736L;
 
-	private static final Log4j2Helper LOG = new Log4j2Helper(ClickablePathPanel.class);
+    private static final Log4j2Helper LOG = new Log4j2Helper(ClickablePathPanel.class);
 
-	private JEditorPane pathJEditorPane;
+    private JEditorPane pathJEditorPane;
 
-	public ClickablePathPanel() {
+    public ClickablePathPanel() {
 
-		super();
+        super();
 
-		setupUI();
+        setupUI();
 
-	}
+    }
 
-	protected void setupUI() {
+    protected void setupUI() {
 
-		setLayout(new GridBagLayout());
+        setLayout(new GridBagLayout());
 
-		GridBagConstraints gbc1 = new GridBagConstraints();
-		gbc1.gridx = 0;
-		gbc1.gridy = 0;
-		gbc1.weightx = 1.0D;
-		gbc1.weighty = 0.0D;
-		gbc1.fill = GridBagConstraints.BOTH;
-		gbc1.anchor = GridBagConstraints.NORTHWEST;
-		gbc1.insets = new Insets(0, 0, 0, 0);
+        GridBagConstraints gbc1 = new GridBagConstraints();
+        gbc1.gridx = 0;
+        gbc1.gridy = 0;
+        gbc1.weightx = 1.0D;
+        gbc1.weighty = 0.0D;
+        gbc1.fill = GridBagConstraints.BOTH;
+        gbc1.anchor = GridBagConstraints.NORTHWEST;
+        gbc1.insets = new Insets(0, 0, 0, 0);
 
-		JEditorPane filePathJEditorPane = getPathJEditorPane();
-		add(filePathJEditorPane, gbc1);
+        JEditorPane filePathJEditorPane = getPathJEditorPane();
+        add(filePathJEditorPane, gbc1);
 
-	}
+    }
 
-	protected JEditorPane getPathJEditorPane() {
+    protected JEditorPane getPathJEditorPane() {
 
-		if (pathJEditorPane == null) {
+        if (pathJEditorPane == null) {
 
-			pathJEditorPane = new JEditorPane();
-			pathJEditorPane.setSize(Integer.MAX_VALUE, 30);
-			pathJEditorPane.setEditable(false);
-			pathJEditorPane.setContentType("text/html");
-			pathJEditorPane.setOpaque(false);
-			pathJEditorPane.setBackground(this.getBackground());
+            pathJEditorPane = new JEditorPane();
 
-			StyleSheet styleSheet = FileUtilities.getStyleSheet(this.getClass(), "styles.css");
+            // Dimension size = new Dimension(Integer.MAX_VALUE, 26);
+            //
+            // pathJEditorPane.setPreferredSize(size);
+            pathJEditorPane.setEditable(false);
+            pathJEditorPane.setContentType("text/html");
+            pathJEditorPane.setOpaque(false);
+            pathJEditorPane.setBackground(this.getBackground());
 
-			if (styleSheet != null) {
+            StyleSheet styleSheet = FileUtilities.getStyleSheet(this.getClass(), "styles.css");
 
-				HTMLEditorKit htmlEditorKit = new HTMLEditorKit();
-				StyleSheet htmlStyleSheet = htmlEditorKit.getStyleSheet();
-				htmlStyleSheet.addStyleSheet(styleSheet);
+            if (styleSheet != null) {
 
-				pathJEditorPane.setEditorKitForContentType("text/html", htmlEditorKit);
-			}
+                HTMLEditorKit htmlEditorKit = new HTMLEditorKit();
+                StyleSheet htmlStyleSheet = htmlEditorKit.getStyleSheet();
+                htmlStyleSheet.addStyleSheet(styleSheet);
 
-			pathJEditorPane.addHyperlinkListener(new HyperlinkListener() {
+                pathJEditorPane.setEditorKitForContentType("text/html", htmlEditorKit);
+            }
 
-				@Override
-				public void hyperlinkUpdate(HyperlinkEvent e) {
+            pathJEditorPane.addHyperlinkListener(new HyperlinkListener() {
 
-					if (e.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED)) {
+                @Override
+                public void hyperlinkUpdate(HyperlinkEvent hyperlinkEvent) {
 
-						if (Desktop.isDesktopSupported()) {
+                    if (hyperlinkEvent.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED)) {
 
-							Desktop desktop = Desktop.getDesktop();
-							try {
-								desktop.browse(e.getURL().toURI());
-							} catch (Exception ex) {
-								LOG.error("Error in invoking browser url: " + e.getURL(), ex);
-							}
-						}
-					}
+                        if (Desktop.isDesktopSupported()) {
 
-				}
-			});
-		}
+                            Desktop desktop = Desktop.getDesktop();
+                            try {
+                                desktop.browse(hyperlinkEvent.getURL().toURI());
+                            } catch (Exception ex) {
+                                LOG.error("Error in invoking browser url: " + hyperlinkEvent.getURL(), ex);
+                            }
+                        }
+                    }
 
-		return pathJEditorPane;
-	}
+                }
+            });
+        }
 
-	public void setUrl(String url) {
+        return pathJEditorPane;
+    }
 
-		String filePathHtml = GUIUtilities.getHyperlinkText(url);
+    public void setUrl(String url) {
 
-		JEditorPane filePathJEditorPane = getPathJEditorPane();
+        String filePathHtml = GUIUtilities.getHyperlinkText(url);
 
-		filePathJEditorPane.setText(filePathHtml);
-	}
+        JEditorPane filePathJEditorPane = getPathJEditorPane();
+
+        filePathJEditorPane.setText(filePathHtml);
+    }
 
 }

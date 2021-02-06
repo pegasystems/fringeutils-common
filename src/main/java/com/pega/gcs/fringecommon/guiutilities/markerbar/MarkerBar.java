@@ -4,6 +4,7 @@
  * Contributors:
  *     Manu Varghese
  *******************************************************************************/
+
 package com.pega.gcs.fringecommon.guiutilities.markerbar;
 
 import java.awt.AlphaComposite;
@@ -16,11 +17,11 @@ import java.awt.Graphics2D;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import java.util.ArrayList;
 import java.util.EventObject;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
-import java.util.Vector;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
@@ -29,255 +30,244 @@ import com.pega.gcs.fringecommon.guiutilities.NavigationController;
 
 public class MarkerBar<T> extends JComponent implements MarkerModelListener {
 
-	private static final long serialVersionUID = 3414304903179140199L;
+    private static final long serialVersionUID = 3414304903179140199L;
 
-	private Vector<MarkerModel<T>> markerModelList;
+    private ArrayList<MarkerModel<T>> markerModelList;
 
-	private HashMap<Integer, Integer> positionIndexMap;
+    private HashMap<Integer, Integer> positionIndexMap;
 
-	private T selectedKey;
+    private T selectedKey;
 
-	private NavigationController<T> navigationController;
+    private NavigationController<T> navigationController;
 
-	/**
-	 * @param markerModel
-	 */
-	public MarkerBar(NavigationController<T> navigationController, MarkerModel<T> markerModel) {
+    public MarkerBar(NavigationController<T> navigationController, MarkerModel<T> markerModel) {
 
-		super();
+        super();
 
-		this.navigationController = navigationController;
-		this.selectedKey = null;
-		this.markerModelList = new Vector<MarkerModel<T>>();
+        this.navigationController = navigationController;
+        this.selectedKey = null;
+        this.markerModelList = new ArrayList<MarkerModel<T>>();
 
-		if (markerModel != null) {
-			markerModelList.add(markerModel);
-			markerModel.addMarkerModelListener(this);
-		}
+        if (markerModel != null) {
+            markerModelList.add(markerModel);
+            markerModel.addMarkerModelListener(this);
+        }
 
-		addMouseMotionListener(new MouseMotionAdapter() {
-			@Override
-			public void mouseMoved(MouseEvent e) {
+        addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseMoved(MouseEvent mouseEvent) {
 
-				int yPosition = e.getY();
+                int ypos = mouseEvent.getY();
 
-				Marker<T> marker = getMarkerForPoint(yPosition);
+                Marker<T> marker = getMarkerForPoint(ypos);
 
-				if (marker != null) {
-					setSelectedKey(marker.getKey());
-					setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                if (marker != null) {
+                    setSelectedKey(marker.getKey());
+                    setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
-					setToolTipText(marker.getText());
-				} else {
-					setSelectedKey(null);
-					setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-					setToolTipText(null);
-				}
-				/*
-				 * // LOG.info("e.getPoint().getY():" + // e.getPoint().getY() +
-				 * " getHeight():" + getHeight()); double yRatio =
-				 * e.getPoint().getY() / getHeight(); Object markerObj =
-				 * getMarkerForPoint(yRatio);
-				 * 
-				 * if (markerObj != null) {
-				 * 
-				 * Marker<T> marker = null;
-				 * 
-				 * if (markerObj instanceof List) { marker = ((List<Marker<T>>)
-				 * markerObj).get(0); } else { marker = (Marker<T>) markerObj; }
-				 * 
-				 * setSelectedKey(marker.getKey());
-				 * setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-				 * 
-				 * setToolTipText(marker.getText());
-				 * 
-				 * } else { setSelectedKey(null);
-				 * setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-				 * setToolTipText(null); }
-				 */
-			}
-		});
+                    setToolTipText(marker.getText());
+                } else {
+                    setSelectedKey(null);
+                    setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+                    setToolTipText(null);
+                }
+                /*
+                 * // LOG.info("e.getPoint().getY():" + // e.getPoint().getY() + " getHeight():" + getHeight()); double yRatio = e.getPoint().getY()
+                 * / getHeight(); Object markerObj = getMarkerForPoint(yRatio);
+                 * 
+                 * if (markerObj != null) {
+                 * 
+                 * Marker<T> marker = null;
+                 * 
+                 * if (markerObj instanceof List) { marker = ((List<Marker<T>>) markerObj).get(0); } else { marker = (Marker<T>) markerObj; }
+                 * 
+                 * setSelectedKey(marker.getKey()); setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                 * 
+                 * setToolTipText(marker.getText());
+                 * 
+                 * } else { setSelectedKey(null); setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR)); setToolTipText(null); }
+                 */
+            }
+        });
 
-		addMouseListener(new MouseAdapter() {
+        addMouseListener(new MouseAdapter() {
 
-			@Override
-			public void mousePressed(MouseEvent e) {
+            @Override
+            public void mousePressed(MouseEvent mouseEvent) {
 
-				T selectedKey = getSelectedKey();
+                T selectedKey = getSelectedKey();
 
-				if (selectedKey != null) {
-					getNavigationController().scrollToKey(selectedKey);
-				}
-			}
+                if (selectedKey != null) {
+                    getNavigationController().scrollToKey(selectedKey);
+                }
+            }
 
-			@Override
-			public void mouseExited(MouseEvent e) {
-				setSelectedKey(null);
-			}
-		});
+            @Override
+            public void mouseExited(MouseEvent mouseEvent) {
+                setSelectedKey(null);
+            }
+        });
 
-		setOpaque(false);
+        setOpaque(false);
 
-		setMinimumSize(new Dimension(16, 80));
-		setPreferredSize(new Dimension(16, 80));
+        setMinimumSize(new Dimension(16, 80));
+        setPreferredSize(new Dimension(16, 80));
 
-		setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
-	}
+        setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
+    }
 
-	protected T getSelectedKey() {
-		return selectedKey;
-	}
+    protected T getSelectedKey() {
+        return selectedKey;
+    }
 
-	protected void setSelectedKey(T aSelectedKey) {
-		selectedKey = aSelectedKey;
-	}
+    protected void setSelectedKey(T selectedKey) {
+        this.selectedKey = selectedKey;
+    }
 
-	protected NavigationController<T> getNavigationController() {
-		return navigationController;
-	}
+    protected NavigationController<T> getNavigationController() {
+        return navigationController;
+    }
 
-	protected Marker<T> getMarkerForPoint(Integer position) {
+    protected Marker<T> getMarkerForPoint(Integer position) {
 
-		Marker<T> markerForPoint = null;
+        Marker<T> markerForPoint = null;
 
-		Integer markerIndex = positionIndexMap.get(position);
+        Integer markerIndex = positionIndexMap.get(position);
 
-		if (markerIndex != null) {
-			// override the markerForPoint value so that the last one is used.
-			// as we paint the last one as well.
-			for (MarkerModel<T> markerModel : markerModelList) {
+        if (markerIndex != null) {
+            // override the markerForPoint value so that the last one is used.
+            // as we paint the last one as well.
+            for (MarkerModel<T> markerModel : markerModelList) {
 
-				T key = markerModel.getKey(markerIndex);
+                T key = markerModel.getKey(markerIndex);
 
-				if (key != null) {
-					List<Marker<T>> markerList = markerModel.getMarkers(key);
+                if (key != null) {
+                    List<Marker<T>> markerList = markerModel.getMarkers(key);
 
-					markerForPoint = markerList.get(0);
-				}
-			}
-		}
+                    markerForPoint = markerList.get(0);
+                }
+            }
+        }
 
-		return markerForPoint;
-	}
-	/*
-	 * protected Object getMarkerForPoint(double yRatio) {
-	 * 
-	 * T key = null; Object marker = null; MarkerModel<T> markerModel = null;
-	 * 
-	 * for (MarkerModel<T> mm : markerModelList) {
-	 * 
-	 * double pointLine = mm.getTotalEntryCount() * yRatio;
-	 * 
-	 * int lineNumber = (int) Math.floor(pointLine); key =
-	 * mm.getKey(lineNumber);
-	 * 
-	 * // LOG.info("lineNumber: " + lineNumber);
-	 * 
-	 * if (key != null) {
-	 * 
-	 * markerModel = mm; break; } else {
-	 * 
-	 * lineNumber = (int) Math.ceil(pointLine); // LOG.info("lineNumber 2: " +
-	 * lineNumber); key = mm.getKey(lineNumber);
-	 * 
-	 * if (key != null) { markerModel = mm; break; }
-	 * 
-	 * }
-	 * 
-	 * }
-	 * 
-	 * if (key != null) { marker = markerModel.getMarker(key); }
-	 * 
-	 * return marker; }
-	 */
+        return markerForPoint;
+    }
+    /*
+     * protected Object getMarkerForPoint(double yRatio) {
+     * 
+     * T key = null; Object marker = null; MarkerModel<T> markerModel = null;
+     * 
+     * for (MarkerModel<T> mm : markerModelList) {
+     * 
+     * double pointLine = mm.getTotalEntryCount() * yRatio;
+     * 
+     * int lineNumber = (int) Math.floor(pointLine); key = mm.getKey(lineNumber);
+     * 
+     * // LOG.info("lineNumber: " + lineNumber);
+     * 
+     * if (key != null) {
+     * 
+     * markerModel = mm; break; } else {
+     * 
+     * lineNumber = (int) Math.ceil(pointLine); // LOG.info("lineNumber 2: " + lineNumber); key = mm.getKey(lineNumber);
+     * 
+     * if (key != null) { markerModel = mm; break; }
+     * 
+     * }
+     * 
+     * }
+     * 
+     * if (key != null) { marker = markerModel.getMarker(key); }
+     * 
+     * return marker; }
+     */
 
-	public void addMarkerModel(MarkerModel<T> markerModel) {
+    public void addMarkerModel(MarkerModel<T> markerModel) {
 
-		if (markerModel != null) {
+        if (markerModel != null) {
 
-			markerModelList.add(markerModel);
-			markerModel.addMarkerModelListener(this);
+            markerModelList.add(markerModel);
+            markerModel.addMarkerModelListener(this);
 
-			modelDataChanged(new EventObject(markerModel));
-		}
-	}
+            modelDataChanged(new EventObject(markerModel));
+        }
+    }
 
-	public void removeMarkerModel(MarkerModel<T> markerModel) {
+    public void removeMarkerModel(MarkerModel<T> markerModel) {
 
-		if (markerModel != null) {
+        if (markerModel != null) {
 
-			boolean success = markerModelList.remove(markerModel);
+            boolean success = markerModelList.remove(markerModel);
 
-			if (success) {
-				markerModel.removeMarkerModelListener(this);
-			}
+            if (success) {
+                markerModel.removeMarkerModelListener(this);
+            }
 
-			modelDataChanged(new EventObject(markerModel));
-		}
-	}
+            modelDataChanged(new EventObject(markerModel));
+        }
+    }
 
-	public void clearMarkerModelList() {
+    public void clearMarkerModelList() {
 
-		markerModelList.clear();
+        markerModelList.clear();
 
-		modelDataChanged(new EventObject(this));
+        modelDataChanged(new EventObject(this));
 
-	}
+    }
 
-	@Override
-	public void modelDataChanged(EventObject e) {
-		revalidate();
-		repaint();
-	}
+    @Override
+    public void modelDataChanged(EventObject eventObject) {
+        revalidate();
+        repaint();
+    }
 
-	@Override
-	protected void paintComponent(Graphics g) {
+    @Override
+    protected void paintComponent(Graphics graphics) {
 
-		if (markerModelList.size() > 0) {
+        if (markerModelList.size() > 0) {
 
-			Graphics2D g2 = (Graphics2D) g;
+            Graphics2D g2 = (Graphics2D) graphics;
 
-			Composite composite = g2.getComposite();
+            Composite composite = g2.getComposite();
 
-			g2.setColor(getBackground());
+            g2.setColor(getBackground());
 
-			if (!isOpaque()) {
-				g2.setComposite(AlphaComposite.getInstance(AlphaComposite.DST));
-			}
+            if (!isOpaque()) {
+                g2.setComposite(AlphaComposite.getInstance(AlphaComposite.DST));
+            }
 
-			g2.fillRect(0, 0, getWidth(), getHeight());
-			g2.setComposite(composite);
+            g2.fillRect(0, 0, getWidth(), getHeight());
+            g2.setComposite(composite);
 
-			// rebuilt whenever the bar is painted
-			positionIndexMap = new HashMap<>();
+            // rebuilt whenever the bar is painted
+            positionIndexMap = new HashMap<>();
 
-			for (MarkerModel<T> markerModel : markerModelList) {
-				paintMarkerModel(g2, markerModel, positionIndexMap);
-			}
-		} else {
-			super.paintComponent(g);
-		}
-	}
+            for (MarkerModel<T> markerModel : markerModelList) {
+                paintMarkerModel(g2, markerModel, positionIndexMap);
+            }
+        } else {
+            super.paintComponent(graphics);
+        }
+    }
 
-	private void paintMarkerModel(Graphics2D g2, MarkerModel<T> markerModel,
-			HashMap<Integer, Integer> positionIndexMap) {
+    private void paintMarkerModel(Graphics2D g2, MarkerModel<T> markerModel,
+            HashMap<Integer, Integer> positionIndexMap) {
 
-		double totalHeight = getHeight();
-		double totalCount = markerModel.getTotalEntryCount();
-		double markerScale = totalHeight / totalCount;
-		int markerHeight = Math.max(1, (int) markerScale);
+        double totalHeight = getHeight();
+        double totalCount = markerModel.getTotalEntryCount();
+        double markerScale = totalHeight / totalCount;
+        int markerHeight = Math.max(1, (int) markerScale);
 
-		g2.setColor(markerModel.getMarkerColor());
-		int pos;
+        g2.setColor(markerModel.getMarkerColor());
+        int pos;
 
-		Set<Integer> indexKeySet = markerModel.getIndexKeySet();
+        Set<Integer> indexKeySet = markerModel.getIndexKeySet();
 
-		for (Integer index : indexKeySet) {
-			pos = (int) (index * markerScale);
-			positionIndexMap.put(pos, index);
+        for (Integer index : indexKeySet) {
+            pos = (int) (index * markerScale);
+            positionIndexMap.put(pos, index);
 
-			g2.fillRect(0, pos, getWidth(), markerHeight);
-		}
-	}
+            g2.fillRect(0, pos, getWidth(), markerHeight);
+        }
+    }
 
 }

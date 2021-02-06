@@ -4,6 +4,7 @@
  * Contributors:
  *     Manu Varghese
  *******************************************************************************/
+
 package com.pega.gcs.fringecommon.guiutilities;
 
 import java.awt.Dimension;
@@ -24,165 +25,167 @@ import javax.swing.table.TableModel;
 
 public class FilterTable<T extends Comparable<? super T>> extends CustomJTable {
 
-	private static final long serialVersionUID = -3587453063266930735L;
+    private static final long serialVersionUID = -3587453063266930735L;
 
-	// will be false for compare table. Remove column filter from the initial
-	// display table as the table model is same as original model.
-	private boolean filterColumns;
+    // will be false for compare table. Remove column filter from the initial
+    // display table as the table model is same as original model.
+    private boolean filterColumns;
 
-	public FilterTable(FilterTableModel<T> filterTableModel) {
-		this(filterTableModel, true);
-	}
+    public FilterTable(FilterTableModel<T> filterTableModel) {
+        this(filterTableModel, true);
+    }
 
-	public FilterTable(FilterTableModel<T> filterTableModel, boolean filterColumns) {
+    public FilterTable(FilterTableModel<T> filterTableModel, boolean filterColumns) {
 
-		super(filterTableModel);
+        super(filterTableModel);
 
-		this.filterColumns = filterColumns;
+        this.filterColumns = filterColumns;
 
-		setAutoCreateColumnsFromModel(false);
+        setAutoCreateColumnsFromModel(false);
 
-		setRowHeight(22);
+        setRowHeight(22);
 
-		setRowSelectionAllowed(true);
+        setRowSelectionAllowed(true);
 
-		setFillsViewportHeight(true);
+        setFillsViewportHeight(true);
 
-		TableColumnModel columnModel = filterTableModel.getTableColumnModel();
+        TableColumnModel columnModel = filterTableModel.getTableColumnModel();
 
-		setColumnModel(columnModel);
+        setColumnModel(columnModel);
 
-		setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
+        setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
 
-		setFilterTableHeader();
-	}
+        setFilterTableHeader();
+    }
 
-	public boolean isFilterColumns() {
-		return filterColumns;
-	}
+    public boolean isFilterColumns() {
+        return filterColumns;
+    }
 
-	private void setFilterTableHeader() {
+    private void setFilterTableHeader() {
 
-		JTableHeader tableHeader = getTableHeader();
+        JTableHeader tableHeader = getTableHeader();
 
-		tableHeader.setReorderingAllowed(false);
+        tableHeader.setReorderingAllowed(false);
 
-		TableCellRenderer origTableCellRenderer = tableHeader.getDefaultRenderer();
-		FilterTableHeaderCellRenderer tthcr = new FilterTableHeaderCellRenderer(origTableCellRenderer);
-		tableHeader.setDefaultRenderer(tthcr);
+        TableCellRenderer origTableCellRenderer = tableHeader.getDefaultRenderer();
+        FilterTableHeaderCellRenderer tthcr = new FilterTableHeaderCellRenderer(origTableCellRenderer);
+        tableHeader.setDefaultRenderer(tthcr);
 
-		// bold the header
-		Font existingFont = tableHeader.getFont();
-		String existingFontName = existingFont.getName();
-		int existFontSize = existingFont.getSize();
-		Font newFont = new Font(existingFontName, Font.BOLD, existFontSize);
-		tableHeader.setFont(newFont);
+        // bold the header
+        Font existingFont = tableHeader.getFont();
+        String existingFontName = existingFont.getName();
+        int existFontSize = existingFont.getSize();
+        Font newFont = new Font(existingFontName, Font.BOLD, existFontSize);
+        tableHeader.setFont(newFont);
 
-		// set column header filters action
-		tableHeader.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
+        // set column header filters action
+        tableHeader.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent mouseEvent) {
 
-				if (SwingUtilities.isLeftMouseButton(e)) {
+                if (SwingUtilities.isLeftMouseButton(mouseEvent)) {
 
-					JTableHeader target = (JTableHeader) e.getSource();
-					JTable table = target.getTable();
-					TableModel tableModel = table.getModel();
+                    JTableHeader target = (JTableHeader) mouseEvent.getSource();
+                    JTable table = target.getTable();
+                    TableModel tableModel = table.getModel();
 
-					if (tableModel instanceof FilterTableModel) {
+                    if (tableModel instanceof FilterTableModel) {
 
-						if (filterColumns) {
-							
-							@SuppressWarnings("unchecked")
-							FilterTableModel<T> ftm = (FilterTableModel<T>) tableModel;
+                        if (filterColumns) {
 
-							final int columnIndex = target.columnAtPoint(e.getPoint());
+                            @SuppressWarnings("unchecked")
+                            FilterTableModel<T> ftm = (FilterTableModel<T>) tableModel;
 
-							boolean columnFilterEnabled = ftm.isColumnFilterEnabled(columnIndex);
+                            final int columnIndex = target.columnAtPoint(mouseEvent.getPoint());
 
-							boolean columnLoading = ftm.isColumnLoading(columnIndex);
+                            boolean columnFilterEnabled = ftm.isColumnFilterEnabled(columnIndex);
 
-							if ((columnFilterEnabled) && (!columnLoading)) {
+                            boolean columnLoading = ftm.isColumnLoading(columnIndex);
 
-								Set<CheckBoxMenuItemPopupEntry<T>> filterTableHeaderColumnEntrySet;
-								filterTableHeaderColumnEntrySet = ftm.getColumnFilterEntrySet(columnIndex);
+                            if ((columnFilterEnabled) && (!columnLoading)) {
 
-								JPopupMenu filterTableHeaderPopupMenu = new FilterTableHeaderPopupMenu<T>(
-										filterTableHeaderColumnEntrySet) {
+                                Set<CheckBoxMenuItemPopupEntry<T>> filterTableHeaderColumnEntrySet;
+                                filterTableHeaderColumnEntrySet = ftm.getColumnFilterEntrySet(columnIndex);
 
-									private static final long serialVersionUID = 69036102746514349L;
+                                JPopupMenu filterTableHeaderPopupMenu = new FilterTableHeaderPopupMenu<T>(
+                                        filterTableHeaderColumnEntrySet) {
 
-									@Override
-									public void applyJButtonAction() {
-										applyColumnHeaderFilter(columnIndex, false);
-									}
-								};
+                                    private static final long serialVersionUID = 69036102746514349L;
 
-								// limit the size of popup
-								filterTableHeaderPopupMenu
-										.setMaximumSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE));
+                                    @Override
+                                    public void applyJButtonAction() {
+                                        applyColumnHeaderFilter(columnIndex, false);
+                                    }
+                                };
 
-								int width = filterTableHeaderPopupMenu.getPreferredSize().width;
-								int height = filterTableHeaderPopupMenu.getPreferredSize().height;
+                                // limit the size of popup
+                                filterTableHeaderPopupMenu
+                                        .setMaximumSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE));
 
-								if ((width > 300) || (height > 400)) {
+                                Dimension preferredSize = filterTableHeaderPopupMenu.getPreferredSize();
 
-									width = 300;
-									height = ((height > 400) ? 400 : height);
+                                int width = preferredSize.width;
+                                int height = preferredSize.height;
 
-									filterTableHeaderPopupMenu.setPreferredSize(new Dimension(width, height));
-								}
+                                if ((width > 300) || (height > 400)) {
 
-								Rectangle rect = target.getHeaderRect(columnIndex);
-								filterTableHeaderPopupMenu.show(target, rect.x, rect.height);
+                                    width = 300;
+                                    height = ((height > 400) ? 400 : height);
 
-							}
-						}
-					}
-				}
+                                    filterTableHeaderPopupMenu.setPreferredSize(new Dimension(width, height));
+                                }
 
-			}
+                                Rectangle rect = target.getHeaderRect(columnIndex);
+                                filterTableHeaderPopupMenu.show(target, rect.x, rect.height);
 
-		});
+                            }
+                        }
+                    }
+                }
 
-		setTableHeader(tableHeader);
-	}
+            }
 
-	private void applyColumnHeaderFilter(int columnIndex, boolean clearAll) {
+        });
 
-		TableModel tableModel = getModel();
+        setTableHeader(tableHeader);
+    }
 
-		if (tableModel instanceof FilterTableModel) {
+    private void applyColumnHeaderFilter(int columnIndex, boolean clearAll) {
 
-			@SuppressWarnings("unchecked")
-			FilterTableModel<T> ftm = (FilterTableModel<T>) tableModel;
+        TableModel tableModel = getModel();
 
-			Set<CheckBoxMenuItemPopupEntry<T>> columnFilterEntrySet = null;
+        if (tableModel instanceof FilterTableModel) {
 
-			if (!clearAll) {
+            @SuppressWarnings("unchecked")
+            FilterTableModel<T> ftm = (FilterTableModel<T>) tableModel;
 
-				columnFilterEntrySet = new HashSet<CheckBoxMenuItemPopupEntry<T>>();
+            Set<CheckBoxMenuItemPopupEntry<T>> columnFilterEntrySet = null;
 
-				Set<CheckBoxMenuItemPopupEntry<T>> ttcfeSet = ftm.getColumnFilterEntrySet(columnIndex);
+            if (!clearAll) {
 
-				for (CheckBoxMenuItemPopupEntry<T> ttcfe : ttcfeSet) {
+                columnFilterEntrySet = new HashSet<CheckBoxMenuItemPopupEntry<T>>();
 
-					if (ttcfe.isSelected()) {
-						columnFilterEntrySet.add(ttcfe);
-					} else {
-						ttcfe.setVisible(false);
-					}
-				}
+                Set<CheckBoxMenuItemPopupEntry<T>> ttcfeSet = ftm.getColumnFilterEntrySet(columnIndex);
 
-			}
+                for (CheckBoxMenuItemPopupEntry<T> ttcfe : ttcfeSet) {
 
-			JTableHeader tableHeader = getTableHeader();
+                    if (ttcfe.isSelected()) {
+                        columnFilterEntrySet.add(ttcfe);
+                    } else {
+                        ttcfe.setVisible(false);
+                    }
+                }
 
-			ftm.applyColumnFilter(columnFilterEntrySet, columnIndex, tableHeader);
+            }
 
-			// repaint occurs separately in the FilterColumnUpdateTask now
-			// tableHeader.repaint();
-		}
-	}
+            JTableHeader tableHeader = getTableHeader();
+
+            ftm.applyColumnFilter(columnFilterEntrySet, columnIndex, tableHeader);
+
+            // repaint occurs separately in the FilterColumnUpdateTask now
+            // tableHeader.repaint();
+        }
+    }
 
 }

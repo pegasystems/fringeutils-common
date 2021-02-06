@@ -4,6 +4,7 @@
  * Contributors:
  *     Manu Varghese
  *******************************************************************************/
+
 package com.pega.gcs.fringecommon.guiutilities;
 
 import java.awt.BasicStroke;
@@ -29,160 +30,157 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
 /**
- * Component to be used as tabComponent; Contains a JLabel to show the text and
- * a JButton to close the tab it belongs to
+ * Component to be used as tabComponent; Contains a JLabel to show the text and a JButton to close the tab it belongs to.
  */
 public class ButtonTabComponent extends JPanel {
 
-	private static final long serialVersionUID = -8658986828578174335L;
+    private static final long serialVersionUID = -8658986828578174335L;
 
-	private String label;
+    private String label;
 
-	private JTabbedPane jTabbedPane;
+    private JTabbedPane tabbedPane;
 
-	private JLabel tabLabel;
+    private JLabel tabLabel;
 
-	private JButton tabButton;
+    private JButton tabButton;
 
-	public ButtonTabComponent(String label, JTabbedPane jTabbedPane) {
+    public ButtonTabComponent(String label, JTabbedPane tabbedPane) {
 
-		super();
+        super();
 
-		this.label = label;
-		this.jTabbedPane = jTabbedPane;
+        this.label = label;
+        this.tabbedPane = tabbedPane;
 
-		setOpaque(false);
+        setOpaque(false);
 
-		LayoutManager layout = new BoxLayout(this, BoxLayout.LINE_AXIS);
+        LayoutManager layout = new BoxLayout(this, BoxLayout.LINE_AXIS);
 
-		setLayout(layout);
+        setLayout(layout);
 
-		JLabel tabLabel = getTabLabel();
-		JButton tabButton = getTabButton();
+        JLabel tabLabel = getTabLabel();
+        JButton tabButton = getTabButton();
 
-		Dimension spacer = new Dimension(5, 20);
+        Dimension spacer = new Dimension(5, 20);
 
-		add(tabLabel);
-		add(Box.createRigidArea(spacer));
-		add(tabButton);
-	}
+        add(tabLabel);
+        add(Box.createRigidArea(spacer));
+        add(tabButton);
+    }
 
-	protected JTabbedPane getjTabbedPane() {
-		return jTabbedPane;
-	}
+    protected JTabbedPane getTabbedPane() {
+        return tabbedPane;
+    }
 
-	/**
-	 * @return the tabLabel
-	 */
-	private JLabel getTabLabel() {
+    private JLabel getTabLabel() {
 
-		if (tabLabel == null) {
-			tabLabel = new JLabel(label);
-		}
+        if (tabLabel == null) {
+            tabLabel = new JLabel(label);
+        }
 
-		return tabLabel;
-	}
+        return tabLabel;
+    }
 
-	/**
-	 * @return the tabButton
-	 */
-	private JButton getTabButton() {
+    private JButton getTabButton() {
 
-		if (tabButton == null) {
+        if (tabButton == null) {
 
-			tabButton = new JButton() {
+            tabButton = new JButton() {
 
-				private static final long serialVersionUID = -2794775022954503406L;
+                private static final long serialVersionUID = -2794775022954503406L;
 
-				/*
-				 * (non-Javadoc)
-				 * 
-				 * @see javax.swing.JComponent#paintComponent(java.awt.Graphics)
-				 */
-				@Override
-				protected void paintComponent(Graphics g) {
+                /*
+                 * (non-Javadoc)
+                 * 
+                 * @see javax.swing.JComponent#paintComponent(java.awt.Graphics)
+                 */
+                @Override
+                protected void paintComponent(Graphics graphics) {
 
-					super.paintComponent(g);
+                    super.paintComponent(graphics);
 
-					Graphics2D g2 = (Graphics2D) g.create();
+                    Graphics2D g2 = (Graphics2D) graphics.create();
 
-					if (getModel().isPressed()) {
-						g2.translate(1, 1);
-					}
+                    if (getModel().isPressed()) {
+                        g2.translate(1, 1);
+                    }
 
-					g2.setStroke(new BasicStroke(2));
-					g2.setColor(Color.BLACK);
+                    g2.setStroke(new BasicStroke(2));
+                    g2.setColor(Color.BLACK);
 
-					if (getModel().isRollover()) {
-						g2.setColor(MyColor.RED_ON);
-					}
+                    if (getModel().isRollover()) {
+                        g2.setColor(MyColor.RED_ON);
+                    }
 
-					int delta = 6;
+                    int delta = 6;
 
-					g2.drawLine(delta, delta, getWidth() - delta - 1, getHeight() - delta - 1);
+                    g2.drawLine(delta, delta, getWidth() - delta - 1, getHeight() - delta - 1);
 
-					g2.drawLine(getWidth() - delta - 1, delta, delta, getHeight() - delta - 1);
+                    g2.drawLine(getWidth() - delta - 1, delta, delta, getHeight() - delta - 1);
 
-					g2.dispose();
-				}
+                    g2.dispose();
+                }
 
-			};
+            };
 
-			Dimension size = new Dimension(17, 17);
+            Dimension size = new Dimension(17, 17);
 
-			tabButton.setPreferredSize(size);
-			tabButton.setSize(size);
-			tabButton.setMaximumSize(size);
+            tabButton.setPreferredSize(size);
+            tabButton.setSize(size);
+            tabButton.setMaximumSize(size);
 
-			tabButton.setToolTipText("Close");
-			tabButton.setContentAreaFilled(false);
-			tabButton.setFocusable(false);
-			tabButton.setBorder(BorderFactory.createEtchedBorder());
-			tabButton.setBorderPainted(false);
-			tabButton.setRolloverEnabled(true);
+            tabButton.setToolTipText("Close");
+            tabButton.setContentAreaFilled(false);
+            tabButton.setFocusable(false);
+            tabButton.setBorder(BorderFactory.createEtchedBorder());
+            tabButton.setBorderPainted(false);
+            tabButton.setRolloverEnabled(true);
 
-			MouseListener mouseListener = new MouseAdapter() {
+            MouseListener mouseListener = new MouseAdapter() {
 
-				@Override
-				public void mouseEntered(MouseEvent e) {
-					Component component = e.getComponent();
-					if (component instanceof AbstractButton) {
-						AbstractButton button = (AbstractButton) component;
-						button.setBorderPainted(true);
-					}
-				}
+                @Override
+                public void mouseEntered(MouseEvent mouseEvent) {
 
-				@Override
-				public void mouseExited(MouseEvent e) {
-					Component component = e.getComponent();
-					if (component instanceof AbstractButton) {
-						AbstractButton button = (AbstractButton) component;
-						button.setBorderPainted(false);
-					}
-				}
-			};
+                    Component component = mouseEvent.getComponent();
 
-			tabButton.addMouseListener(mouseListener);
+                    if (component instanceof AbstractButton) {
+                        AbstractButton button = (AbstractButton) component;
+                        button.setBorderPainted(true);
+                    }
+                }
 
-			ActionListener actionListener = new ActionListener() {
+                @Override
+                public void mouseExited(MouseEvent mouseEvent) {
 
-				@Override
-				public void actionPerformed(ActionEvent e) {
+                    Component component = mouseEvent.getComponent();
 
-					JTabbedPane jTabbedPane = getjTabbedPane();
+                    if (component instanceof AbstractButton) {
+                        AbstractButton button = (AbstractButton) component;
+                        button.setBorderPainted(false);
+                    }
+                }
+            };
 
-					int i = jTabbedPane.indexOfTabComponent(ButtonTabComponent.this);
+            tabButton.addMouseListener(mouseListener);
 
-					if (i != -1) {
-						jTabbedPane.remove(i);
-					}
-				}
-			};
+            ActionListener actionListener = new ActionListener() {
 
-			tabButton.addActionListener(actionListener);
-		}
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
 
-		return tabButton;
-	}
+                    JTabbedPane tabbedPane = getTabbedPane();
+
+                    int index = tabbedPane.indexOfTabComponent(ButtonTabComponent.this);
+
+                    if (index != -1) {
+                        tabbedPane.remove(index);
+                    }
+                }
+            };
+
+            tabButton.addActionListener(actionListener);
+        }
+
+        return tabButton;
+    }
 
 }

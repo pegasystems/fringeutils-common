@@ -1,0 +1,86 @@
+/*
+ * Allows for publishing artifacts either to Bintray or to Artifactory. Bintray is
+ * the default choice but this can be configured within <root-project>/gradle.properties.
+ */
+apply plugin: 'maven-publish'
+
+publishing {
+    publications {
+        mavenJava (MavenPublication) {
+            from components.java             
+            artifact sourcesJar
+            artifact docsJar
+            
+            pom.withXml {
+                def root = asNode()
+                root.appendNode('name', 'Pega Fringeutils-Common')
+                root.appendNode('description', 'Common library used in LogViewer and TracerViewer tools.')
+                root.appendNode('url', 'https://github.com/pegasystems/fringeutils-common')
+
+                def scm = root.appendNode('scm')
+                scm.appendNode('url', 'https://github.com/pegasystems/fringeutils-common')
+                scm.appendNode('connection', 'scm:https://developer@github.com/pegasystems/fringeutils-common.git')
+                scm.appendNode('developerConnection', 'scm:git://github.com/pegasystems/fringeutils-common.git')
+
+                def license = root.appendNode('licenses').appendNode('license')
+                license.appendNode('name', 'The Apache Software License, Version 2.0')
+                license.appendNode('url', 'http://www.apache.org/licenses/LICENSE-2.0.txt')
+                license.appendNode('distribution', 'repo')
+
+                def developers = root.appendNode('developers')
+                def dev1 = developers.appendNode('developer')
+                dev1.appendNode('id', 'vargm')
+                dev1.appendNode('name', 'Manu Varghese')
+            }
+        }
+    }
+}
+
+ext {
+    githubSite = 'https://github.com'
+}
+
+bintray {
+    user = resolveProperty('bintrayUsername')
+    key = resolveProperty('bintrayKey')
+    publications = ['mavenJava']
+    publish = true
+
+    pkg {
+        def orgName = rootProject.findProperty('organization')
+        
+        userOrg = orgName
+        repo = rootProject.findProperty('release.stage') == 'final' ? releaseRepository : snapshotRepository
+        name = project.name
+        websiteUrl = 'https://github.com/pegasystems/fringeutils-common'
+        issueTrackerUrl = 'https://github.com/pegasystems/fringeutils-common/issues'
+        vcsUrl = 'https://github.com/pegasystems/fringeutils-common.git'
+        licenses = ['Apache-2.0']
+        labels = ['java', 'pega', 'Pega RULES log', 'Pega ALERT log']
+        publicDownloadNumbers = true
+        githubRepo = 'pegasystems/fringeutils-common'
+        githubReleaseNotesFile = 'README.md'
+
+        version {
+            name = '${project.version}'
+            desc = "FringeUtils-Common"
+            released  = new Date()
+            vcsTag = '${project.version}'
+
+            gpg {
+                sign = true
+                passphrase = resolveProperty('gpgPassphrase')
+            }
+        }
+    }
+}
+
+/*
+ * Check environment for property and if that fails 
+ * ask gradle to find the property somewhere within
+ * the project hierarchy.
+ */
+String resolveProperty(String propKey) {
+    String propValue = System.getenv()[propKey]
+    return propValue ?: findProperty(propKey)
+}

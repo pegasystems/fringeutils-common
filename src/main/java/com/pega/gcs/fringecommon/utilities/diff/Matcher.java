@@ -4,9 +4,10 @@
  * Contributors:
  *     Manu Varghese
  *******************************************************************************/
+
 package com.pega.gcs.fringecommon.utilities.diff;
 
 public interface Matcher<T> {
 
-	public boolean match(T o1, T o2);
+    public boolean match(T o1, T o2);
 }

@@ -4,6 +4,7 @@
  * Contributors:
  *     Manu Varghese
  *******************************************************************************/
+
 package com.pega.gcs.fringecommon.guiutilities;
 
 import java.awt.event.ActionEvent;
@@ -15,76 +16,73 @@ import javax.swing.JMenuItem;
 
 public abstract class RecentFileJMenu extends JMenu implements RecentFileContainerListener {
 
-	private static final long serialVersionUID = 6861799077954827435L;
+    private static final long serialVersionUID = 6861799077954827435L;
 
-	private RecentFileContainer recentFileContainer;
+    private RecentFileContainer recentFileContainer;
 
-	public abstract void onSelect(RecentFile recentFile);
+    public abstract void onSelect(RecentFile recentFile);
 
-	public RecentFileJMenu(RecentFileContainer recentFileContainer) {
+    public RecentFileJMenu(RecentFileContainer recentFileContainer) {
 
-		super("Recent");
+        super("Recent");
 
-		this.recentFileContainer = recentFileContainer;
+        this.recentFileContainer = recentFileContainer;
 
-		this.setMnemonic(KeyEvent.VK_R);
+        this.setMnemonic(KeyEvent.VK_R);
 
-		this.recentFileContainer.addRecentFileContainerListener(this);
+        this.recentFileContainer.addRecentFileContainerListener(this);
 
-		populateJMenuItems();
-	}
+        populateJMenuItems();
+    }
 
-	private void populateJMenuItems() {
+    private void populateJMenuItems() {
 
-		removeAll();
+        removeAll();
 
-		int index = 0;
+        int index = 0;
 
-		for (final RecentFile recentFile : recentFileContainer.getRecentFileList()) {
+        for (RecentFile recentFile : recentFileContainer.getRecentFileList()) {
 
-			if (recentFile != null) {
+            if (recentFile != null) {
 
-				String recentFileStr = recentFile.toString();
+                String recentFileStr = recentFile.toString();
 
-				JMenuItem menuItem = new JMenuItem(recentFileStr);
-				menuItem.setToolTipText(recentFileStr);
-				menuItem.setActionCommand(String.valueOf(index));
-				menuItem.addActionListener(new ActionListener() {
+                JMenuItem menuItem = new JMenuItem(recentFileStr);
+                menuItem.setToolTipText(recentFileStr);
+                menuItem.setActionCommand(String.valueOf(index));
+                menuItem.addActionListener(new ActionListener() {
 
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						// int index = Integer.parseInt(e.getActionCommand());
-						onSelect(recentFile);
-					}
-				});
+                    @Override
+                    public void actionPerformed(ActionEvent actionEvent) {
+                        onSelect(recentFile);
+                    }
+                });
 
-				add(menuItem);
-			}
+                add(menuItem);
+            }
 
-			index++;
-		}
-	}
+            index++;
+        }
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.fringe.common.guiutilities.RecentFileContainerListener#
-	 * recentFileAdded ()
-	 */
-	@Override
-	public void recentFileAdded() {
-		populateJMenuItems();
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.fringe.common.guiutilities.RecentFileContainerListener# recentFileAdded ()
+     */
+    @Override
+    public void recentFileAdded() {
+        populateJMenuItems();
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.fringe.common.guiutilities.RecentFileContainerListener#
-	 * recentFileDeleted ()
-	 */
-	@Override
-	public void recentFileDeleted() {
-		populateJMenuItems();
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.fringe.common.guiutilities.RecentFileContainerListener# recentFileDeleted ()
+     */
+    @Override
+    public void recentFileDeleted() {
+        populateJMenuItems();
+    }
 
 }

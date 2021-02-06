@@ -4,6 +4,7 @@
  * Contributors:
  *     Manu Varghese
  *******************************************************************************/
+
 package com.pega.gcs.fringecommon.guiutilities.bookmark;
 
 import java.awt.BorderLayout;
@@ -36,287 +37,275 @@ import com.pega.gcs.fringecommon.guiutilities.markerbar.Marker;
 
 public abstract class BookmarkContainerPanel<T> extends JPanel {
 
-	private static final long serialVersionUID = -7076048541108098076L;
+    private static final long serialVersionUID = -7076048541108098076L;
 
-	public abstract FilterTableModel<? super T> getFilterTableModel();
+    public abstract FilterTableModel<? super T> getFilterTableModel();
 
-	private BookmarkModel<T> bookmarkModel;
+    private BookmarkModel<T> bookmarkModel;
 
-	private NavigationTableController<T> navigationTableController;
+    private NavigationTableController<T> navigationTableController;
 
-	JList<Marker<T>> bookmarkJList;
+    JList<Marker<T>> bookmarkJList;
 
-	private JButton deleteJButton;
+    private JButton deleteJButton;
 
-	private JButton deleteAllJButton;
+    private JButton deleteAllJButton;
 
-	public BookmarkContainerPanel(BookmarkModel<T> bookmarkModel,
-			NavigationTableController<T> navigationTableController) {
+    public BookmarkContainerPanel(BookmarkModel<T> bookmarkModel,
+            NavigationTableController<T> navigationTableController) {
 
-		super();
+        super();
 
-		this.bookmarkModel = bookmarkModel;
-		this.navigationTableController = navigationTableController;
+        this.bookmarkModel = bookmarkModel;
+        this.navigationTableController = navigationTableController;
 
-		setLayout(new BorderLayout());
+        setLayout(new BorderLayout());
 
-		JPanel buttonsJPanel = getButtonsJPanel();
-		JPanel bookmarkListPanel = getBookmarkListPanel();
+        JPanel buttonsJPanel = getButtonsJPanel();
+        JPanel bookmarkListPanel = getBookmarkListPanel();
 
-		add(buttonsJPanel, BorderLayout.NORTH);
-		add(bookmarkListPanel, BorderLayout.CENTER);
-	}
+        add(buttonsJPanel, BorderLayout.NORTH);
+        add(bookmarkListPanel, BorderLayout.CENTER);
+    }
 
-	protected BookmarkModel<T> getBookmarkModel() {
-		return bookmarkModel;
-	}
+    protected BookmarkModel<T> getBookmarkModel() {
+        return bookmarkModel;
+    }
 
-	protected NavigationTableController<T> getNavigationTableController() {
-		return navigationTableController;
-	}
+    protected NavigationTableController<T> getNavigationTableController() {
+        return navigationTableController;
+    }
 
-	private JPanel getButtonsJPanel() {
+    private JPanel getButtonsJPanel() {
 
-		JPanel buttonsJPanel = new JPanel();
+        JPanel buttonsJPanel = new JPanel();
 
-		LayoutManager layout = new BoxLayout(buttonsJPanel, BoxLayout.X_AXIS);
-		buttonsJPanel.setLayout(layout);
+        LayoutManager layout = new BoxLayout(buttonsJPanel, BoxLayout.X_AXIS);
+        buttonsJPanel.setLayout(layout);
 
-		JButton deleteJButton = getDeleteJButton();
-		JButton deleteAllJButton = getDeleteAllJButton();
+        JButton deleteJButton = getDeleteJButton();
+        JButton deleteAllJButton = getDeleteAllJButton();
 
-		Dimension dim = new Dimension(1, 30);
+        Dimension dim = new Dimension(1, 30);
 
-		buttonsJPanel.add(Box.createHorizontalGlue());
-		buttonsJPanel.add(deleteJButton);
-		buttonsJPanel.add(Box.createRigidArea(dim));
-		buttonsJPanel.add(Box.createHorizontalGlue());
-		buttonsJPanel.add(deleteAllJButton);
-		buttonsJPanel.add(Box.createHorizontalGlue());
+        buttonsJPanel.add(Box.createHorizontalGlue());
+        buttonsJPanel.add(deleteJButton);
+        buttonsJPanel.add(Box.createRigidArea(dim));
+        buttonsJPanel.add(Box.createHorizontalGlue());
+        buttonsJPanel.add(deleteAllJButton);
+        buttonsJPanel.add(Box.createHorizontalGlue());
 
-		return buttonsJPanel;
-	}
+        return buttonsJPanel;
+    }
 
-	private JList<Marker<T>> getBookmarkJList() {
+    private JList<Marker<T>> getBookmarkJList() {
 
-		if (bookmarkJList == null) {
+        if (bookmarkJList == null) {
 
-			DefaultListModel<Marker<T>> dlm = new DefaultListModel<Marker<T>>();
+            BookmarkModel<T> bookmarkModel = getBookmarkModel();
 
-			BookmarkContainer<T> bookmarkContainer;
-			bookmarkContainer = bookmarkModel.getBookmarkContainer();
+            DefaultListModel<Marker<T>> dlm = new DefaultListModel<Marker<T>>();
 
-			Iterator<T> bmIterator = bookmarkContainer.getIterator();
+            BookmarkContainer<T> bookmarkContainer;
+            bookmarkContainer = bookmarkModel.getBookmarkContainer();
 
-			while (bmIterator.hasNext()) {
+            Iterator<T> bmIterator = bookmarkContainer.getIterator();
 
-				T key = bmIterator.next();
+            while (bmIterator.hasNext()) {
 
-				List<Marker<T>> bookmarkList;
-				bookmarkList = bookmarkContainer.getBookmarkList(key);
+                T key = bmIterator.next();
 
-				if (bookmarkList != null) {
-					for (Marker<T> bookmark : bookmarkList) {
-						dlm.addElement(bookmark);
-					}
-				}
-			}
+                List<Marker<T>> bookmarkList;
+                bookmarkList = bookmarkContainer.getBookmarkList(key);
 
-			bookmarkJList = new JList<Marker<T>>(dlm);
+                if (bookmarkList != null) {
+                    for (Marker<T> bookmark : bookmarkList) {
+                        dlm.addElement(bookmark);
+                    }
+                }
+            }
 
-			DefaultListCellRenderer dlcr = getDefaultListCellRenderer();
+            bookmarkJList = new JList<>(dlm);
 
-			bookmarkJList.setCellRenderer(dlcr);
+            DefaultListCellRenderer dlcr = getDefaultListCellRenderer();
 
-			bookmarkJList.setFixedCellHeight(20);
+            bookmarkJList.setCellRenderer(dlcr);
 
-			bookmarkJList.addMouseListener(new MouseAdapter() {
+            bookmarkJList.setFixedCellHeight(20);
 
-				@Override
-				public void mouseClicked(MouseEvent e) {
+            bookmarkJList.addMouseListener(new MouseAdapter() {
 
-					if (e.getClickCount() == 2) {
+                @Override
+                public void mouseClicked(MouseEvent mouseEvent) {
 
-						Marker<T> bookmark = (Marker<T>) bookmarkJList.getSelectedValue();
+                    if (mouseEvent.getClickCount() == 2) {
 
-						if (bookmark != null) {
-							T key = bookmark.getKey();
+                        Marker<T> bookmark = bookmarkJList.getSelectedValue();
 
-							getNavigationTableController().scrollToKey(key);
-						}
-					} else {
-						super.mouseClicked(e);
-					}
-				}
+                        if (bookmark != null) {
+                            T key = bookmark.getKey();
 
-			});
+                            getNavigationTableController().scrollToKey(key);
+                        }
+                    } else {
+                        super.mouseClicked(mouseEvent);
+                    }
+                }
 
-		}
-		return bookmarkJList;
-	}
+            });
 
-	private JButton getDeleteJButton() {
+        }
+        return bookmarkJList;
+    }
 
-		if (deleteJButton == null) {
-			deleteJButton = new JButton("Delete Bookmark");
+    private JButton getDeleteJButton() {
 
-			Dimension size = new Dimension(150, 20);
-			deleteJButton.setPreferredSize(size);
-			deleteJButton.setMaximumSize(size);
-			// deleteJButton.setHorizontalTextPosition(SwingConstants.LEADING);
+        if (deleteJButton == null) {
+            deleteJButton = new JButton("Delete Bookmark");
 
-			deleteJButton.addActionListener(new ActionListener() {
+            Dimension size = new Dimension(150, 20);
+            deleteJButton.setPreferredSize(size);
+            deleteJButton.setMaximumSize(size);
+            // deleteJButton.setHorizontalTextPosition(SwingConstants.LEADING);
 
-				@Override
-				public void actionPerformed(ActionEvent e) {
+            deleteJButton.addActionListener(new ActionListener() {
 
-					Marker<T> bookmark = (Marker<T>) bookmarkJList.getSelectedValue();
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
 
-					if (bookmark != null) {
+                    Marker<T> bookmark = (Marker<T>) bookmarkJList.getSelectedValue();
 
-						T key = bookmark.getKey();
+                    if (bookmark != null) {
 
-						BookmarkContainer<T> bookmarkContainer;
-						bookmarkContainer = bookmarkModel.getBookmarkContainer();
+                        T key = bookmark.getKey();
 
-						List<Marker<T>> bookmarkList;
-						bookmarkList = bookmarkContainer.getBookmarkList(key);
+                        BookmarkModel<T> bookmarkModel = getBookmarkModel();
 
-						int index = 0;
+                        BookmarkContainer<T> bookmarkContainer;
+                        bookmarkContainer = bookmarkModel.getBookmarkContainer();
 
-						for (Marker<T> bm : bookmarkList) {
-							// remove the first occurrence
-							if (bm.getText().equals(bookmark.getText())) {
+                        List<Marker<T>> bookmarkList;
+                        bookmarkList = bookmarkContainer.getBookmarkList(key);
 
-								DefaultListModel<Marker<T>> dlm = (DefaultListModel<Marker<T>>) bookmarkJList
-										.getModel();
+                        int index = 0;
 
-								dlm.removeElement(bookmark);
+                        for (Marker<T> bm : bookmarkList) {
+                            // remove the first occurrence
+                            if (bm.getText().equals(bookmark.getText())) {
 
-								getBookmarkModel().removeMarker(bm.getKey(), index);
+                                DefaultListModel<Marker<T>> dlm = (DefaultListModel<Marker<T>>) bookmarkJList
+                                        .getModel();
 
-								break;
-							}
+                                dlm.removeElement(bookmark);
 
-							index++;
-						}
+                                bookmarkModel.removeMarker(bm.getKey(), index);
 
-					}
-				}
+                                break;
+                            }
 
-			});
+                            index++;
+                        }
 
-		}
+                    }
+                }
 
-		return deleteJButton;
-	}
+            });
 
-	private JButton getDeleteAllJButton() {
+        }
 
-		if (deleteAllJButton == null) {
-			deleteAllJButton = new JButton("Delete all Bookmarks");
+        return deleteJButton;
+    }
 
-			Dimension size = new Dimension(150, 20);
-			deleteAllJButton.setPreferredSize(size);
-			deleteAllJButton.setMaximumSize(size);
-			// deleteJButton.setHorizontalTextPosition(SwingConstants.LEADING);
+    private JButton getDeleteAllJButton() {
 
-			deleteAllJButton.addActionListener(new ActionListener() {
+        if (deleteAllJButton == null) {
+            deleteAllJButton = new JButton("Delete all Bookmarks");
 
-				@Override
-				public void actionPerformed(ActionEvent e) {
+            Dimension size = new Dimension(150, 20);
+            deleteAllJButton.setPreferredSize(size);
+            deleteAllJButton.setMaximumSize(size);
+            // deleteJButton.setHorizontalTextPosition(SwingConstants.LEADING);
 
-					DefaultListModel<Marker<T>> dlm = (DefaultListModel<Marker<T>>) bookmarkJList.getModel();
+            deleteAllJButton.addActionListener(new ActionListener() {
 
-					dlm.clear();
-					getBookmarkModel().clearMarkers();
-				}
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
 
-			});
+                    DefaultListModel<Marker<T>> dlm = (DefaultListModel<Marker<T>>) bookmarkJList.getModel();
+                    dlm.clear();
 
-		}
+                    BookmarkModel<T> bookmarkModel = getBookmarkModel();
+                    bookmarkModel.clearMarkers();
+                }
 
-		return deleteAllJButton;
-	}
+            });
 
-	private DefaultListCellRenderer getDefaultListCellRenderer() {
+        }
 
-		DefaultListCellRenderer dlcr = new DefaultListCellRenderer() {
+        return deleteAllJButton;
+    }
 
-			private static final long serialVersionUID = 7578704614877257466L;
+    private DefaultListCellRenderer getDefaultListCellRenderer() {
 
-			@Override
-			public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
-					boolean cellHasFocus) {
+        DefaultListCellRenderer dlcr = new DefaultListCellRenderer() {
 
-				super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+            private static final long serialVersionUID = 7578704614877257466L;
 
-				setBorder(new EmptyBorder(1, 10, 1, 1));
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
+                    boolean cellHasFocus) {
 
-				return this;
-			}
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 
-		};
+                setBorder(new EmptyBorder(1, 10, 1, 1));
 
-		return dlcr;
-	}
+                return this;
+            }
 
-	private JPanel getBookmarkListPanel() {
+        };
 
-		JPanel bookmarkListPanel = new JPanel();
+        return dlcr;
+    }
 
-		LayoutManager layout = new BoxLayout(bookmarkListPanel, BoxLayout.Y_AXIS);
+    private JPanel getBookmarkListPanel() {
 
-		bookmarkListPanel.setLayout(layout);
+        JPanel bookmarkListPanel = new JPanel();
 
-		String text = "Double click on an entry to select the row on main table.";
-		JPanel labelJPanel = getLabelJPanel(text);
+        LayoutManager layout = new BoxLayout(bookmarkListPanel, BoxLayout.Y_AXIS);
 
-		JList<Marker<T>> bookmarkJList = getBookmarkJList();
-		JScrollPane bookmarkJListScrollPane = new JScrollPane(bookmarkJList);
+        bookmarkListPanel.setLayout(layout);
 
-		bookmarkListPanel.add(labelJPanel);
-		bookmarkListPanel.add(bookmarkJListScrollPane);
+        String text = "Double click on an entry to select the row on main table.";
+        JPanel labelJPanel = getLabelJPanel(text);
 
-		return bookmarkListPanel;
-	}
+        JList<Marker<T>> bookmarkJList = getBookmarkJList();
+        JScrollPane bookmarkJListScrollPane = new JScrollPane(bookmarkJList);
 
-	private JPanel getLabelJPanel(String text) {
+        bookmarkListPanel.add(labelJPanel);
+        bookmarkListPanel.add(bookmarkJListScrollPane);
 
-		JPanel labelJPanel = new JPanel();
+        return bookmarkListPanel;
+    }
 
-		LayoutManager layout = new BoxLayout(labelJPanel, BoxLayout.LINE_AXIS);
-		labelJPanel.setLayout(layout);
+    private JPanel getLabelJPanel(String text) {
 
-		JLabel label = new JLabel(text);
+        JPanel labelJPanel = new JPanel();
 
-		int height = 30;
+        LayoutManager layout = new BoxLayout(labelJPanel, BoxLayout.LINE_AXIS);
+        labelJPanel.setLayout(layout);
 
-		Dimension spacer = new Dimension(10, height);
-		labelJPanel.add(Box.createRigidArea(spacer));
-		labelJPanel.add(label);
-		labelJPanel.add(Box.createHorizontalGlue());
+        JLabel label = new JLabel(text);
 
-		labelJPanel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
-		return labelJPanel;
+        int height = 30;
 
-	}
+        Dimension spacer = new Dimension(10, height);
+        labelJPanel.add(Box.createRigidArea(spacer));
+        labelJPanel.add(label);
+        labelJPanel.add(Box.createHorizontalGlue());
 
-	/*
-	 * private void scrollToTraceEventKey(T key) {
-	 * 
-	 * FilterTableModel<? super T> filterTableModel = getFilterTableModel();
-	 * 
-	 * if (customJTable instanceof AbstractTreeTable) { AbstractTreeTableNode
-	 * treeNode = filterTableModel.getTreeNodeForKey(key);
-	 * 
-	 * if (treeNode != null) { ((AbstractTreeTable)
-	 * customJTable).scrollNodeToVisible(treeNode); } } else { int rowNumber =
-	 * filterTableModel.getIndexOfKey(key);
-	 * 
-	 * if (rowNumber != -1) { customJTable.setRowSelectionInterval(rowNumber,
-	 * rowNumber); customJTable.scrollRowToVisible(rowNumber); } }
-	 * 
-	 * }
-	 */
+        labelJPanel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
+        return labelJPanel;
+
+    }
+
 }

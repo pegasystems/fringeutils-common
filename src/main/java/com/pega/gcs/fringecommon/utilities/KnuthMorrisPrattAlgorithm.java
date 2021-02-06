@@ -4,92 +4,100 @@
  * Contributors:
  *     Manu Varghese
  *******************************************************************************/
+
 package com.pega.gcs.fringecommon.utilities;
 
 /**
- * @see Knuth-Morris-Pratt Algorithm for Pattern Matching
+ * Knuth-Morris-Pratt Algorithm for Pattern Matching.
  */
 public class KnuthMorrisPrattAlgorithm {
 
-	/**
-	 * Computes the failure function using a boot-strapping process, where the
-	 * pattern is matched against itself.
-	 */
-	private static int[] computeFailure(byte[] pattern) {
-		int[] failure = new int[pattern.length];
+    /**
+     * Computes the failure function using a bootstrap process, where the pattern is matched against itself.
+     */
+    private static int[] computeFailure(byte[] pattern) {
+        int[] failure = new int[pattern.length];
 
-		int j = 0;
-		for (int i = 1; i < pattern.length; i++) {
-			while (j > 0 && pattern[j] != pattern[i]) {
-				j = failure[j - 1];
-			}
-			if (pattern[j] == pattern[i]) {
-				j++;
-			}
-			failure[i] = j;
-		}
+        int jcounter = 0;
 
-		return failure;
-	}
+        for (int i = 1; i < pattern.length; i++) {
+            while (jcounter > 0 && pattern[jcounter] != pattern[i]) {
+                jcounter = failure[jcounter - 1];
+            }
+            if (pattern[jcounter] == pattern[i]) {
+                jcounter++;
+            }
+            failure[i] = jcounter;
+        }
 
-	/**
-	 * Finds the first occurrence of the pattern in the text from the offset
-	 * index.
-	 */
-	public static int indexOf(byte[] data, byte[] pattern, int startidx) {
-		int[] failure = computeFailure(pattern);
+        return failure;
+    }
 
-		int j = 0;
+    /**
+     * Finds the first occurrence of the pattern in the text.
+     *
+     * @param data    - data to be searched
+     * @param pattern - search pattern
+     * @return - index of first occurrence
+     */
+    public static int indexOf(byte[] data, byte[] pattern) {
+        return indexOf(data, pattern, 0);
+    }
 
-		if (data.length == 0) {
-			return -1;
-		}
+    /**
+     * Finds the first occurrence of the pattern in the text from the offset index.
+     *
+     * @param data     - data to be searched
+     * @param pattern  - search pattern
+     * @param startidx - index location on data to start search
+     * @return - index of first occurrence from startidx
+     */
+    public static int indexOf(byte[] data, byte[] pattern, int startidx) {
+        int[] failure = computeFailure(pattern);
 
-		for (int i = startidx; i < data.length; i++) {
+        int jcounter = 0;
 
-			while (j > 0 && pattern[j] != data[i]) {
-				j = failure[j - 1];
-			}
+        if (data.length == 0) {
+            return -1;
+        }
 
-			if (pattern[j] == data[i]) {
-				j++;
-			}
+        for (int i = startidx; i < data.length; i++) {
 
-			if (j == pattern.length) {
-				return i - pattern.length + 1;
-			}
-		}
-		return -1;
-	}
+            while (jcounter > 0 && pattern[jcounter] != data[i]) {
+                jcounter = failure[jcounter - 1];
+            }
 
-	/**
-	 * Finds the first occurrence of the pattern in the text. index returned
-	 * includes the pattern length
-	 */
-	public static int indexOfWithPatternLength(byte[] data, byte[] pattern, int startidx) {
+            if (pattern[jcounter] == data[i]) {
+                jcounter++;
+            }
 
-		int index = indexOf(data, pattern, startidx);
+            if (jcounter == pattern.length) {
+                return i - pattern.length + 1;
+            }
+        }
+        return -1;
+    }
 
-		if (index != -1) {
-			index = index + pattern.length;
-		}
+    /**
+     * Finds the first occurrence of the pattern in the text. index returned includes the pattern length.
+     *
+     * @param data     - data to be searched
+     * @param pattern  - search pattern
+     * @param startidx - index location on data to start search
+     * @return - index of first occurrence from startidx. includes search pattern size.
+     */
+    public static int indexOfWithPatternLength(byte[] data, byte[] pattern, int startidx) {
 
-		return index;
-	}
+        int index = indexOf(data, pattern, startidx);
 
-	/**
-	 * Finds the first occurrence of the pattern in the text.
-	 */
-	public static int indexOf(byte[] data, byte[] pattern) {
-		return indexOf(data, pattern, 0);
-	}
+        if (index != -1) {
+            index = index + pattern.length;
+        }
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
+        return index;
+    }
 
-	}
-
+    public static void main(String[] args) {
+        // TODO Auto-generated method stub
+    }
 }

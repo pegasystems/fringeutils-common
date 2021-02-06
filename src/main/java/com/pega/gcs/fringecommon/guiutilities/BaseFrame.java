@@ -4,6 +4,7 @@
  * Contributors:
  *     Manu Varghese
  *******************************************************************************/
+
 package com.pega.gcs.fringecommon.guiutilities;
 
 import java.awt.Component;
@@ -19,6 +20,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.List;
 
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
@@ -30,6 +32,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.border.Border;
 import javax.swing.filechooser.FileFilter;
 
 import com.pega.gcs.fringecommon.log4j2.Log4j2Helper;
@@ -38,333 +41,344 @@ import com.pega.gcs.fringecommon.utilities.GeneralUtilities;
 
 public abstract class BaseFrame extends JFrame {
 
-	private static final long serialVersionUID = 836535275459924503L;
+    private static final long serialVersionUID = 836535275459924503L;
 
-	private static final Log4j2Helper LOG = new Log4j2Helper(BaseFrame.class);
+    private static final Log4j2Helper LOG = new Log4j2Helper(BaseFrame.class);
 
-	public static final String PREF_SETTINGS = "settings";
+    public static final String PREF_SETTINGS = "settings";
 
-	public static final String PREF_LAST_VISITED_DIR = "last_visited_dir";
+    public static final String PREF_LAST_VISITED_DIR = "last_visited_dir";
 
-	public static final String PREF_OPEN_FILE_LIST = "open_file_list";
+    public static final String PREF_OPEN_FILE_LIST = "open_file_list";
 
-	private static ImageIcon appIcon;
+    private static ImageIcon appIcon;
 
-	protected abstract void initialize() throws Exception;
+    protected abstract void initialize() throws Exception;
 
-	protected abstract JComponent getMainJPanel();
+    protected abstract JComponent getMainJPanel();
 
-	protected abstract String getAppName();
+    protected abstract String getAppName();
 
-	protected abstract void release();
+    protected abstract void release();
 
-	protected BaseFrame() throws Exception {
-		// Metal : javax.swing.plaf.metal.MetalLookAndFeel
-		// Nimbus : com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel
-		// CDE/Motif : com.sun.java.swing.plaf.motif.MotifLookAndFeel
-		// Windows : com.sun.java.swing.plaf.windows.WindowsLookAndFeel
-		// Windows Classic :
-		// com.sun.java.swing.plaf.windows.WindowsClassicLookAndFeel
-		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+    protected BaseFrame() throws Exception {
+        // Metal : javax.swing.plaf.metal.MetalLookAndFeel
+        // Nimbus : com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel
+        // CDE/Motif : com.sun.java.swing.plaf.motif.MotifLookAndFeel
+        // Windows : com.sun.java.swing.plaf.windows.WindowsLookAndFeel
+        // Windows Classic :
+        // com.sun.java.swing.plaf.windows.WindowsClassicLookAndFeel
+        String lafClassName = UIManager.getSystemLookAndFeelClassName();
 
-		appIcon = FileUtilities.getImageIcon(this.getClass(), "pega16.png");
+        LOG.info("Using LAF class: " + lafClassName);
+        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
-		setPreferredSize(new Dimension(1200, 700));
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setTitle(null);
-		setIconImage(appIcon.getImage());
-		// setLocationRelativeTo(null);
+        Border splitPaneDividerBorder = BorderFactory.createRaisedBevelBorder();
+        UIManager.put("SplitPaneDivider.border", splitPaneDividerBorder);
 
-		// setExtendedState(JFrame.MAXIMIZED_BOTH);
-		// setVisible(true);
+        setPreferredSize(new Dimension(1200, 700));
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setTitle(null);
+        setIconImage(getAppIcon().getImage());
+        // setLocationRelativeTo(null);
 
-		addWindowListener(new WindowAdapter() {
-			@Override
-			public void windowClosing(WindowEvent e) {
-				exit(0);
-			}
-		});
+        // setExtendedState(JFrame.MAXIMIZED_BOTH);
+        // setVisible(true);
 
-		loadPlugins();
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent windowEvent) {
+                exit(0);
+            }
+        });
 
-		initialize();
+        loadPlugins();
 
-		setJMenuBar(getMenuJMenuBar());
+        initialize();
 
-		setContentPane(getMainJPanel());
-	}
+        setJMenuBar(getMenuJMenuBar());
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.awt.Frame#setTitle(java.lang.String)
-	 */
-	@Override
-	public void setTitle(String title) {
+        setContentPane(getMainJPanel());
+    }
 
-		String localTitle = title;
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.awt.Frame#setTitle(java.lang.String)
+     */
+    @Override
+    public void setTitle(String title) {
 
-		if ((title != null) && (!"".equals(title))) {
-			localTitle = " - " + title;
-		} else {
-			localTitle = "";
-		}
+        String localTitle = title;
 
-		String finalTitle = getAppName() + localTitle;
+        if ((title != null) && (!"".equals(title))) {
+            localTitle = " - " + title;
+        } else {
+            localTitle = "";
+        }
 
-		super.setTitle(finalTitle);
-	}
+        String finalTitle = getAppName() + localTitle;
 
-	private void loadPlugins() {
-		try {
+        super.setTitle(finalTitle);
+    }
 
-			String pwd = System.getProperty("user.dir");
-			URL pluginsUrl = getClass().getResource("/plugins");
+    private void loadPlugins() {
+        try {
 
-			File pluginsDir = null;
+            String pwd = System.getProperty("user.dir");
+            URL pluginsUrl = getClass().getResource("/plugins");
 
-			if (pluginsUrl != null) {
-				pluginsDir = new File(pluginsUrl.getFile());
-			} else {
-				pluginsDir = new File(pwd, "plugins");
-			}
+            LOG.info("Loading Plugins - user.dir: " + pwd + " pluginsUrl: "
+                    + ((pluginsUrl != null) ? pluginsUrl.getPath() : "<NULL>"));
 
-			if (pluginsDir.exists() && pluginsDir.isDirectory()) {
+            File pluginsDir = null;
 
-				URLClassLoader systemClassLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
+            if (pluginsUrl != null) {
+                pluginsDir = new File(pluginsUrl.getFile());
+            } else {
+                pluginsDir = new File(pwd, "plugins");
+            }
 
-				Class<URLClassLoader> urlClassLoaderClass = URLClassLoader.class;
+            if (pluginsDir.exists() && pluginsDir.isDirectory()) {
 
-				Method addURLMethod = urlClassLoaderClass.getDeclaredMethod("addURL", new Class[] { URL.class });
-				addURLMethod.setAccessible(true);
+                URLClassLoader systemClassLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
 
-				File[] jarlist = pluginsDir.listFiles(new java.io.FileFilter() {
-					public boolean accept(File file) {
-						return file.getPath().toLowerCase().endsWith(".jar");
-					}
-				});
+                Class<URLClassLoader> urlClassLoaderClass = URLClassLoader.class;
 
-				for (File jarFile : jarlist) {
+                Method addURLMethod = urlClassLoaderClass.getDeclaredMethod("addURL", new Class[] { URL.class });
+                addURLMethod.setAccessible(true);
 
-					URL jarFileURL = jarFile.toURI().toURL();
-					LOG.info("loading external jar: " + jarFileURL);
+                File[] jarlist = pluginsDir.listFiles(new java.io.FileFilter() {
 
-					addURLMethod.invoke(systemClassLoader, new Object[] { jarFileURL });
-				}
-			}
+                    @Override
+                    public boolean accept(File file) {
+                        return file.getPath().toLowerCase().endsWith(".jar");
+                    }
+                });
 
-		} catch (Exception e) {
-			LOG.error("Error loading plugins", e);
-		}
-	}
+                for (File jarFile : jarlist) {
 
-	/**
-	 * @return the appIcon
-	 */
-	public static ImageIcon getAppIcon() {
-		return appIcon;
-	}
+                    URL jarFileURL = jarFile.toURI().toURL();
+                    LOG.info("loading external jar: " + jarFileURL);
 
-	public void exit(int value) {
-		release();
-		System.exit(value);
-	}
+                    addURLMethod.invoke(systemClassLoader, new Object[] { jarFileURL });
+                }
+            }
 
-	protected JMenuBar getMenuJMenuBar() {
-		JMenu fileJMenu = new JMenu("File");
-		fileJMenu.setMnemonic(KeyEvent.VK_F);
+        } catch (Exception e) {
+            LOG.error("Error loading plugins", e);
+        }
+    }
 
-		JMenuItem exitJMenuItem = new JMenuItem("Exit");
-		exitJMenuItem.setMnemonic(KeyEvent.VK_X);
-		exitJMenuItem.setToolTipText("Exit application");
-		ImageIcon ii = FileUtilities.getImageIcon(this.getClass(), "exit.png");
+    public static ImageIcon getAppIcon() {
 
-		exitJMenuItem.setIcon(ii);
-		exitJMenuItem.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent event) {
-				exit(0);
-			}
-		});
+        if (appIcon == null) {
+            appIcon = FileUtilities.getImageIcon(BaseFrame.class, "pega16.png");
+        }
 
-		fileJMenu.addSeparator();
-		fileJMenu.add(exitJMenuItem);
+        return appIcon;
+    }
 
-		JMenu helpJMenu = getHelpAboutJMenu();
-		JMenuBar jMenuBar = new JMenuBar();
-		jMenuBar.add(fileJMenu);
-		jMenuBar.add(helpJMenu);
+    public void exit(int value) {
+        release();
+        System.exit(value);
+    }
 
-		return jMenuBar;
-	}
+    protected JMenuBar getMenuJMenuBar() {
+        JMenu fileJMenu = new JMenu("File");
+        fileJMenu.setMnemonic(KeyEvent.VK_F);
 
-	protected JMenu getHelpAboutJMenu() {
+        JMenuItem exitJMenuItem = new JMenuItem("Exit");
+        exitJMenuItem.setMnemonic(KeyEvent.VK_X);
+        exitJMenuItem.setToolTipText("Exit application");
+        ImageIcon ii = FileUtilities.getImageIcon(this.getClass(), "exit.png");
 
-		JMenu helpJMenu = new JMenu("   Help   ");
-		helpJMenu.setMnemonic(KeyEvent.VK_H);
+        exitJMenuItem.setIcon(ii);
+        exitJMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                exit(0);
+            }
+        });
 
-		JMenuItem aboutJMenuItem = new JMenuItem("About");
-		aboutJMenuItem.setToolTipText("About");
+        fileJMenu.addSeparator();
+        fileJMenu.add(exitJMenuItem);
 
-		ImageIcon ii = FileUtilities.getImageIcon(this.getClass(), "pega16.png");
-		aboutJMenuItem.setIcon(ii);
+        JMenu helpJMenu = getHelpAboutJMenu();
+        JMenuBar menuBar = new JMenuBar();
+        menuBar.add(fileJMenu);
+        menuBar.add(helpJMenu);
 
-		aboutJMenuItem.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent event) {
+        return menuBar;
+    }
 
-				ImageIcon ii = FileUtilities.getImageIcon(this.getClass(), "pega300.png");
-				AboutDialog aboutDialog = new AboutDialog(ii.getImage(), getAppName());
-				aboutDialog.setVisible(true);
-			}
-		});
+    protected JMenu getHelpAboutJMenu() {
 
-		helpJMenu.add(aboutJMenuItem);
+        JMenu helpJMenu = new JMenu("   Help   ");
+        helpJMenu.setMnemonic(KeyEvent.VK_H);
 
-		return helpJMenu;
-	}
+        JMenuItem aboutJMenuItem = new JMenuItem("About");
+        aboutJMenuItem.setToolTipText("About");
 
-	protected JScrollPane getComponentJScrollPane(JComponent jComponent, int vsbPolicy, int hsbPolicy) {
+        ImageIcon ii = FileUtilities.getImageIcon(this.getClass(), "pega16.png");
+        aboutJMenuItem.setIcon(ii);
 
-		JScrollPane jScrollPane = new JScrollPane(jComponent, vsbPolicy, hsbPolicy);
-		return jScrollPane;
-	}
+        aboutJMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
 
-	public static FileFilter getDefaultFileFilter(final String description, final List<String> fileExtList) {
+                ImageIcon ii = FileUtilities.getImageIcon(this.getClass(), "pega300.png");
+                AboutDialog aboutDialog = new AboutDialog(ii.getImage(), getAppName(), BaseFrame.this);
+                aboutDialog.setVisible(true);
+            }
+        });
 
-		FileFilter fileFilter = new FileFilter() {
+        helpJMenu.add(aboutJMenuItem);
 
-			@Override
-			public String getDescription() {
-				return description;
-			}
+        return helpJMenu;
+    }
 
-			@Override
-			public boolean accept(File f) {
+    protected JScrollPane getComponentJScrollPane(JComponent component, int vsbPolicy, int hsbPolicy) {
 
-				boolean retVal = true;
+        JScrollPane scrollPane = new JScrollPane(component, vsbPolicy, hsbPolicy);
+        return scrollPane;
+    }
 
-				// pass through directories
-				if (f.isFile()) {
+    public static FileFilter getDefaultFileFilter(final String description, final List<String> fileExtList) {
 
-					if (fileExtList != null) {
+        FileFilter fileFilter = new FileFilter() {
 
-						String ext = FileUtilities.getExtension(f);
+            @Override
+            public String getDescription() {
+                return description;
+            }
 
-						retVal = false;
+            @Override
+            public boolean accept(File file) {
 
-						for (String fileExt : fileExtList) {
+                boolean retVal = true;
 
-							if (fileExt.equalsIgnoreCase(ext)) {
-								retVal = true;
-								break;
-							}
-						}
-					}
-				}
+                // pass through directories
+                if (file.isFile()) {
 
-				return retVal;
-			}
-		};
+                    if (fileExtList != null) {
 
-		return fileFilter;
-	}
+                        String ext = FileUtilities.getExtension(file);
 
-	public static File openFileChooser(Component parent, Class<?> clazz, String title, FileFilter fileFilter,
-			File prevSelectedFile) {
+                        retVal = false;
 
-		File selectedFile = null;
+                        for (String fileExt : fileExtList) {
 
-		String prefName = PREF_LAST_VISITED_DIR;
+                            if (fileExt.equalsIgnoreCase(ext)) {
+                                retVal = true;
+                                break;
+                            }
+                        }
+                    }
+                }
 
-		String lastVisitedDir = GeneralUtilities.getPreferenceString(clazz, prefName);
+                return retVal;
+            }
+        };
 
-		File jChooserFile = getExistingDirectory(prevSelectedFile);
+        return fileFilter;
+    }
 
-		if ((jChooserFile == null) && (!"".equals(lastVisitedDir))) {
+    public static File openFileChooser(Component parent, Class<?> clazz, String title, FileFilter fileFilter,
+            File prevSelectedFile) {
 
-			jChooserFile = getExistingDirectory(new File(lastVisitedDir));
-		}
+        File selectedFile = null;
 
-		JFileChooser jFileChooser = new JFileChooser(jChooserFile);
+        String prefName = PREF_LAST_VISITED_DIR;
 
-		jFileChooser.setDialogTitle(title);
+        String lastVisitedDir = GeneralUtilities.getPreferenceString(clazz, prefName);
 
-		if (fileFilter != null) {
-			jFileChooser.setFileFilter(fileFilter);
-		}
+        File prevSelectedDirectory = getExistingDirectory(prevSelectedFile);
 
-		int returnValue = jFileChooser.showOpenDialog(parent);
+        if ((prevSelectedDirectory == null) && (!"".equals(lastVisitedDir))) {
 
-		if (returnValue == JFileChooser.APPROVE_OPTION) {
-			selectedFile = jFileChooser.getSelectedFile();
+            prevSelectedDirectory = getExistingDirectory(new File(lastVisitedDir));
+        }
 
-			GeneralUtilities.setPreferenceString(clazz, prefName, selectedFile.getParent());
-		}
+        JFileChooser fileChooser = new JFileChooser(prevSelectedDirectory);
 
-		return selectedFile;
-	}
+        fileChooser.setDialogTitle(title);
 
-	private static File getExistingDirectory(File aFile) {
+        if (fileFilter != null) {
+            fileChooser.setFileFilter(fileFilter);
+        }
 
-		File existingDir = aFile;
+        int returnValue = fileChooser.showOpenDialog(parent);
 
-		if (aFile != null) {
+        if (returnValue == JFileChooser.APPROVE_OPTION) {
+            selectedFile = fileChooser.getSelectedFile();
 
-			if (aFile.exists()) {
+            GeneralUtilities.setPreferenceString(clazz, prefName, selectedFile.getParent());
+        }
 
-				if (aFile.isFile()) {
-					existingDir = aFile.getParentFile();
-				} else {
-					existingDir = aFile;
-				}
-			} else {
-				existingDir = getExistingDirectory(aFile.getParentFile());
-			}
-		}
+        return selectedFile;
+    }
 
-		return existingDir;
-	}
+    private static File getExistingDirectory(File file) {
 
-	public static void main(String[] args) {
+        File existingDir = file;
 
-		// Run GUI codes in Event-Dispatching thread for thread safety
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					BaseFrame baseFrame = new BaseFrame() {
+        if (file != null) {
 
-						private static final long serialVersionUID = -2105706529966669119L;
+            if (file.exists()) {
 
-						@Override
-						protected void release() {
-							// do nothing
-						}
+                if (file.isFile()) {
+                    existingDir = file.getParentFile();
+                } else {
+                    existingDir = file;
+                }
+            } else {
+                existingDir = getExistingDirectory(file.getParentFile());
+            }
+        }
 
-						@Override
-						protected JComponent getMainJPanel() {
-							return new JPanel();
-						}
+        return existingDir;
+    }
 
-						@Override
-						protected String getAppName() {
-							return "Test BaseFrame";
-						}
+    public static void main(String[] args) {
 
-						@Override
-						protected void initialize() {
-							// do nothing
+        // Run GUI codes in Event-Dispatching thread for thread safety
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    BaseFrame baseFrame = new BaseFrame() {
 
-						}
-					};
+                        private static final long serialVersionUID = -2105706529966669119L;
 
-					baseFrame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
+                        @Override
+                        protected void release() {
+                            // do nothing
+                        }
 
-	}
+                        @Override
+                        protected JComponent getMainJPanel() {
+                            return new JPanel();
+                        }
+
+                        @Override
+                        protected String getAppName() {
+                            return "Test BaseFrame";
+                        }
+
+                        @Override
+                        protected void initialize() {
+                            // do nothing
+
+                        }
+                    };
+
+                    baseFrame.setVisible(true);
+                } catch (Exception e) {
+                    LOG.error("Error in BaseFrame", e);
+                }
+            }
+        });
+
+    }
 }

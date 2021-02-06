@@ -4,6 +4,7 @@
  * Contributors:
  *     Manu Varghese
  *******************************************************************************/
+
 package com.pega.gcs.fringecommon.guiutilities;
 
 import java.beans.PropertyChangeListener;
@@ -12,6 +13,7 @@ import java.io.File;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -21,398 +23,467 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import javax.swing.table.AbstractTableModel;
 import javax.swing.table.JTableHeader;
-import javax.swing.table.TableColumnModel;
 
 import com.pega.gcs.fringecommon.guiutilities.bookmark.BookmarkModel;
 import com.pega.gcs.fringecommon.guiutilities.search.SearchModel;
 import com.pega.gcs.fringecommon.guiutilities.treetable.AbstractTreeTableNode;
 import com.pega.gcs.fringecommon.log4j2.Log4j2Helper;
 
-public abstract class FilterTableModel<T extends Comparable<? super T>> extends AbstractTableModel {
+public abstract class FilterTableModel<T extends Comparable<? super T>> extends CustomJTableModel {
 
-	private static final long serialVersionUID = -8731407475816420561L;
+    private static final long serialVersionUID = -8731407475816420561L;
 
-	private static final Log4j2Helper LOG = new Log4j2Helper(FilterTableModel.class);
+    private static final Log4j2Helper LOG = new Log4j2Helper(FilterTableModel.class);
 
-	public static final String NULL_STR = "<NULL>";
+    public static final String NULL_STR = "<NULL>";
 
-	public static final String EMPTY_STR = "<EMPTY>";
+    public static final String EMPTY_STR = "<EMPTY>";
 
-	protected abstract TableColumnModel getTableColumnModel();
+    protected abstract int getModelColumnIndex(int column);
 
-	protected abstract int getModelColumnIndex(int column);
+    // performing one by one search because of showing progress in the monitor
+    // also when cancelling the task we should keep the old search results
+    // hence not search result is stored unless the task is completed
+    protected abstract boolean search(T key, Object searchStrObj);
 
-	// performing one by one search because of showing progress in the monitor
-	// also when cancelling the task we should keep the old search results
-	// hence not search result is stored unless the task is completed
-	protected abstract boolean search(T key, Object searchStrObj);
+    protected abstract FilterTableModelNavigation<T> getNavigationRowIndex(List<T> resultList, int currSelectedRowIndex,
+            boolean forward, boolean first, boolean last, boolean wrap);
 
-	protected abstract FilterTableModelNavigation<T> getNavigationRowIndex(List<T> resultList, int currSelectedRowIndex,
-			boolean forward, boolean first, boolean last, boolean wrap);
+    // working list
+    public abstract List<T> getFtmEntryKeyList();
 
-	// working list
-	public abstract List<T> getFtmEntryKeyList();
+    protected abstract HashMap<T, Integer> getKeyIndexMap();
 
-	public abstract void resetModel();
+    public abstract void resetModel();
 
-	public abstract int getIndexOfKey(T key);
+    // public abstract int getIndexOfKey(T key);
 
-	public abstract Object getEventForKey(T key);
+    public abstract Object getEventForKey(T key);
 
-	public abstract AbstractTreeTableNode getTreeNodeForKey(T key);
+    public abstract AbstractTreeTableNode getTreeNodeForKey(T key);
 
-	public abstract void clearSearchResults(boolean clearResults);
+    public abstract void clearSearchResults(boolean clearResults);
 
-	public abstract SearchModel<T> getSearchModel();
+    public abstract SearchModel<T> getSearchModel();
 
-	private BookmarkModel<T> bookmarkModel;
+    private BookmarkModel<T> bookmarkModel;
 
-	private Map<FilterColumn, List<CheckBoxMenuItemPopupEntry<T>>> columnFilterMap;
+    private Map<FilterColumn, List<CheckBoxMenuItemPopupEntry<T>>> columnFilterMap;
 
-	private RecentFile recentFile;
+    private RecentFile recentFile;
 
-	private Message message;
+    private Message message;
 
-	private PropertyChangeSupport propertyChangeSupport;
-	
-	public FilterTableModel(RecentFile recentFile) {
+    private PropertyChangeSupport propertyChangeSupport;
 
-		this.recentFile = recentFile;
-		this.bookmarkModel = null;
+    public FilterTableModel(RecentFile recentFile) {
 
-		propertyChangeSupport = new PropertyChangeSupport(this);
-	}
+        this.recentFile = recentFile;
+        this.bookmarkModel = null;
 
-	@Override
-	public int getRowCount() {
+        propertyChangeSupport = new PropertyChangeSupport(this);
 
-		int rowCount = 0;
+    }
 
-		List<T> ftmEntryKeyList = getFtmEntryKeyList();
+    @Override
+    public int getRowCount() {
 
-		if (ftmEntryKeyList != null) {
-			rowCount = ftmEntryKeyList.size();
-		}
+        int rowCount = 0;
 
-		return rowCount;
-	}
+        List<T> ftmEntryKeyList = getFtmEntryKeyList();
 
-	public RecentFile getRecentFile() {
-		return recentFile;
-	}
+        if (ftmEntryKeyList != null) {
+            rowCount = ftmEntryKeyList.size();
+        }
 
-	public void setRecentFile(RecentFile recentFile) {
-		this.recentFile = recentFile;
-		resetModel();
-	}
+        return rowCount;
+    }
 
-	public String getFilePath() {
+    public RecentFile getRecentFile() {
+        return recentFile;
+    }
 
-		String filePath = null;
+    public void setRecentFile(RecentFile recentFile) {
+        this.recentFile = recentFile;
+        resetModel();
+    }
 
-		RecentFile recentFile = getRecentFile();
+    public String getFilePath() {
 
-		if (recentFile != null) {
-			filePath = (String) recentFile.getAttribute(RecentFile.KEY_FILE);
-		}
+        String filePath = null;
 
-		return filePath;
-	}
+        RecentFile recentFile = getRecentFile();
 
-	public String getModelName() {
+        if (recentFile != null) {
+            filePath = recentFile.getPath();
+        }
 
-		String modelName = "";
+        return filePath;
+    }
 
-		RecentFile recentFile = getRecentFile();
+    public String getModelName() {
 
-		if (recentFile != null) {
-			String file = (String) recentFile.getAttribute(RecentFile.KEY_FILE);
+        String modelName = "";
 
-			File aFile = new File(file);
-			modelName = aFile.getName();
-		}
+        RecentFile recentFile = getRecentFile();
 
-		return modelName;
-	}
+        if (recentFile != null) {
+            String filePath = recentFile.getPath();
 
-	public String getCharset() {
+            File file = new File(filePath);
+            modelName = file.getName();
+        }
 
-		String charset = null;
+        return modelName;
+    }
 
-		RecentFile recentFile = getRecentFile();
+    public Charset getCharset() {
 
-		if (recentFile != null) {
-			charset = (String) recentFile.getAttribute(RecentFile.KEY_CHARSET);
-		}
+        RecentFile recentFile = getRecentFile();
 
-		if ((charset == null) || ("".equals(charset))) {
-			charset = Charset.defaultCharset().name();
-		}
+        return recentFile.getCharset();
+    }
 
-		return charset;
-	}
+    public Locale getLocale() {
 
-	public Locale getLocale() {
+        RecentFile recentFile = getRecentFile();
 
-		Locale locale = null;
+        return recentFile.getLocale();
+    }
 
-		RecentFile recentFile = getRecentFile();
+    public Long getFileSize() {
 
-		if (recentFile != null) {
-			locale = (Locale) recentFile.getAttribute(RecentFile.KEY_LOCALE);
-		}
+        RecentFile recentFile = getRecentFile();
 
-		if (locale == null) {
-			locale = Locale.getDefault();
-		}
+        return recentFile.getFileSize();
+    }
 
-		return locale;
-	}
+    public String getFileSHA() {
 
-	public Long getFileSize() {
+        RecentFile recentFile = getRecentFile();
 
-		Long fileSize = null;
+        return recentFile.getFileSHA();
+    }
 
-		RecentFile recentFile = getRecentFile();
+    protected PropertyChangeSupport getPropertyChangeSupport() {
+        return propertyChangeSupport;
+    }
 
-		if (recentFile != null) {
-			fileSize = (Long) recentFile.getAttribute(RecentFile.KEY_SIZE);
-		}
+    private void setFtmEntryKeyList(List<T> newftmEntryIndexList) {
 
-		return fileSize;
-	}
+        List<T> ftmEntryIndexList = getFtmEntryKeyList();
 
-	protected PropertyChangeSupport getPropertyChangeSupport() {
-		return propertyChangeSupport;
-	}
+        ftmEntryIndexList.clear();
 
-	private void setFtmEntryKeyList(List<T> newftmEntryIndexList) {
+        ftmEntryIndexList.addAll(newftmEntryIndexList);
 
-		List<T> ftmEntryIndexList = getFtmEntryKeyList();
+        Collections.sort(ftmEntryIndexList);
 
-		ftmEntryIndexList.clear();
-		ftmEntryIndexList.addAll(newftmEntryIndexList);
+        updateKeyIndexMap();
+    }
 
-		Collections.sort(ftmEntryIndexList);
-	}
+    public BookmarkModel<T> getBookmarkModel() {
+        return bookmarkModel;
+    }
 
-	public BookmarkModel<T> getBookmarkModel() {
-		return bookmarkModel;
-	}
+    public void setBookmarkModel(BookmarkModel<T> bookmarkModel) {
+        this.bookmarkModel = bookmarkModel;
+    }
 
-	public void setBookmarkModel(BookmarkModel<T> bookmarkModel) {
-		this.bookmarkModel = bookmarkModel;
-	}
+    // storing table header column filter sets. keyed on model column indexes
+    protected Map<FilterColumn, List<CheckBoxMenuItemPopupEntry<T>>> getColumnFilterMap() {
 
-	// storing table header column filter sets. keyed on model column indexes
-	protected Map<FilterColumn, List<CheckBoxMenuItemPopupEntry<T>>> getColumnFilterMap() {
+        if (columnFilterMap == null) {
+            columnFilterMap = new TreeMap<FilterColumn, List<CheckBoxMenuItemPopupEntry<T>>>();
+        }
 
-		if (columnFilterMap == null) {
-			columnFilterMap = new TreeMap<FilterColumn, List<CheckBoxMenuItemPopupEntry<T>>>();
-		}
+        return columnFilterMap;
+    }
 
-		return columnFilterMap;
-	}
+    private FilterColumn getFilterColumn(int column) {
 
-	private FilterColumn getFilterColumn(int column) {
+        int modelColumnIndex = getModelColumnIndex(column);
 
-		int modelColumnIndex = getModelColumnIndex(column);
+        FilterColumn filterColumn = null;
 
-		FilterColumn filterColumn = null;
+        Map<FilterColumn, List<CheckBoxMenuItemPopupEntry<T>>> columnFilterMap = getColumnFilterMap();
 
-		Map<FilterColumn, List<CheckBoxMenuItemPopupEntry<T>>> columnFilterMap = getColumnFilterMap();
+        Iterator<FilterColumn> fcIterator = columnFilterMap.keySet().iterator();
 
-		Iterator<FilterColumn> fcIterator = columnFilterMap.keySet().iterator();
+        while (fcIterator.hasNext()) {
 
-		while (fcIterator.hasNext()) {
-			FilterColumn fColumn = fcIterator.next();
+            FilterColumn filterCol = fcIterator.next();
 
-			if (modelColumnIndex == fColumn.getIndex()) {
-				filterColumn = fColumn;
-				break;
-			}
-		}
+            if (modelColumnIndex == filterCol.getIndex()) {
+                filterColumn = filterCol;
+                break;
+            }
+        }
 
-		return filterColumn;
-	}
+        return filterColumn;
+    }
 
-	public Set<CheckBoxMenuItemPopupEntry<T>> getColumnFilterEntrySet(int column) {
+    public Set<CheckBoxMenuItemPopupEntry<T>> getColumnFilterEntrySet(int column) {
 
-		Set<CheckBoxMenuItemPopupEntry<T>> columnFilterEntrySet = new TreeSet<CheckBoxMenuItemPopupEntry<T>>();
+        Set<CheckBoxMenuItemPopupEntry<T>> columnFilterEntrySet = new TreeSet<CheckBoxMenuItemPopupEntry<T>>();
 
-		FilterColumn filterColumn = getFilterColumn(column);
+        FilterColumn filterColumn = getFilterColumn(column);
 
-		if (filterColumn != null) {
+        if (filterColumn != null) {
 
-			Map<FilterColumn, List<CheckBoxMenuItemPopupEntry<T>>> columnFilterMap;
-			columnFilterMap = getColumnFilterMap();
-			List<CheckBoxMenuItemPopupEntry<T>> columnFilterEntryList = columnFilterMap.get(filterColumn);
+            Map<FilterColumn, List<CheckBoxMenuItemPopupEntry<T>>> columnFilterMap;
+            columnFilterMap = getColumnFilterMap();
+            List<CheckBoxMenuItemPopupEntry<T>> columnFilterEntryList = columnFilterMap.get(filterColumn);
 
-			columnFilterEntrySet = new TreeSet<CheckBoxMenuItemPopupEntry<T>>(columnFilterEntryList);
-		}
+            if (columnFilterEntryList != null) {
+                columnFilterEntrySet = new TreeSet<CheckBoxMenuItemPopupEntry<T>>(columnFilterEntryList);
+            }
+        }
 
-		return columnFilterEntrySet;
+        return columnFilterEntrySet;
 
-	}
+    }
 
-	public boolean isColumnFilterEnabled(int column) {
-		boolean columnFilterEnabled = false;
+    public boolean isColumnFilterEnabled(int column) {
+        boolean columnFilterEnabled = false;
 
-		FilterColumn filterColumn = getFilterColumn(column);
+        FilterColumn filterColumn = getFilterColumn(column);
 
-		if (filterColumn != null) {
-			columnFilterEnabled = filterColumn.isColumnFilterEnabled();
-		}
+        if (filterColumn != null) {
+            columnFilterEnabled = filterColumn.isColumnFilterEnabled();
+        }
 
-		return columnFilterEnabled;
-	}
+        return columnFilterEnabled;
+    }
 
-	public boolean isColumnFiltered(int column) {
-		boolean columnFiltered = false;
+    public boolean isAnyColumnFiltered() {
+        boolean anyColumnFiltered = false;
 
-		FilterColumn filterColumn = getFilterColumn(column);
+        Map<FilterColumn, List<CheckBoxMenuItemPopupEntry<T>>> columnFilterMap;
+        columnFilterMap = getColumnFilterMap();
 
-		if (filterColumn != null) {
-			columnFiltered = filterColumn.isColumnFiltered();
-		}
+        Iterator<FilterColumn> fcIterator = columnFilterMap.keySet().iterator();
 
-		return columnFiltered;
-	}
+        while (fcIterator.hasNext()) {
 
-	public boolean isColumnLoading(int column) {
-		boolean columnLoading = false;
+            FilterColumn filterColumn = fcIterator.next();
 
-		FilterColumn filterColumn = getFilterColumn(column);
+            anyColumnFiltered = filterColumn.isColumnFiltered();
 
-		if (filterColumn != null) {
-			columnLoading = filterColumn.isColumnLoading();
-		}
+            if (anyColumnFiltered) {
+                break;
+            }
+        }
 
-		return columnLoading;
-	}
+        return anyColumnFiltered;
+    }
 
-	public void applyColumnFilter(Set<CheckBoxMenuItemPopupEntry<T>> columnFilterEntrySet, int columnIndex,
-			JTableHeader tableHeader) {
+    public boolean isColumnFiltered(int column) {
+        boolean columnFiltered = false;
 
-		LOG.info("Apply Column Filter column:" + columnIndex + " " + columnFilterEntrySet);
+        FilterColumn filterColumn = getFilterColumn(column);
 
-		FilterColumn filterColumn = getFilterColumn(columnIndex);
+        if (filterColumn != null) {
+            columnFiltered = filterColumn.isColumnFiltered();
+        }
 
-		List<T> columnFilteredTEList = new ArrayList<T>();
+        return columnFiltered;
+    }
 
-		if ((columnFilterEntrySet != null) && (columnFilterEntrySet.size() > 0)) {
+    public boolean isColumnLoading(int column) {
+        boolean columnLoading = false;
 
-			filterColumn.setColumnFiltered(true);
+        FilterColumn filterColumn = getFilterColumn(column);
 
-			for (CheckBoxMenuItemPopupEntry<T> ttcfe : columnFilterEntrySet) {
+        if (filterColumn != null) {
+            columnLoading = filterColumn.isColumnLoading();
+        }
 
-				columnFilteredTEList.addAll(ttcfe.getRowIndexList());
-			}
-		} else {
+        return columnLoading;
+    }
 
-			filterColumn.setColumnFiltered(false);
+    public void applyColumnFilter(Set<CheckBoxMenuItemPopupEntry<T>> columnFilterEntrySet, int columnIndex,
+            JTableHeader tableHeader) {
 
-			Map<FilterColumn, List<CheckBoxMenuItemPopupEntry<T>>> columnFilterMap;
-			columnFilterMap = getColumnFilterMap();
-			List<CheckBoxMenuItemPopupEntry<T>> columnFilterEntryList = columnFilterMap.get(filterColumn);
+        LOG.info("Apply Column Filter column:" + columnIndex + " " + columnFilterEntrySet);
 
-			for (CheckBoxMenuItemPopupEntry<T> ttcfe : columnFilterEntryList) {
+        FilterColumn filterColumn = getFilterColumn(columnIndex);
 
-				ttcfe.setSelected(false);
-				ttcfe.setVisible(true);
+        List<T> columnFilteredTEList = new ArrayList<T>();
 
-				columnFilteredTEList.addAll(ttcfe.getRowIndexList());
-			}
+        if ((columnFilterEntrySet != null) && (columnFilterEntrySet.size() > 0)) {
 
-		}
+            filterColumn.setColumnFiltered(true);
 
-		applyColumnFilterToMap(columnFilteredTEList, filterColumn, tableHeader);
+            for (CheckBoxMenuItemPopupEntry<T> ttcfe : columnFilterEntrySet) {
 
-		// search model can be null in case of simple filtered tables.
+                columnFilteredTEList.addAll(ttcfe.getRowIndexList());
+            }
+        } else {
 
-		SearchModel<T> searchModel = getSearchModel();
+            filterColumn.setColumnFiltered(false);
 
-		if (searchModel != null) {
-			searchModel.resetResults(true);
-		}
+            Map<FilterColumn, List<CheckBoxMenuItemPopupEntry<T>>> columnFilterMap;
+            columnFilterMap = getColumnFilterMap();
+            List<CheckBoxMenuItemPopupEntry<T>> columnFilterEntryList = columnFilterMap.get(filterColumn);
 
-		fireTableDataChanged();
-	}
+            for (CheckBoxMenuItemPopupEntry<T> ttcfe : columnFilterEntryList) {
 
-	private void applyColumnFilterToMap(List<T> columnFilteredTEList, FilterColumn excludeFilterColumn,
-			JTableHeader tableHeader) {
+                ttcfe.setSelected(false);
+                ttcfe.setVisible(true);
 
-		Map<FilterColumn, List<CheckBoxMenuItemPopupEntry<T>>> columnFilterMap;
-		columnFilterMap = getColumnFilterMap();
+                columnFilteredTEList.addAll(ttcfe.getRowIndexList());
+            }
 
-		for (FilterColumn filterColumn : columnFilterMap.keySet()) {
+        }
 
-			if ((filterColumn != excludeFilterColumn) && (filterColumn.isColumnFiltered())) {
+        applyColumnFilterToMap(columnFilteredTEList, filterColumn, tableHeader);
 
-				List<CheckBoxMenuItemPopupEntry<T>> columnFilterEntryList = columnFilterMap.get(filterColumn);
+        // search model can be null in case of simple filtered tables.
 
-				Set<T> ttcfeTEIdSet = new HashSet<T>();
+        SearchModel<T> searchModel = getSearchModel();
 
-				for (CheckBoxMenuItemPopupEntry<T> ttcfe : columnFilterEntryList) {
+        if (searchModel != null) {
+            searchModel.resetResults(true);
+        }
 
-					if (ttcfe.isSelected()) {
+        fireTableDataChanged();
+    }
 
-						List<T> ttcfeTEIdList = ttcfe.getRowIndexList();
-						ttcfeTEIdSet.addAll(ttcfeTEIdList);
-					}
-				}
+    private void applyColumnFilterToMap(List<T> columnFilteredTEList, FilterColumn excludeFilterColumn,
+            JTableHeader tableHeader) {
 
-				columnFilteredTEList.retainAll(ttcfeTEIdSet);
-			}
+        Map<FilterColumn, List<CheckBoxMenuItemPopupEntry<T>>> columnFilterMap;
+        columnFilterMap = getColumnFilterMap();
 
-		}
+        for (FilterColumn filterColumn : columnFilterMap.keySet()) {
 
-		setFtmEntryKeyList(columnFilteredTEList);
+            if ((!filterColumn.equals(excludeFilterColumn)) && (filterColumn.isColumnFiltered())) {
 
-		for (FilterColumn filterColumn : columnFilterMap.keySet()) {
-			// bug: un-checking the CheckBoxMenuItemPopupEntry should only show
-			// entries from current selection, in case there is a filter
-			// already applied on a different column. hence run the update task
-			// on all columns. the update task also updates the current count on
-			// each entry
+                List<CheckBoxMenuItemPopupEntry<T>> columnFilterEntryList = columnFilterMap.get(filterColumn);
 
-			// if (filterColumn != excludeFilterColumn) {
+                Set<T> ttcfeTEIdSet = new HashSet<T>();
 
-			List<CheckBoxMenuItemPopupEntry<T>> columnFilterEntryList = columnFilterMap.get(filterColumn);
+                for (CheckBoxMenuItemPopupEntry<T> ttcfe : columnFilterEntryList) {
 
-			filterColumn.setColumnLoading(true);
-			tableHeader.repaint();
+                    if (ttcfe.isSelected()) {
 
-			FilterColumnUpdateTask<T> filterColumnUpdateTask = new FilterColumnUpdateTask<T>(getFtmEntryKeyList(),
-					filterColumn, columnFilterEntryList, tableHeader);
+                        List<T> ttcfeTEIdList = ttcfe.getRowIndexList();
+                        ttcfeTEIdSet.addAll(ttcfeTEIdList);
+                    }
+                }
 
-			filterColumnUpdateTask.execute();
-			// }
-		}
-	}
+                columnFilteredTEList.retainAll(ttcfeTEIdSet);
+            }
 
-	public void addPropertyChangeListener(PropertyChangeListener listener) {
-		PropertyChangeSupport propertyChangeSupport = getPropertyChangeSupport();
-		propertyChangeSupport.addPropertyChangeListener(listener);
-	}
+        }
 
-	public void removePropertyChangeListener(PropertyChangeListener listener) {
-		PropertyChangeSupport propertyChangeSupport = getPropertyChangeSupport();
-		propertyChangeSupport.removePropertyChangeListener(listener);
-	}
+        setFtmEntryKeyList(columnFilteredTEList);
 
-	public Message getMessage() {
-		return message;
-	}
+        for (FilterColumn filterColumn : columnFilterMap.keySet()) {
+            // bug: un-checking the CheckBoxMenuItemPopupEntry should only show
+            // entries from current selection, in case there is a filter
+            // already applied on a different column. hence run the update task
+            // on all columns. the update task also updates the current count on
+            // each entry
 
-	public void setMessage(Message message) {
+            // if (filterColumn != excludeFilterColumn) {
 
-		this.message = message;
+            List<CheckBoxMenuItemPopupEntry<T>> columnFilterEntryList = columnFilterMap.get(filterColumn);
 
-		PropertyChangeSupport propertyChangeSupport = getPropertyChangeSupport();
-		propertyChangeSupport.firePropertyChange("message", null, message);
-	}
+            filterColumn.setColumnLoading(true);
+            tableHeader.repaint();
+
+            FilterColumnUpdateTask<T> filterColumnUpdateTask = new FilterColumnUpdateTask<T>(getFtmEntryKeyList(),
+                    filterColumn, columnFilterEntryList, tableHeader);
+
+            filterColumnUpdateTask.execute();
+            // }
+        }
+    }
+
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        PropertyChangeSupport propertyChangeSupport = getPropertyChangeSupport();
+        propertyChangeSupport.addPropertyChangeListener(listener);
+    }
+
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        PropertyChangeSupport propertyChangeSupport = getPropertyChangeSupport();
+        propertyChangeSupport.removePropertyChangeListener(listener);
+    }
+
+    public Message getMessage() {
+        return message;
+    }
+
+    public void setMessage(Message message) {
+
+        this.message = message;
+
+        PropertyChangeSupport propertyChangeSupport = getPropertyChangeSupport();
+        propertyChangeSupport.firePropertyChange("message", null, message);
+    }
+
+    /**
+     * Get EntryKey for selected rows.
+     * 
+     * @param selectedRows - null for entire list
+     * @return a list of EntryKey
+     */
+    public List<T> getEntryKeyForRowsList(int[] selectedRows) {
+
+        List<T> entryKeyList = new ArrayList<>();
+
+        if (selectedRows == null) {
+
+            entryKeyList = getFtmEntryKeyList();
+
+        } else {
+
+            for (int selectedRow : selectedRows) {
+
+                T entryKey = getFtmEntryKeyList().get(selectedRow);
+
+                entryKeyList.add(entryKey);
+
+            }
+        }
+
+        return entryKeyList;
+    }
+
+    protected void updateKeyIndexMap() {
+
+        HashMap<T, Integer> keyIndexMap = getKeyIndexMap();
+
+        if (keyIndexMap != null) {
+
+            keyIndexMap.clear();
+
+            List<T> ftmEntryIndexList = getFtmEntryKeyList();
+
+            for (int index = 0; index < ftmEntryIndexList.size(); index++) {
+
+                T key = ftmEntryIndexList.get(index);
+
+                keyIndexMap.put(key, index);
+            }
+        }
+    }
+
+    public int getIndexOfKey(T key) {
+
+        int index = -1;
+
+        HashMap<T, Integer> keyIndexMap = getKeyIndexMap();
+
+        if (keyIndexMap != null) {
+            Integer value = keyIndexMap.get(key);
+            index = value != null ? value.intValue() : -1;
+        }
+
+        return index;
+    }
 
 }

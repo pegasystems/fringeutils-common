@@ -4,30 +4,31 @@
  * Contributors:
  *     Manu Varghese
  *******************************************************************************/
+
 package com.pega.gcs.fringecommon.guiutilities;
 
 public class Message {
 
-	public enum MessageType {
-		INFO, ERROR
-	}
+    public enum MessageType {
+        INFO, ERROR
+    }
 
-	private MessageType messageType;
+    private MessageType messageType;
 
-	private String text;
+    private String text;
 
-	public Message(MessageType messageType, String text) {
-		super();
-		this.messageType = messageType;
-		this.text = text;
-	}
+    public Message(MessageType messageType, String text) {
+        super();
+        this.messageType = messageType;
+        this.text = text;
+    }
 
-	public MessageType getMessageType() {
-		return messageType;
-	}
+    public MessageType getMessageType() {
+        return messageType;
+    }
 
-	public String getText() {
-		return text;
-	}
+    public String getText() {
+        return text;
+    }
 
 }

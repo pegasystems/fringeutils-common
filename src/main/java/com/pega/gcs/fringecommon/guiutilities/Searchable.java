@@ -4,38 +4,39 @@
  * Contributors:
  *     Manu Varghese
  *******************************************************************************/
+
 package com.pega.gcs.fringecommon.guiutilities;
 
 public interface Searchable<T> {
 
-	public enum SelectedRowPosition {
-		FIRST, BETWEEN, LAST, NONE
-	}
+    public enum SelectedRowPosition {
+        FIRST, BETWEEN, LAST, NONE
+    }
 
-	public T first();
+    public T first();
 
-	public T previous();
+    public T previous();
 
-	public T next();
+    public T next();
 
-	public T last();
+    public T last();
 
-	public Object getSearchStrObj();
+    public Object getSearchStrObj();
 
-	public void setSearchStrObj(Object searchStrObj);
+    public void setSearchStrObj(Object searchStrObj);
 
-	public boolean isWrapMode();
+    public boolean isWrapMode();
 
-	public void setWrapMode(boolean wrapMode);
+    public void setWrapMode(boolean wrapMode);
 
-	public int getResultCount();
+    public int getResultCount();
 
-	public int getNavIndex();
+    public int getNavIndex();
 
-	// based on the current selected row
-	public SelectedRowPosition getSelectedRowPosition();
+    // based on the current selected row
+    public SelectedRowPosition getSelectedRowPosition();
 
-	public void resetResults(boolean clearResults);
+    public void resetResults(boolean clearResults);
 
-	public void searchInEvents(Object searchStrObj, ModalProgressMonitor mProgressMonitor);
+    public void searchInEvents(Object searchStrObj, ModalProgressMonitor modalProgressMonitor);
 }

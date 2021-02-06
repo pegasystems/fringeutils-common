@@ -4,6 +4,7 @@
  * Contributors:
  *     Manu Varghese
  *******************************************************************************/
+
 package com.pega.gcs.fringecommon.guiutilities;
 
 import java.util.List;
@@ -14,83 +15,83 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 public class MultipleTableSelectionListener extends NavigationTableController<Integer>
-		implements ListSelectionListener {
+        implements ListSelectionListener {
 
-	private boolean valueChanging;
+    private boolean valueChanging;
 
-	public MultipleTableSelectionListener(FilterTableModel<Integer> filterTableModel,
-			NavigationTableController<Integer> navigationTableController) {
+    public MultipleTableSelectionListener(FilterTableModel<Integer> filterTableModel,
+            NavigationTableController<Integer> navigationTableController) {
 
-		super(filterTableModel);
+        super(filterTableModel);
 
-		List<CustomJTable> customJTableList = navigationTableController.getCustomJTableList();
+        List<CustomJTable> customJTableList = navigationTableController.getCustomJTableList();
 
-		for (CustomJTable customJTable : customJTableList) {
-			addCustomJTable(customJTable);
-		}
-	}
+        for (CustomJTable customJTable : customJTableList) {
+            addCustomJTable(customJTable);
+        }
+    }
 
-	public void clearCustomJTables() {
+    public void clearCustomJTables() {
 
-		List<CustomJTable> customJTableList = getCustomJTableList();
+        List<CustomJTable> customJTableList = getCustomJTableList();
 
-		for (CustomJTable customJTable : customJTableList) {
-			customJTable.getSelectionModel().removeListSelectionListener(this);
-		}
-	}
+        for (CustomJTable customJTable : customJTableList) {
+            customJTable.getSelectionModel().removeListSelectionListener(this);
+        }
+    }
 
-	@Override
-	public void addCustomJTable(CustomJTable customJTable) {
-		super.addCustomJTable(customJTable);
+    @Override
+    public void addCustomJTable(CustomJTable customJTable) {
+        super.addCustomJTable(customJTable);
 
-		customJTable.getSelectionModel().addListSelectionListener(this);
-	}
+        customJTable.getSelectionModel().addListSelectionListener(this);
+    }
 
-	@Override
-	public void valueChanged(ListSelectionEvent e) {
+    @Override
+    public void valueChanged(ListSelectionEvent listSelectionEvent) {
 
-		if (!e.getValueIsAdjusting() && !valueChanging) {
+        if (!listSelectionEvent.getValueIsAdjusting() && !valueChanging) {
 
-			valueChanging = true;
+            valueChanging = true;
 
-			try {
+            try {
 
-				ListSelectionModel lsm = (ListSelectionModel) e.getSource();
+                ListSelectionModel lsm = (ListSelectionModel) listSelectionEvent.getSource();
 
-				JTable table = getTableFromModel(lsm);
+                JTable table = getTableFromModel(lsm);
 
-				int selectedRow = table.getSelectedRow();
+                int selectedRow = table.getSelectedRow();
 
-				List<CustomJTable> customJTableList = getCustomJTableList();
-				for (CustomJTable customJTable : customJTableList) {
+                List<CustomJTable> customJTableList = getCustomJTableList();
+                for (CustomJTable customJTable : customJTableList) {
 
-					if (customJTable != table) {
+                    if (customJTable != table) {
 
-						customJTable.changeSelection(selectedRow, 0, false, false);
-					}
-				}
+                        customJTable.changeSelection(selectedRow, 0, false, false);
+                    }
+                }
 
-			} finally {
-				valueChanging = false;
-			}
-		}
+            } finally {
+                valueChanging = false;
+            }
+        }
 
-	}
+    }
 
-	private JTable getTableFromModel(ListSelectionModel model) {
+    private JTable getTableFromModel(ListSelectionModel model) {
 
-		JTable tableFromModel = null;
+        JTable tableFromModel = null;
 
-		List<CustomJTable> customJTableList = getCustomJTableList();
+        List<CustomJTable> customJTableList = getCustomJTableList();
 
-		for (CustomJTable customJTable : customJTableList) {
+        for (CustomJTable customJTable : customJTableList) {
 
-			if (customJTable.getSelectionModel() == model) {
-				tableFromModel = customJTable;
-			}
-		}
+            if (customJTable.getSelectionModel() == model) {
+                tableFromModel = customJTable;
+            }
+        }
 
-		return tableFromModel;
+        return tableFromModel;
 
-	}
+    }
 }

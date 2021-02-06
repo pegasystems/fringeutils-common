@@ -4,56 +4,57 @@
  * Contributors:
  *     Manu Varghese
  *******************************************************************************/
+
 package com.pega.gcs.fringecommon.guiutilities;
 
 public class ProgressTaskInfo implements Comparable<ProgressTaskInfo> {
 
-	private long total;
+    private long total;
 
-	private long count;
+    private long count;
 
-	private String note;
+    private String note;
 
-	public ProgressTaskInfo(long total, long count) {
-		this(total, count, null);
-	}
+    public ProgressTaskInfo(long total, long count) {
+        this(total, count, null);
+    }
 
-	public ProgressTaskInfo(long total, long count, String note) {
-		super();
-		this.total = total;
-		this.count = count;
-		this.note = note;
-	}
+    public ProgressTaskInfo(long total, long count, String note) {
+        super();
+        this.total = total;
+        this.count = count;
+        this.note = note;
+    }
 
-	public long getTotal() {
-		return total;
-	}
+    public long getTotal() {
+        return total;
+    }
 
-	public long getCount() {
-		return count;
-	}
+    public long getCount() {
+        return count;
+    }
 
-	public String getNote() {
-		return note;
-	}
+    public String getNote() {
+        return note;
+    }
 
-	@Override
-	public int compareTo(ProgressTaskInfo o) {
+    @Override
+    public int compareTo(ProgressTaskInfo other) {
 
-		if (this.total != o.total) {
+        if (this.total != other.total) {
 
-			Long thisTotal = new Long(getTotal());
-			Long otherTotal = new Long(o.getTotal());
+            Long thisTotal = Long.valueOf(getTotal());
+            Long otherTotal = Long.valueOf(other.getTotal());
 
-			return thisTotal.compareTo(otherTotal);
+            return thisTotal.compareTo(otherTotal);
 
-		} else {
-			Long thisCount = new Long(getCount());
-			Long otherCount = new Long(o.getCount());
+        } else {
+            Long thisCount = Long.valueOf(getCount());
+            Long otherCount = Long.valueOf(other.getCount());
 
-			return thisCount.compareTo(otherCount);
+            return thisCount.compareTo(otherCount);
 
-		}
-	}
+        }
+    }
 
 }

@@ -4,45 +4,46 @@
  * Contributors:
  *     Manu Varghese
  *******************************************************************************/
+
 package com.pega.gcs.fringecommon.guiutilities;
 
 public class EventReadTaskInfo implements Comparable<EventReadTaskInfo> {
 
-	private long eventCount;
+    private long eventCount;
 
-	private long linesRead;
+    private long linesRead;
 
-	public EventReadTaskInfo(long eventCount, long linesRead) {
-		super();
-		this.eventCount = eventCount;
-		this.linesRead = linesRead;
-	}
+    public EventReadTaskInfo(long eventCount, long linesRead) {
+        super();
+        this.eventCount = eventCount;
+        this.linesRead = linesRead;
+    }
 
-	public long getEventCount() {
-		return eventCount;
-	}
+    public long getEventCount() {
+        return eventCount;
+    }
 
-	public long getLinesRead() {
-		return linesRead;
-	}
+    public long getLinesRead() {
+        return linesRead;
+    }
 
-	@Override
-	public int compareTo(EventReadTaskInfo o) {
+    @Override
+    public int compareTo(EventReadTaskInfo other) {
 
-		if (this.eventCount != o.eventCount) {
+        if (this.eventCount != other.eventCount) {
 
-			Long thisEventCount = new Long(getEventCount());
-			Long otherEventCount = new Long(o.getEventCount());
+            Long thisEventCount = Long.valueOf(getEventCount());
+            Long otherEventCount = Long.valueOf(other.getEventCount());
 
-			return thisEventCount.compareTo(otherEventCount);
+            return thisEventCount.compareTo(otherEventCount);
 
-		} else {
-			Long thisLinesRead = new Long(getLinesRead());
-			Long otherLinesRead = new Long(o.getLinesRead());
+        } else {
+            Long thisLinesRead = Long.valueOf(getLinesRead());
+            Long otherLinesRead = Long.valueOf(other.getLinesRead());
 
-			return thisLinesRead.compareTo(otherLinesRead);
+            return thisLinesRead.compareTo(otherLinesRead);
 
-		}
-	}
+        }
+    }
 
 }

@@ -4,9 +4,10 @@
  * Contributors:
  *     Manu Varghese
  *******************************************************************************/
+
 package com.pega.gcs.fringecommon.utilities;
 
 public interface Identifiable<T> {
 
-	public T getKey();
+    public T getKey();
 }

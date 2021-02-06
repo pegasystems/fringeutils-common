@@ -4,221 +4,284 @@
  * Contributors:
  *     Manu Varghese
  *******************************************************************************/
+
 package com.pega.gcs.fringecommon.guiutilities.treetable;
 
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeExpansionListener;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
-import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableColumnModel;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
-public class TreeTableModelAdapter extends AbstractTableModel implements TreeModelListener {
+import com.pega.gcs.fringecommon.guiutilities.CustomJTableModel;
 
-	private static final long serialVersionUID = -4711898270514748553L;
+public abstract class TreeTableModelAdapter extends CustomJTableModel implements TreeModelListener {
 
-	DefaultTreeTableTree tree;
+    private static final long serialVersionUID = -4711898270514748553L;
 
-	/**
-	 * @param tree
-	 * @param abstractTreeTableModel
-	 */
-	public TreeTableModelAdapter(DefaultTreeTableTree tree) {
+    private DefaultTreeTableTree tree;
 
-		super();
+    public abstract DefaultTableCellRenderer getTreeTableCellRenderer();
 
-		this.tree = tree;
+    public TreeTableModelAdapter(DefaultTreeTableTree tree) {
 
-		AbstractTreeTableTreeModel abstractTreeTableTreeModel;
-		abstractTreeTableTreeModel = (AbstractTreeTableTreeModel) tree.getModel();
-		abstractTreeTableTreeModel.addTreeModelListener(this);
+        super();
 
-		tree.addTreeExpansionListener(new TreeExpansionListener() {
+        this.tree = tree;
 
-			@Override
-			public void treeExpanded(TreeExpansionEvent event) {
-				fireTableDataChanged();
-			}
+        AbstractTreeTableTreeModel abstractTreeTableTreeModel;
+        abstractTreeTableTreeModel = (AbstractTreeTableTreeModel) tree.getModel();
+        abstractTreeTableTreeModel.addTreeModelListener(this);
 
-			@Override
-			public void treeCollapsed(TreeExpansionEvent event) {
-				fireTableDataChanged();
-			}
-		});
-	}
+        tree.addTreeExpansionListener(new TreeExpansionListener() {
 
-	public DefaultTreeTableTree getTree() {
-		return tree;
-	}
+            @Override
+            public void treeExpanded(TreeExpansionEvent treeExpansionEvent) {
+                fireTableDataChanged();
+            }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see javax.swing.table.TableModel#getRowCount()
-	 */
-	@Override
-	public int getRowCount() {
+            @Override
+            public void treeCollapsed(TreeExpansionEvent treeExpansionEvent) {
+                fireTableDataChanged();
+            }
+        });
+    }
 
-		DefaultTreeTableTree defaultTreeTableTree = getTree();
+    public DefaultTreeTableTree getTree() {
+        return tree;
+    }
 
-		return defaultTreeTableTree.getRowCount();
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see javax.swing.table.TableModel#getRowCount()
+     */
+    @Override
+    public int getRowCount() {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see javax.swing.table.TableModel#getColumnCount()
-	 */
-	@Override
-	public int getColumnCount() {
+        DefaultTreeTableTree defaultTreeTableTree = getTree();
 
-		DefaultTreeTableTree defaultTreeTableTree = getTree();
+        return defaultTreeTableTree.getRowCount();
+    }
 
-		AbstractTreeTableTreeModel abstractTreeTableTreeModel;
-		abstractTreeTableTreeModel = (AbstractTreeTableTreeModel) defaultTreeTableTree.getModel();
+    /*
+     * (non-Javadoc)
+     * 
+     * @see javax.swing.table.TableModel#getColumnCount()
+     */
+    @Override
+    public int getColumnCount() {
 
-		return abstractTreeTableTreeModel.getColumnCount();
-	}
+        DefaultTreeTableTree defaultTreeTableTree = getTree();
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see javax.swing.table.AbstractTableModel#getColumnName(int)
-	 */
-	@Override
-	public String getColumnName(int column) {
+        AbstractTreeTableTreeModel abstractTreeTableTreeModel;
+        abstractTreeTableTreeModel = (AbstractTreeTableTreeModel) defaultTreeTableTree.getModel();
 
-		DefaultTreeTableTree defaultTreeTableTree = getTree();
+        return abstractTreeTableTreeModel.getColumnCount();
+    }
 
-		AbstractTreeTableTreeModel abstractTreeTableTreeModel;
-		abstractTreeTableTreeModel = (AbstractTreeTableTreeModel) defaultTreeTableTree.getModel();
+    /*
+     * (non-Javadoc)
+     * 
+     * @see javax.swing.table.AbstractTableModel#getColumnName(int)
+     */
+    @Override
+    public String getColumnName(int column) {
 
-		return abstractTreeTableTreeModel.getColumnName(column);
-	}
+        DefaultTreeTableTree defaultTreeTableTree = getTree();
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see javax.swing.table.AbstractTableModel#getColumnClass(int)
-	 */
-	@Override
-	public Class<?> getColumnClass(int columnIndex) {
+        AbstractTreeTableTreeModel abstractTreeTableTreeModel;
+        abstractTreeTableTreeModel = (AbstractTreeTableTreeModel) defaultTreeTableTree.getModel();
 
-		DefaultTreeTableTree defaultTreeTableTree = getTree();
+        return abstractTreeTableTreeModel.getColumnName(column);
+    }
 
-		AbstractTreeTableTreeModel abstractTreeTableTreeModel;
-		abstractTreeTableTreeModel = (AbstractTreeTableTreeModel) defaultTreeTableTree.getModel();
+    /*
+     * (non-Javadoc)
+     * 
+     * @see javax.swing.table.AbstractTableModel#getColumnClass(int)
+     */
+    @Override
+    public Class<?> getColumnClass(int columnIndex) {
 
-		return abstractTreeTableTreeModel.getColumnClass(columnIndex);
-	}
+        DefaultTreeTableTree defaultTreeTableTree = getTree();
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see javax.swing.table.AbstractTableModel#isCellEditable(int, int)
-	 */
-	@Override
-	public boolean isCellEditable(int rowIndex, int columnIndex) {
+        AbstractTreeTableTreeModel abstractTreeTableTreeModel;
+        abstractTreeTableTreeModel = (AbstractTreeTableTreeModel) defaultTreeTableTree.getModel();
 
-		DefaultTreeTableTree defaultTreeTableTree = getTree();
+        return abstractTreeTableTreeModel.getColumnClass(columnIndex);
+    }
 
-		AbstractTreeTableTreeModel abstractTreeTableTreeModel;
-		abstractTreeTableTreeModel = (AbstractTreeTableTreeModel) defaultTreeTableTree.getModel();
+    /*
+     * (non-Javadoc)
+     * 
+     * @see javax.swing.table.AbstractTableModel#isCellEditable(int, int)
+     */
+    @Override
+    public boolean isCellEditable(int rowIndex, int columnIndex) {
 
-		return abstractTreeTableTreeModel.isCellEditable(nodeForRow(rowIndex), columnIndex);
-	}
+        DefaultTreeTableTree defaultTreeTableTree = getTree();
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see javax.swing.table.TableModel#getValueAt(int, int)
-	 */
-	@Override
-	public Object getValueAt(int rowIndex, int columnIndex) {
+        AbstractTreeTableTreeModel abstractTreeTableTreeModel;
+        abstractTreeTableTreeModel = (AbstractTreeTableTreeModel) defaultTreeTableTree.getModel();
 
-		DefaultTreeTableTree defaultTreeTableTree = getTree();
+        return abstractTreeTableTreeModel.isCellEditable(nodeForRow(rowIndex), columnIndex);
+    }
 
-		AbstractTreeTableTreeModel abstractTreeTableTreeModel;
-		abstractTreeTableTreeModel = (AbstractTreeTableTreeModel) defaultTreeTableTree.getModel();
+    /*
+     * (non-Javadoc)
+     * 
+     * @see javax.swing.table.TableModel#getValueAt(int, int)
+     */
+    @Override
+    public Object getValueAt(int rowIndex, int columnIndex) {
 
-		return abstractTreeTableTreeModel.getValueAt(nodeForRow(rowIndex), columnIndex);
-	}
+        DefaultTreeTableTree defaultTreeTableTree = getTree();
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see javax.swing.table.AbstractTableModel#setValueAt(java.lang.Object,
-	 * int, int)
-	 */
-	@Override
-	public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+        AbstractTreeTableTreeModel abstractTreeTableTreeModel;
+        abstractTreeTableTreeModel = (AbstractTreeTableTreeModel) defaultTreeTableTree.getModel();
 
-		DefaultTreeTableTree defaultTreeTableTree = getTree();
+        return abstractTreeTableTreeModel.getValueAt(nodeForRow(rowIndex), columnIndex);
+    }
 
-		AbstractTreeTableTreeModel abstractTreeTableTreeModel;
-		abstractTreeTableTreeModel = (AbstractTreeTableTreeModel) defaultTreeTableTree.getModel();
+    /*
+     * (non-Javadoc)
+     * 
+     * @see javax.swing.table.AbstractTableModel#setValueAt(java.lang.Object, int, int)
+     */
+    @Override
+    public void setValueAt(Object value, int rowIndex, int columnIndex) {
 
-		abstractTreeTableTreeModel.setValueAt(aValue, nodeForRow(rowIndex), columnIndex);
-	}
+        DefaultTreeTableTree defaultTreeTableTree = getTree();
 
-	public TreeTableColumn getColumn(int column) {
+        AbstractTreeTableTreeModel abstractTreeTableTreeModel;
+        abstractTreeTableTreeModel = (AbstractTreeTableTreeModel) defaultTreeTableTree.getModel();
 
-		DefaultTreeTableTree defaultTreeTableTree = getTree();
+        abstractTreeTableTreeModel.setValueAt(value, nodeForRow(rowIndex), columnIndex);
+    }
 
-		AbstractTreeTableTreeModel abstractTreeTableTreeModel;
-		abstractTreeTableTreeModel = (AbstractTreeTableTreeModel) defaultTreeTableTree.getModel();
+    public TreeTableColumn getColumn(int column) {
 
-		return abstractTreeTableTreeModel.getColumn(column);
-	}
+        DefaultTreeTableTree defaultTreeTableTree = getTree();
 
-	private Object nodeForRow(int row) {
+        AbstractTreeTableTreeModel abstractTreeTableTreeModel;
+        abstractTreeTableTreeModel = (AbstractTreeTableTreeModel) defaultTreeTableTree.getModel();
 
-		Object node = null;
+        return abstractTreeTableTreeModel.getColumn(column);
+    }
 
-		if (row >= 0) {
+    private Object nodeForRow(int row) {
 
-			TreePath treePath = tree.getPathForRow(row);
+        Object node = null;
 
-			if (treePath != null) {
-				node = treePath.getLastPathComponent();
-			}
-		}
+        if (row >= 0) {
 
-		return node;
-	}
+            TreePath treePath = tree.getPathForRow(row);
 
-	public DefaultMutableTreeNode getRoot() {
-		DefaultTreeTableTree defaultTreeTableTree = getTree();
+            if (treePath != null) {
+                node = treePath.getLastPathComponent();
+            }
+        }
 
-		AbstractTreeTableTreeModel abstractTreeTableTreeModel;
-		abstractTreeTableTreeModel = (AbstractTreeTableTreeModel) defaultTreeTableTree.getModel();
+        return node;
+    }
 
-		return (DefaultMutableTreeNode) abstractTreeTableTreeModel.getRoot();
-	}
+    public DefaultMutableTreeNode getRoot() {
+        DefaultTreeTableTree defaultTreeTableTree = getTree();
 
-	@Override
-	public void treeNodesChanged(TreeModelEvent e) {
-		fireTableDataChanged();
+        AbstractTreeTableTreeModel abstractTreeTableTreeModel;
+        abstractTreeTableTreeModel = (AbstractTreeTableTreeModel) defaultTreeTableTree.getModel();
 
-	}
+        return (DefaultMutableTreeNode) abstractTreeTableTreeModel.getRoot();
+    }
 
-	@Override
-	public void treeNodesInserted(TreeModelEvent e) {
-		fireTableDataChanged();
+    @Override
+    public void treeNodesChanged(TreeModelEvent treeModelEvent) {
+        fireTableDataChanged();
 
-	}
+    }
 
-	@Override
-	public void treeNodesRemoved(TreeModelEvent e) {
-		fireTableDataChanged();
+    @Override
+    public void treeNodesInserted(TreeModelEvent treeModelEvent) {
+        fireTableDataChanged();
 
-	}
+    }
 
-	@Override
-	public void treeStructureChanged(TreeModelEvent e) {
+    @Override
+    public void treeNodesRemoved(TreeModelEvent treeModelEvent) {
+        fireTableDataChanged();
 
-		fireTableDataChanged();
+    }
 
-	}
+    @Override
+    public void treeStructureChanged(TreeModelEvent treeModelEvent) {
+
+        fireTableDataChanged();
+
+    }
+
+    @Override
+    public String getColumnValue(Object valueAtObject, int columnIndex) {
+
+        AbstractTreeTableNode abstractTreeTableNode = (AbstractTreeTableNode) valueAtObject;
+
+        String columnValue = abstractTreeTableNode.getNodeValue(columnIndex);
+
+        return columnValue;
+    }
+
+    @Override
+    public TableColumnModel getTableColumnModel() {
+
+        TableColumnModel tableColumnModel = new DefaultTableColumnModel();
+
+        for (int i = 0; i < getColumnCount(); i++) {
+
+            TableColumn tableColumn = new TableColumn(i);
+
+            TreeTableColumn treeTableColumn = getColumn(i);
+
+            String text = treeTableColumn.getDisplayName();
+
+            Class<?> columnClass = treeTableColumn.getColumnClass();
+
+            int preferredWidth = treeTableColumn.getPrefColumnWidth();
+
+            tableColumn.setHeaderValue(text);
+            tableColumn.setPreferredWidth(preferredWidth);
+
+            TableCellRenderer tcr = null;
+
+            if (TreeTableColumn.TREE_COLUMN_CLASS.equals(columnClass)) {
+
+                DefaultTreeTableTree treeTableTree = getTree();
+                tcr = treeTableTree;
+                tableColumn.setCellEditor(new TreeTableCellEditor(treeTableTree));
+            } else {
+
+                DefaultTableCellRenderer ltcr = getTreeTableCellRenderer();
+                ltcr.setBorder(new EmptyBorder(1, 3, 1, 1));
+                ltcr.setHorizontalAlignment(treeTableColumn.getHorizontalAlignment());
+
+                tableColumn.setCellEditor(new TreeTableCellEditor(ltcr));
+
+                tcr = ltcr;
+            }
+
+            tableColumn.setCellRenderer(tcr);
+
+            tableColumn.setResizable(true);
+
+            tableColumnModel.addColumn(tableColumn);
+        }
+
+        return tableColumnModel;
+    }
 }

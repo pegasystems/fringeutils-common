@@ -4,9 +4,11 @@
  * Contributors:
  *     Manu Varghese
  *******************************************************************************/
+
 package com.pega.gcs.fringecommon.guiutilities;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
@@ -24,225 +26,245 @@ import com.pega.gcs.fringecommon.utilities.FileUtilities;
 
 public class NavigationPanel<T> extends JPanel {
 
-	private static final long serialVersionUID = -2726689022594491214L;
+    private static final long serialVersionUID = -2726689022594491214L;
 
-	NavigationPanelController<T> navigationPanelController;
+    NavigationPanelController<T> navigationPanelController;
 
-	private ImageIcon firstImageIcon;
+    private ImageIcon firstImageIcon;
 
-	private ImageIcon prevImageIcon;
+    private ImageIcon prevImageIcon;
 
-	private ImageIcon nextImageIcon;
+    private ImageIcon nextImageIcon;
 
-	private ImageIcon lastImageIcon;
+    private ImageIcon lastImageIcon;
 
-	private JLabel dataJLabel;
+    private JLabel dataJLabel;
 
-	private JButton firstJButton;
+    private JButton firstJButton;
 
-	private JButton prevJButton;
+    private JButton prevJButton;
 
-	private JButton nextJButton;
+    private JButton nextJButton;
 
-	private JButton lastJButton;
+    private JButton lastJButton;
 
-	public NavigationPanel(JLabel label, NavigationPanelController<T> navigationPanelController) {
+    public NavigationPanel(JLabel label, NavigationPanelController<T> navigationPanelController) {
 
-		this.navigationPanelController = navigationPanelController;
+        this.navigationPanelController = navigationPanelController;
 
-		firstImageIcon = FileUtilities.getImageIcon(this.getClass(), "first.png");
+        firstImageIcon = FileUtilities.getImageIcon(this.getClass(), "first.png");
 
-		lastImageIcon = FileUtilities.getImageIcon(this.getClass(), "last.png");
+        lastImageIcon = FileUtilities.getImageIcon(this.getClass(), "last.png");
 
-		prevImageIcon = FileUtilities.getImageIcon(this.getClass(), "prev.png");
+        prevImageIcon = FileUtilities.getImageIcon(this.getClass(), "prev.png");
 
-		nextImageIcon = FileUtilities.getImageIcon(this.getClass(), "next.png");
+        nextImageIcon = FileUtilities.getImageIcon(this.getClass(), "next.png");
 
-		LayoutManager layout = new BoxLayout(this, BoxLayout.LINE_AXIS);
-		setLayout(layout);
+        LayoutManager layout = new BoxLayout(this, BoxLayout.LINE_AXIS);
+        setLayout(layout);
 
-		JLabel dataJLabel = getDataJLabel();
-		JButton firstJButton = getFirstJButton();
-		JButton prevJButton = getPrevJButton();
-		JButton nextJButton = getNextJButton();
-		JButton lastJButton = getLastJButton();
+        JLabel dataJLabel = getDataJLabel();
+        JPanel dataPanel = getLabelPanel(dataJLabel);
 
-		int height = 30;
+        JButton firstJButton = getFirstJButton();
+        JButton prevJButton = getPrevJButton();
+        JButton nextJButton = getNextJButton();
+        JButton lastJButton = getLastJButton();
 
-		add(Box.createHorizontalGlue());
-		add(Box.createRigidArea(new Dimension(4, height)));
-		add(firstJButton);
-		add(Box.createRigidArea(new Dimension(2, height)));
-		add(prevJButton);
-		add(Box.createRigidArea(new Dimension(4, height)));
-		add(label);
-		add(Box.createRigidArea(new Dimension(2, height)));
-		add(dataJLabel);
-		add(Box.createRigidArea(new Dimension(4, height)));
-		add(nextJButton);
-		add(Box.createRigidArea(new Dimension(2, height)));
-		add(lastJButton);
-		add(Box.createRigidArea(new Dimension(4, height)));
-		add(Box.createHorizontalGlue());
+        int height = 40;
 
-		// setBorder(BorderFactory.createLineBorder(MyColor.LIGHT_GRAY, 1));
-	}
+        JLabel resultsLabel = new JLabel("Results:");
+        Dimension size = new Dimension(50, 26);
+        resultsLabel.setPreferredSize(size);
 
-	/**
-	 * @return the dataJLabel
-	 */
-	public JLabel getDataJLabel() {
+        // add(Box.createHorizontalGlue());
+        add(Box.createRigidArea(new Dimension(10, height)));
+        add(label);
+        add(Box.createRigidArea(new Dimension(4, height)));
+        add(firstJButton);
+        add(Box.createRigidArea(new Dimension(2, height)));
+        add(prevJButton);
+        add(Box.createRigidArea(new Dimension(4, height)));
+        add(resultsLabel);
+        add(Box.createRigidArea(new Dimension(2, height)));
+        add(dataPanel);
+        add(Box.createRigidArea(new Dimension(4, height)));
+        add(nextJButton);
+        add(Box.createRigidArea(new Dimension(2, height)));
+        add(lastJButton);
+        add(Box.createRigidArea(new Dimension(4, height)));
 
-		if (dataJLabel == null) {
-			dataJLabel = new JLabel();
+        setBorder(BorderFactory.createLineBorder(MyColor.LIGHT_GRAY, 1));
+    }
 
-			Dimension size = new Dimension(80, 20);
-			dataJLabel.setPreferredSize(size);
-			dataJLabel.setMaximumSize(size);
-			dataJLabel.setForeground(Color.BLUE);
-		}
+    public JLabel getDataJLabel() {
 
-		return dataJLabel;
-	}
+        if (dataJLabel == null) {
+            dataJLabel = new JLabel();
 
-	/**
-	 * @return the firstJButton
-	 */
-	public JButton getFirstJButton() {
+            Dimension size = new Dimension(100, 26);
+            dataJLabel.setPreferredSize(size);
+            dataJLabel.setForeground(Color.BLUE);
+        }
 
-		if (firstJButton == null) {
+        return dataJLabel;
+    }
 
-			firstJButton = new JButton(firstImageIcon);
+    public JButton getFirstJButton() {
 
-			Dimension size = new Dimension(40, 20);
+        if (firstJButton == null) {
 
-			firstJButton.setPreferredSize(size);
-			firstJButton.setMaximumSize(size);
-			firstJButton.setBorder(BorderFactory.createEmptyBorder());
-			firstJButton.setEnabled(false);
-			firstJButton.setToolTipText("First");
-			firstJButton.addActionListener(new ActionListener() {
+            firstJButton = new JButton(firstImageIcon);
 
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					navigationPanelController.first();
-				}
-			});
-		}
+            Dimension size = new Dimension(40, 26);
+            Dimension minSize = new Dimension(30, 26);
 
-		return firstJButton;
-	}
+            firstJButton.setPreferredSize(size);
+            firstJButton.setMinimumSize(minSize);
+            firstJButton.setMaximumSize(size);
+            firstJButton.setBorder(BorderFactory.createEmptyBorder());
+            firstJButton.setEnabled(false);
+            firstJButton.setToolTipText("First");
+            firstJButton.addActionListener(new ActionListener() {
 
-	/**
-	 * @return the prevJButton
-	 */
-	public JButton getPrevJButton() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    navigationPanelController.first();
+                }
+            });
+        }
 
-		if (prevJButton == null) {
+        return firstJButton;
+    }
 
-			prevJButton = new JButton(prevImageIcon);
+    public JButton getPrevJButton() {
 
-			Dimension size = new Dimension(40, 20);
-			prevJButton.setPreferredSize(size);
-			prevJButton.setMaximumSize(size);
-			prevJButton.setBorder(BorderFactory.createEmptyBorder());
-			prevJButton.setEnabled(false);
-			prevJButton.setToolTipText("Previous");
-			prevJButton.addActionListener(new ActionListener() {
+        if (prevJButton == null) {
 
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					navigationPanelController.previous();
-				}
-			});
-		}
+            prevJButton = new JButton(prevImageIcon);
 
-		return prevJButton;
-	}
+            Dimension size = new Dimension(40, 26);
+            Dimension minSize = new Dimension(30, 26);
 
-	/**
-	 * @return the nextJButton
-	 */
-	public JButton getNextJButton() {
+            prevJButton.setPreferredSize(size);
+            prevJButton.setMinimumSize(minSize);
+            prevJButton.setMaximumSize(size);
+            prevJButton.setBorder(BorderFactory.createEmptyBorder());
+            prevJButton.setEnabled(false);
+            prevJButton.setToolTipText("Previous");
+            prevJButton.addActionListener(new ActionListener() {
 
-		if (nextJButton == null) {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    navigationPanelController.previous();
+                }
+            });
+        }
 
-			nextJButton = new JButton(nextImageIcon);
+        return prevJButton;
+    }
 
-			Dimension size = new Dimension(40, 20);
-			nextJButton.setPreferredSize(size);
-			nextJButton.setMaximumSize(size);
-			nextJButton.setBorder(BorderFactory.createEmptyBorder());
-			nextJButton.setEnabled(false);
-			nextJButton.setToolTipText("Next");
-			nextJButton.addActionListener(new ActionListener() {
+    public JButton getNextJButton() {
 
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					navigationPanelController.next();
-				}
-			});
-		}
+        if (nextJButton == null) {
 
-		return nextJButton;
-	}
+            nextJButton = new JButton(nextImageIcon);
 
-	/**
-	 * @return the lastJButton
-	 */
-	public JButton getLastJButton() {
+            Dimension size = new Dimension(40, 26);
+            Dimension minSize = new Dimension(30, 26);
 
-		if (lastJButton == null) {
+            nextJButton.setPreferredSize(size);
+            nextJButton.setMinimumSize(minSize);
+            nextJButton.setMaximumSize(size);
+            nextJButton.setBorder(BorderFactory.createEmptyBorder());
+            nextJButton.setEnabled(false);
+            nextJButton.setToolTipText("Next");
+            nextJButton.addActionListener(new ActionListener() {
 
-			lastJButton = new JButton(lastImageIcon);
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    navigationPanelController.next();
+                }
+            });
+        }
 
-			Dimension size = new Dimension(40, 20);
-			lastJButton.setPreferredSize(size);
-			lastJButton.setMaximumSize(size);
-			lastJButton.setBorder(BorderFactory.createEmptyBorder());
-			lastJButton.setEnabled(false);
-			lastJButton.setToolTipText("Last");
-			lastJButton.addActionListener(new ActionListener() {
+        return nextJButton;
+    }
 
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					navigationPanelController.last();
-				}
-			});
-		}
+    public JButton getLastJButton() {
 
-		return lastJButton;
-	}
+        if (lastJButton == null) {
 
-	public void resetNavigationPanel() {
+            lastJButton = new JButton(lastImageIcon);
 
-		JLabel dataJLabel = getDataJLabel();
-		dataJLabel.setText("");
-		setEnabled(false);
-	}
+            Dimension size = new Dimension(40, 26);
+            Dimension minSize = new Dimension(30, 26);
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see javax.swing.JComponent#setEnabled(boolean)
-	 */
-	@Override
-	public void setEnabled(boolean enabled) {
+            lastJButton.setPreferredSize(size);
+            lastJButton.setMinimumSize(minSize);
+            lastJButton.setMaximumSize(size);
+            lastJButton.setBorder(BorderFactory.createEmptyBorder());
+            lastJButton.setEnabled(false);
+            lastJButton.setToolTipText("Last");
+            lastJButton.addActionListener(new ActionListener() {
 
-		JLabel dataJLabel = getDataJLabel();
-		JButton firstJButton = getFirstJButton();
-		JButton prevJButton = getPrevJButton();
-		JButton nextJButton = getNextJButton();
-		JButton lastJButton = getLastJButton();
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    navigationPanelController.last();
+                }
+            });
+        }
 
-		dataJLabel.setEnabled(enabled);
-		firstJButton.setEnabled(enabled);
-		prevJButton.setEnabled(enabled);
-		nextJButton.setEnabled(enabled);
-		lastJButton.setEnabled(enabled);
+        return lastJButton;
+    }
 
-		super.setEnabled(enabled);
+    public void resetNavigationPanel() {
 
-	}
+        JLabel dataJLabel = getDataJLabel();
+        dataJLabel.setText("");
+        setEnabled(false);
+    }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see javax.swing.JComponent#setEnabled(boolean)
+     */
+    @Override
+    public void setEnabled(boolean enabled) {
+
+        JLabel dataJLabel = getDataJLabel();
+        JButton firstJButton = getFirstJButton();
+        JButton prevJButton = getPrevJButton();
+        JButton nextJButton = getNextJButton();
+        JButton lastJButton = getLastJButton();
+
+        dataJLabel.setEnabled(enabled);
+        firstJButton.setEnabled(enabled);
+        prevJButton.setEnabled(enabled);
+        nextJButton.setEnabled(enabled);
+        lastJButton.setEnabled(enabled);
+
+        super.setEnabled(enabled);
+
+    }
+
+    private JPanel getLabelPanel(Component label) {
+
+        JPanel labelPanel = new JPanel();
+
+        LayoutManager layout = new BoxLayout(labelPanel, BoxLayout.X_AXIS);
+        labelPanel.setLayout(layout);
+
+        Dimension dim = new Dimension(1, 30);
+
+        labelPanel.add(Box.createHorizontalGlue());
+        labelPanel.add(Box.createRigidArea(dim));
+        labelPanel.add(label);
+        labelPanel.add(Box.createHorizontalGlue());
+
+        // labelPanel.setBorder(BorderFactory.createLineBorder(Color.RED, 1));
+
+        return labelPanel;
+    }
 }

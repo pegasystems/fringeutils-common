@@ -4,144 +4,182 @@
  * Contributors:
  *     Manu Varghese
  *******************************************************************************/
+
 package com.pega.gcs.fringecommon.guiutilities;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.Serializable;
+import java.nio.charset.Charset;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 public class RecentFile implements Serializable {
 
-	private static final long serialVersionUID = 8845107200663083072L;
+    private static final long serialVersionUID = 2000931902948933150L;
 
-	public static String KEY_FILE = "file";
+    public static String KEY_SHA = "sha";
 
-	public static String KEY_SHA256 = "sha256";
+    public static String KEY_CHARSET = "charset";
 
-	public static String KEY_CHARSET = "charset";
+    public static String KEY_LOGFILETYPE = "logFileType";
 
-	public static String KEY_LOGFILETYPE = "logFileType";
+    public static String KEY_TIMEZONE = "timezone";
 
-	public static String KEY_TIMEZONE = "timezone";
+    public static String KEY_LOCALE = "locale";
 
-	public static String KEY_LOCALE = "locale";
+    public static String KEY_BOOKMARK = "bookmark";
 
-	public static String KEY_BOOKMARK = "bookmark";
+    public static String KEY_SIZE = "size";
 
-	public static String KEY_SIZE = "size";
+    public static String KEY_SEARCH_KEYS = "searchKeys";
 
-	public Map<String, Object> attibutes;
+    public static String REMOTE_ADDRESS = "remoteAddress";
 
-	private transient PropertyChangeSupport propertyChangeSupport;
+    private String path;
 
-	@SuppressWarnings("unused")
-	private RecentFile() {
-		// constructor for kryo purpose
-	}
+    private Map<String, Object> attibutes;
 
-	public RecentFile(String file, String charset) {
+    private transient PropertyChangeSupport propertyChangeSupport;
 
-		attibutes = new HashMap<String, Object>();
+    // for ex for Socket receiver, same ports could be used for different log types.
+    private boolean persist;
 
-		attibutes.put(KEY_FILE, file);
-		attibutes.put(KEY_CHARSET, charset);
+    @SuppressWarnings("unused")
+    private RecentFile() {
+        // constructor for kryo purpose
+    }
 
-		propertyChangeSupport = getPropertyChangeSupport();
-	}
+    public RecentFile(String path, String charset, boolean persist) {
+        super();
+        this.path = path;
+        this.persist = persist;
 
-	public Object getAttribute(String key) {
-		return attibutes.get(key);
-	}
+        attibutes = new HashMap<String, Object>();
 
-	public void setAttribute(String key, Object value) {
-		attibutes.put(key, value);
+        attibutes.put(KEY_CHARSET, charset);
 
-		PropertyChangeSupport propertyChangeSupport = getPropertyChangeSupport();
-		propertyChangeSupport.firePropertyChange("attibutes", null, key + " [" + value + "]");
+        propertyChangeSupport = getPropertyChangeSupport();
+    }
 
-	}
+    public String getPath() {
+        return path;
+    }
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		String file = (String) getAttribute(KEY_FILE);
+    public boolean isPersist() {
+        return persist;
+    }
 
-		result = prime * result + ((file == null) ? 0 : file.hashCode());
-		return result;
-	}
+    public Object getAttribute(String key) {
+        return attibutes.get(key);
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		RecentFile other = (RecentFile) obj;
+    public void setAttribute(String key, Object value) {
+        attibutes.put(key, value);
 
-		String file = (String) getAttribute(KEY_FILE);
-		String otherfile = (String) other.getAttribute(KEY_FILE);
+        PropertyChangeSupport propertyChangeSupport = getPropertyChangeSupport();
+        propertyChangeSupport.firePropertyChange("attibutes", null, key + " [" + value + "]");
 
-		if (file == null) {
-			if (otherfile != null) {
-				return false;
-			}
-		} else if (!file.toLowerCase().equals(otherfile.toLowerCase())) {
-			return false;
-		}
+    }
 
-		return true;
-	}
+    public Charset getCharset() {
 
-	@Override
-	public String toString() {
+        Charset charset = null;
+        String charsetName = (String) getAttribute(RecentFile.KEY_CHARSET);
 
-		StringBuffer sb = new StringBuffer();
+        if ((charsetName == null) || ("".equals(charsetName))) {
+            charset = Charset.defaultCharset();
+        } else {
+            charset = Charset.forName(charsetName);
+        }
 
-		String file = (String) getAttribute(KEY_FILE);
-		sb.append(file);
+        return charset;
+    }
 
-		// String charset = (String) getAttribute(KEY_CHARSET);
-		//
-		// if ((charset != null) && (!"".equals(charset))) {
-		// sb.append(" [");
-		// sb.append(charset);
-		// sb.append("]");
-		// }
-		//
-		// Long size = (Long) getAttribute(KEY_SIZE);
-		//
-		// if (size != null) {
-		//
-		// sb.append(" [");
-		// sb.append(GeneralUtilities.humanReadableSize(size.longValue()));
-		// sb.append("]");
-		// }
+    public Locale getLocale() {
 
-		return sb.toString();
-	}
+        Locale locale = (Locale) getAttribute(RecentFile.KEY_LOCALE);
 
-	public void addPropertyChangeListener(PropertyChangeListener listener) {
+        if (locale == null) {
+            locale = Locale.getDefault();
+        }
 
-		PropertyChangeSupport propertyChangeSupport = getPropertyChangeSupport();
-		propertyChangeSupport.addPropertyChangeListener(listener);
-	}
+        return locale;
+    }
 
-	public void removePropertyChangeListener(PropertyChangeListener listener) {
-		PropertyChangeSupport propertyChangeSupport = getPropertyChangeSupport();
-		propertyChangeSupport.removePropertyChangeListener(listener);
-	}
+    public Long getFileSize() {
 
-	private PropertyChangeSupport getPropertyChangeSupport() {
+        Long fileSize = (Long) getAttribute(RecentFile.KEY_SIZE);
 
-		if (propertyChangeSupport == null) {
-			propertyChangeSupport = new PropertyChangeSupport(this);
-		}
+        return fileSize;
+    }
 
-		return propertyChangeSupport;
-	}
+    public String getFileSHA() {
+
+        String fileSHA = (String) getAttribute(RecentFile.KEY_SHA);
+
+        return fileSHA;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        return Objects.hash(path);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj) {
+
+        if (this == obj) {
+            return true;
+        }
+
+        if (obj == null) {
+            return false;
+        }
+
+        if (!(obj instanceof RecentFile)) {
+            return false;
+        }
+
+        RecentFile other = (RecentFile) obj;
+
+        return Objects.equals(path.toLowerCase(), other.path.toLowerCase());
+    }
+
+    @Override
+    public String toString() {
+        return path;
+    }
+
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+
+        PropertyChangeSupport propertyChangeSupport = getPropertyChangeSupport();
+        propertyChangeSupport.addPropertyChangeListener(listener);
+    }
+
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        PropertyChangeSupport propertyChangeSupport = getPropertyChangeSupport();
+        propertyChangeSupport.removePropertyChangeListener(listener);
+    }
+
+    private PropertyChangeSupport getPropertyChangeSupport() {
+
+        if (propertyChangeSupport == null) {
+            propertyChangeSupport = new PropertyChangeSupport(this);
+        }
+
+        return propertyChangeSupport;
+    }
 }

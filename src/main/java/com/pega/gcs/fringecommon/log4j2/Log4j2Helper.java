@@ -1,9 +1,10 @@
 /*******************************************************************************
- * Copyright (c) 2017 Pegasystems Inc. All rights reserved.
+ *  Copyright (c) 2020 Pegasystems Inc. All rights reserved.
  *
- * Contributors:
- *     Manu Varghese
+ *  Contributors:
+ *      Manu Varghese
  *******************************************************************************/
+
 package com.pega.gcs.fringecommon.log4j2;
 
 import java.io.File;
@@ -14,45 +15,46 @@ import org.apache.logging.log4j.LogManager;
 
 public class Log4j2Helper extends AbstractLog4j2Helper {
 
-	private static final String LOG4J2XML = "/log4j2.xml";
+    private static final String LOG4J2XML = "/log4j2.xml";
 
-	public Log4j2Helper(Class<?> loggerClass) {
+    public Log4j2Helper(Class<?> loggerClass) {
 
-		super(loggerClass);
-	}
+        super(loggerClass);
+    }
 
-	protected void initLoggerContext() {
+    @Override
+    protected void initLoggerContext() {
 
-		if (isInitialized()) {
-			return;
-		}
+        if (isInitialized()) {
+            return;
+        }
 
-		try {
-			String pwd = System.getProperty("user.dir");
-			File log4j2XmlFile = new File(pwd, LOG4J2XML);
+        try {
+            String pwd = System.getProperty("user.dir");
+            File log4j2XmlFile = new File(pwd, LOG4J2XML);
 
-			URI configLocation = null;
+            URI configLocation = null;
 
-			if (log4j2XmlFile.exists()) {
-				
-				configLocation = log4j2XmlFile.toURI();
+            if (log4j2XmlFile.exists()) {
 
-			} else {
+                configLocation = log4j2XmlFile.toURI();
 
-				URL log4jXmlUrl = getClass().getResource(LOG4J2XML);
+            } else {
 
-				if (log4jXmlUrl != null) {
-					configLocation = log4jXmlUrl.toURI();
-				}
-			}
+                URL log4jXmlUrl = getClass().getResource(LOG4J2XML);
 
-			LogManager.getContext(null, false, configLocation);
+                if (log4jXmlUrl != null) {
+                    configLocation = log4jXmlUrl.toURI();
+                }
+            }
 
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+            LogManager.getContext(null, false, configLocation);
 
-		setInitialized(true);
-	}
+        } catch (Exception e) {
+            e.printStackTrace(System.out);
+        }
+
+        setInitialized(true);
+    }
 
 }

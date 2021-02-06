@@ -4,146 +4,188 @@
  * Contributors:
  *     Manu Varghese
  *******************************************************************************/
+
 package com.pega.gcs.fringecommon.guiutilities;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import javax.swing.SwingConstants;
 
 import com.pega.gcs.fringecommon.log4j2.Log4j2Helper;
 
-public abstract class DefaultTableColumn {
+public class DefaultTableColumn {
 
-	private static final Log4j2Helper LOG = new Log4j2Helper(DefaultTableColumn.class);
+    private static final Log4j2Helper LOG = new Log4j2Helper(DefaultTableColumn.class);
 
-	private String columnId;
+    private String columnId;
 
-	private String displayName;
+    private String displayName;
 
-	private int prefColumnWidth;
+    private int prefColumnWidth;
 
-	private int horizontalAlignment;
+    private int horizontalAlignment;
 
-	private boolean visibleColumn;
+    private boolean visibleColumn;
 
-	private boolean filterable;
+    private boolean filterable;
 
-	public DefaultTableColumn(String displayName) {
-		this(displayName, displayName, -1, SwingConstants.LEFT, true, true);
-	}
+    public DefaultTableColumn(String displayName) {
+        this(displayName, displayName, -1, SwingConstants.LEFT, true, true);
+    }
 
-	public DefaultTableColumn(String displayName, int prefColumnWidth, int horizontalAlignment) {
-		this(displayName, displayName, prefColumnWidth, horizontalAlignment, true, true);
-	}
+    public DefaultTableColumn(String displayName, int prefColumnWidth, int horizontalAlignment) {
+        this(displayName, displayName, prefColumnWidth, horizontalAlignment, true, true);
+    }
 
-	public DefaultTableColumn(String columnId, String displayName, int prefColumnWidth, int horizontalAlignment,
-			boolean visibleColumn, boolean filterable) {
+    public DefaultTableColumn(String columnId, String displayName, int prefColumnWidth, int horizontalAlignment,
+            boolean visibleColumn, boolean filterable) {
 
-		super();
+        super();
 
-		this.columnId = columnId;
-		this.displayName = displayName;
-		this.prefColumnWidth = prefColumnWidth;
-		this.horizontalAlignment = horizontalAlignment;
-		this.visibleColumn = visibleColumn;
-		this.filterable = filterable;
-	}
+        this.columnId = columnId;
+        this.displayName = displayName;
+        this.prefColumnWidth = prefColumnWidth;
+        this.horizontalAlignment = horizontalAlignment;
+        this.visibleColumn = visibleColumn;
+        this.filterable = filterable;
+    }
 
-	public String getColumnId() {
-		return columnId;
-	}
+    public String getDisplayName() {
+        return displayName;
+    }
 
-	public String getDisplayName() {
-		return displayName;
-	}
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
 
-	public int getPrefColumnWidth() {
-		return prefColumnWidth;
-	}
+    public int getPrefColumnWidth() {
+        return prefColumnWidth;
+    }
 
-	public int getHorizontalAlignment() {
-		return horizontalAlignment;
-	}
+    public void setPrefColumnWidth(int prefColumnWidth) {
+        this.prefColumnWidth = prefColumnWidth;
+    }
 
-	public boolean isVisibleColumn() {
-		return visibleColumn;
-	}
+    public int getHorizontalAlignment() {
+        return horizontalAlignment;
+    }
 
-	public boolean isFilterable() {
-		return filterable;
-	}
+    public void setHorizontalAlignment(int horizontalAlignment) {
+        this.horizontalAlignment = horizontalAlignment;
+    }
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((columnId == null) ? 0 : columnId.hashCode());
-		return result;
-	}
+    public boolean isVisibleColumn() {
+        return visibleColumn;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		DefaultTableColumn other = (DefaultTableColumn) obj;
-		if (columnId == null) {
-			if (other.columnId != null)
-				return false;
-		} else if (!columnId.equals(other.columnId))
-			return false;
-		return true;
-	}
+    public void setVisibleColumn(boolean visibleColumn) {
+        this.visibleColumn = visibleColumn;
+    }
 
-	@Override
-	public String toString() {
-		return getDisplayName();
-	}
+    public boolean isFilterable() {
+        return filterable;
+    }
 
-	public static <T extends DefaultTableColumn> T getTableColumnByName(String displayName,
-			List<? extends DefaultTableColumn> columnList) {
+    public void setFilterable(boolean filterable) {
+        this.filterable = filterable;
+    }
 
-		DefaultTableColumn defaultTableColumn = null;
+    public String getColumnId() {
+        return columnId;
+    }
 
-		for (DefaultTableColumn dtc : columnList) {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        return Objects.hash(columnId);
+    }
 
-			String dName = dtc.getDisplayName();
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj) {
 
-			if (dName.equals(displayName)) {
-				defaultTableColumn = dtc;
-				break;
-			}
-		}
+        if (this == obj) {
+            return true;
+        }
 
-		if (defaultTableColumn == null) {
-			LOG.error("Unidentified Table Column name: " + displayName);
-		}
+        if (obj == null) {
+            return false;
+        }
 
-		return (T) defaultTableColumn;
-	}
+        if (!(obj instanceof DefaultTableColumn)) {
+            return false;
+        }
 
-	public static <T extends DefaultTableColumn> T getTableColumnById(String columnId,
-			List<? extends DefaultTableColumn> columnList) {
+        DefaultTableColumn other = (DefaultTableColumn) obj;
+        return Objects.equals(columnId, other.columnId);
+    }
 
-		DefaultTableColumn defaultTableColumn = null;
+    @Override
+    public String toString() {
+        return getDisplayName();
+    }
 
-		for (DefaultTableColumn dtc : columnList) {
+    public static <T extends DefaultTableColumn> T getTableColumnByName(String displayName, List<T> columnList) {
 
-			String cId = dtc.getColumnId();
+        T defaultTableColumn = null;
 
-			if (cId.equals(columnId)) {
-				defaultTableColumn = dtc;
-				break;
-			}
-		}
+        for (T dtc : columnList) {
 
-		if (defaultTableColumn == null) {
-			LOG.error("Unidentified Table Column id: " + columnId);
-		}
+            String name = dtc.getDisplayName();
 
-		return (T) defaultTableColumn;
-	}
+            if (name.equals(displayName)) {
+                defaultTableColumn = dtc;
+                break;
+            }
+        }
+
+        if (defaultTableColumn == null) {
+            LOG.error("Unidentified Table Column name: " + displayName);
+        }
+
+        return defaultTableColumn;
+    }
+
+    public static <T extends DefaultTableColumn> T getTableColumnById(String columnId, List<T> columnList) {
+
+        T defaultTableColumn = null;
+
+        for (T dtc : columnList) {
+
+            String colId = dtc.getColumnId();
+
+            if (colId.equals(columnId)) {
+                defaultTableColumn = dtc;
+                break;
+            }
+        }
+
+        if (defaultTableColumn == null) {
+            LOG.error("Unidentified Table Column id: " + columnId);
+        }
+
+        return defaultTableColumn;
+    }
+
+    public static List<String> getColumnNameList(List<? extends DefaultTableColumn> defaultTableColumnList) {
+
+        List<String> columnNameList = new ArrayList<>();
+
+        for (DefaultTableColumn defaultTableColumn : defaultTableColumnList) {
+
+            columnNameList.add(defaultTableColumn.getDisplayName());
+        }
+
+        return columnNameList;
+    }
 }

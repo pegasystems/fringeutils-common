@@ -4,28 +4,29 @@
  * Contributors:
  *     Manu Varghese
  *******************************************************************************/
+
 package com.pega.gcs.fringecommon.guiutilities;
 
 public class TableCompareEntry {
 
-	private int startEntry;
+    private int startEntry;
 
-	private int endEntry;
+    private int endEntry;
 
-	public TableCompareEntry(int startEntry, int endEntry) {
+    public TableCompareEntry(int startEntry, int endEntry) {
 
-		super();
+        super();
 
-		this.startEntry = startEntry;
-		this.endEntry = endEntry;
-	}
+        this.startEntry = startEntry;
+        this.endEntry = endEntry;
+    }
 
-	public int getStartEntry() {
-		return startEntry;
-	}
+    public int getStartEntry() {
+        return startEntry;
+    }
 
-	public int getEndEntry() {
-		return endEntry;
-	}
+    public int getEndEntry() {
+        return endEntry;
+    }
 
 }

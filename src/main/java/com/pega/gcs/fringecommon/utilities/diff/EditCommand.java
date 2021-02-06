@@ -4,9 +4,10 @@
  * Contributors:
  *     Manu Varghese
  *******************************************************************************/
+
 package com.pega.gcs.fringecommon.utilities.diff;
 
 public enum EditCommand {
 
-	SNAKE, INSERT, DELETE;
+    SNAKE, INSERT, DELETE;
 }

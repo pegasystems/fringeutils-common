@@ -1,0 +1,87 @@
+import net.ltgt.gradle.errorprone.CheckSeverity
+
+plugins {
+    id 'java-library'
+    id 'net.ltgt.errorprone'        version '0.8.1'
+    id 'com.github.spotbugs'        version '2.0.0'
+    id 'com.jfrog.bintray'          version '1.8.5'
+    id 'nebula.release'             version '15.3.1'
+}
+
+group = 'com.pega.gcs'
+description = "FringeUtils-Common"
+
+apply from: "$rootDir/gradle/artifacts.gradle"
+apply from: "$rootDir/gradle/jacoco.gradle"
+apply from: "$rootDir/gradle/pmd.gradle"
+apply from: "$rootDir/gradle/checkstyle.gradle"
+apply from: "$rootDir/gradle/spotbugs.gradle"
+apply from: "$rootDir/gradle/publishing.gradle"
+
+repositories {
+
+    maven {
+        url "https://dl.bintray.com/pegasystems/fringeutils" 
+    }
+
+    jcenter()
+
+    mavenCentral()    
+}
+
+dependencies {
+
+    errorprone("com.google.errorprone:error_prone_core:latest.release")
+    errorproneJavac("com.google.errorprone:javac:latest.release")
+
+    api 'com.esotericsoftware:kryo:4.0.2'
+    api 'commons-io:commons-io:2.8.0'
+    api 'commons-fileupload:commons-fileupload:1.4'
+    api 'dom4j:dom4j:1.6.1'
+    api 'org.lz4:lz4-java:1.7.1'
+    api 'org.apache.commons:commons-csv:1.8'
+    api 'org.apache.commons:commons-lang3:3.11'
+    api 'org.apache.commons:commons-text:1.9'
+    api 'org.apache.commons:commons-compress:1.20'
+    api 'org.tukaani:xz:1.8'
+    
+    api 'org.apache.logging.log4j:log4j-api:2.14.0'
+    api 'org.apache.logging.log4j:log4j-core:2.14.0'
+
+    testImplementation 'junit:junit:4.12'
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+    options.compilerArgs += ['-Xlint:-options']
+    options.compilerArgs += ['-proc:none']
+    sourceCompatibility = '1.8'
+    targetCompatibility = '1.8'
+    // configure error prone
+    options.errorprone.check("UnnecessaryParentheses", CheckSeverity.OFF)
+}
+
+tasks.withType(Javadoc) {
+    failOnError = false
+}
+
+tasks.withType (Test) {
+    maxParallelForks = 2
+
+    testLogging {
+        showStandardStreams = true
+        events 'started', 'passed', 'failed'
+    }
+
+    jacoco {
+        destinationFile = file("$buildDir/jacoco/${name}.exec")
+        classDumpDir = file("$buildDir/jacoco/${name}_ClassDump")
+    }
+}
+
+task copyLicense(type: Copy) {
+    from "LICENSE"
+    into "$buildDir"
+}
+
+build.finalizedBy jacocoTestReport, jacocoTestCoverageVerification
