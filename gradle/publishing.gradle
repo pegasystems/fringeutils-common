@@ -36,10 +36,6 @@ publishing {
     }
 }
 
-ext {
-    githubSite = 'https://github.com'
-}
-
 bintray {
     user = resolveProperty('bintrayUsername')
     key = resolveProperty('bintrayKey')
