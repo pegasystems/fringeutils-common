@@ -15,9 +15,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
-import java.lang.reflect.Method;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -92,8 +89,6 @@ public abstract class BaseFrame extends JFrame {
             }
         });
 
-        loadPlugins();
-
         initialize();
 
         setJMenuBar(getMenuJMenuBar());
@@ -120,54 +115,6 @@ public abstract class BaseFrame extends JFrame {
         String finalTitle = getAppName() + localTitle;
 
         super.setTitle(finalTitle);
-    }
-
-    private void loadPlugins() {
-        try {
-
-            String pwd = System.getProperty("user.dir");
-            URL pluginsUrl = getClass().getResource("/plugins");
-
-            LOG.info("Loading Plugins - user.dir: " + pwd + " pluginsUrl: "
-                    + ((pluginsUrl != null) ? pluginsUrl.getPath() : "<NULL>"));
-
-            File pluginsDir = null;
-
-            if (pluginsUrl != null) {
-                pluginsDir = new File(pluginsUrl.getFile());
-            } else {
-                pluginsDir = new File(pwd, "plugins");
-            }
-
-            if (pluginsDir.exists() && pluginsDir.isDirectory()) {
-
-                URLClassLoader systemClassLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
-
-                Class<URLClassLoader> urlClassLoaderClass = URLClassLoader.class;
-
-                Method addURLMethod = urlClassLoaderClass.getDeclaredMethod("addURL", new Class[] { URL.class });
-                addURLMethod.setAccessible(true);
-
-                File[] jarlist = pluginsDir.listFiles(new java.io.FileFilter() {
-
-                    @Override
-                    public boolean accept(File file) {
-                        return file.getPath().toLowerCase().endsWith(".jar");
-                    }
-                });
-
-                for (File jarFile : jarlist) {
-
-                    URL jarFileURL = jarFile.toURI().toURL();
-                    LOG.info("loading external jar: " + jarFileURL);
-
-                    addURLMethod.invoke(systemClassLoader, new Object[] { jarFileURL });
-                }
-            }
-
-        } catch (Exception e) {
-            LOG.error("Error loading plugins", e);
-        }
     }
 
     public static ImageIcon getAppIcon() {

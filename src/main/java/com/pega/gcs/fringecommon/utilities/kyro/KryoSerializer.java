@@ -26,7 +26,11 @@ public class KryoSerializer {
 
         @Override
         protected Kryo initialValue() {
+
             Kryo kryo = new Kryo();
+
+            kryo.setRegistrationRequired(false);
+
             return kryo;
         }
 

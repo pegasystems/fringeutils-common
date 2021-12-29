@@ -7,12 +7,15 @@
 
 package com.pega.gcs.fringecommon.guiutilities;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-public class CheckBoxMenuItemPopupEntry<T> implements Comparable<CheckBoxMenuItemPopupEntry<T>> {
+public class CheckBoxMenuItemPopupEntry<T> implements Comparable<CheckBoxMenuItemPopupEntry<T>>, Serializable {
+
+    private static final long serialVersionUID = 3889706679542807912L;
 
     private String itemText;
 
@@ -24,6 +27,11 @@ public class CheckBoxMenuItemPopupEntry<T> implements Comparable<CheckBoxMenuIte
 
     // show updated counts in case of multiple filters are applied
     private int filteredCount;
+
+    @SuppressWarnings("unused")
+    private CheckBoxMenuItemPopupEntry() {
+        // for kryo
+    }
 
     public CheckBoxMenuItemPopupEntry(String itemText) {
 

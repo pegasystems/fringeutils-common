@@ -15,6 +15,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileInputStream;
+import java.net.MalformedURLException;
 import java.nio.channels.FileChannel;
 
 import javax.swing.JButton;
@@ -151,33 +152,40 @@ public class ClickableFilePathPanel extends ClickablePathPanel {
 
         if ((file != null) && (file.exists())) {
 
-            String filePath = file.getAbsolutePath();
-            String filePathHtml = GUIUtilities.getFileHyperlinkText(filePath);
+            try {
+                String url = file.toURI().toURL().toExternalForm();
 
-            filePathJEditorPane.setText(filePathHtml);
+                String filePath = file.getAbsolutePath();
 
-            openFolderJButton.setActionCommand(filePath);
-            openFolderJButton.setEnabled(true);
+                String filePathHtml = GUIUtilities.getHyperlinkText(url, filePath);
 
-            if (showFileSize) {
+                filePathJEditorPane.setText(filePathHtml);
 
-                JLabel fileSizeJLabel = getFileSizeJLabel();
-                String fileSizeStr = null;
-                long fileSize = -1;
+                openFolderJButton.setActionCommand(filePath);
+                openFolderJButton.setEnabled(true);
 
-                try (FileInputStream fis = new FileInputStream(file)) {
+                if (showFileSize) {
 
-                    FileChannel fileChannel = fis.getChannel();
-                    fileSize = fileChannel.size();
-                    fileSizeStr = GeneralUtilities.humanReadableSize(fileSize, false);
+                    JLabel fileSizeJLabel = getFileSizeJLabel();
+                    String fileSizeStr = null;
+                    long fileSize = -1;
 
-                    fileSizeJLabel.setText(fileSizeStr);
+                    try (FileInputStream fis = new FileInputStream(file)) {
 
-                } catch (Exception e) {
-                    LOG.error("Error parsing filesize:" + fileSize, e);
+                        FileChannel fileChannel = fis.getChannel();
+                        fileSize = fileChannel.size();
+                        fileSizeStr = GeneralUtilities.humanReadableSize(fileSize, false);
 
-                    fileSizeJLabel.setText(fileSizeStr);
+                        fileSizeJLabel.setText(fileSizeStr);
+
+                    } catch (Exception e) {
+                        LOG.error("Error parsing filesize:" + fileSize, e);
+
+                        fileSizeJLabel.setText(fileSizeStr);
+                    }
                 }
+            } catch (MalformedURLException murle) {
+                LOG.error("Error getting url from " + file, murle);
             }
         } else {
 

@@ -11,6 +11,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Window;
@@ -24,8 +25,12 @@ import java.util.Locale;
 import java.util.SortedMap;
 import java.util.TimeZone;
 
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.JViewport;
+import javax.swing.SwingConstants;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
@@ -144,13 +149,6 @@ public class GUIUtilities {
 
     }
 
-    public static String getFileHyperlinkText(String filePath) {
-
-        String url = "file://" + filePath;
-
-        return getHyperlinkText(url, filePath);
-    }
-
     public static String getHyperlinkText(String url) {
         return getHyperlinkText(url, url);
     }
@@ -236,5 +234,38 @@ public class GUIUtilities {
 
             column.setPreferredWidth(columnWidth);
         }
+    }
+
+    public static void addTab(JTabbedPane tabbedPane, JComponent tabComponent, String tabLabelText,
+            Dimension labelDim) {
+
+        JLabel tabLabel = new JLabel(tabLabelText);
+        Font labelFont = tabLabel.getFont();
+        Font tabFont = labelFont.deriveFont(Font.BOLD, 12);
+
+        tabLabel.setFont(tabFont);
+        tabLabel.setSize(labelDim);
+        tabLabel.setPreferredSize(labelDim);
+        tabLabel.setHorizontalAlignment(SwingConstants.CENTER);
+
+        tabbedPane.addTab(tabLabelText, tabComponent);
+
+        int tabIndex = tabbedPane.getTabCount() - 1;
+        tabbedPane.setTabComponentAt(tabIndex, tabLabel);
+    }
+
+    public static JTextField getValueTextField(String value) {
+
+        JTextField valueTextField = new JTextField();
+        valueTextField.setEditable(false);
+        valueTextField.setBackground(null);
+        // valueTextField.setBorder(null);
+        valueTextField.setText(value);
+
+        Dimension minimumSize = new Dimension(100, 26);
+        valueTextField.setMinimumSize(minimumSize);
+
+        return valueTextField;
+
     }
 }
