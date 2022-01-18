@@ -33,8 +33,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -44,22 +42,12 @@ import org.dom4j.Element;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
 
-import com.pega.gcs.fringecommon.guiutilities.GUIUtilities;
 import com.pega.gcs.fringecommon.guiutilities.ModalProgressMonitor;
 import com.pega.gcs.fringecommon.log4j2.Log4j2Helper;
 
 public class GeneralUtilities {
 
     private static final Log4j2Helper LOG = new Log4j2Helper(GeneralUtilities.class);
-
-    private static final String GOTO_URL = "http://goto.pega.com";
-
-    // ( hfix | se | bug | sr | us | hotfix | task | issue)
-    private static Pattern PEGA_WORK_ID_PATTERN;
-    /*
-     * = Pattern.compile( "(hfix[-\\s]?\\d+)|(se[-\\s]?\\d+)|(bug-\\d+)|(sr-[a-z]?\\d+)|((us-\\d+[-]?)\\d+)|(hotfix[-\\s]?\\d+)",
-     * Pattern.CASE_INSENSITIVE)
-     */
 
     // @formatter:off
     private static final String SECRET = "[Q]And so, to our first contestant. Good evening! Your name, please!"
@@ -672,125 +660,13 @@ public class GeneralUtilities {
         return outputString;
     }
 
-    public static Pattern getPegaWorkIdPattern() {
-
-        if (PEGA_WORK_ID_PATTERN == null) {
-
-            StringBuilder patternStringBuilder = new StringBuilder();
-
-            // HFIX
-            patternStringBuilder.append("(hfix[-\\s]?\\d+)");
-            patternStringBuilder.append("|");
-            // SE
-            patternStringBuilder.append("(se[-\\s]?\\d+)");
-            patternStringBuilder.append("|");
-            // BUG
-            patternStringBuilder.append("(bug-\\d+)");
-            patternStringBuilder.append("|");
-            // SR
-            patternStringBuilder.append("(sr-[a-z]?\\d+)");
-            patternStringBuilder.append("|");
-            // US
-            patternStringBuilder.append("((us-\\d+[-]?)\\d+)");
-            patternStringBuilder.append("|");
-            // HOTFIX
-            patternStringBuilder.append("(hotfix[-\\s]?\\d+)");
-            patternStringBuilder.append("|");
-            // TASK
-            patternStringBuilder.append("(task-\\d+)");
-            patternStringBuilder.append("|");
-            // ISSUE
-            patternStringBuilder.append("(issue-\\d+)");
-            patternStringBuilder.append("|");
-            // EPIC
-            patternStringBuilder.append("(epic-\\d+)");
-
-            String patternString = patternStringBuilder.toString();
-
-            PEGA_WORK_ID_PATTERN = Pattern.compile(patternString, Pattern.CASE_INSENSITIVE);
-        }
-
-        return PEGA_WORK_ID_PATTERN;
-    }
-
-    public static String getWorkIdHyperlinkText(String workId) {
-
-        StringBuilder sb = new StringBuilder();
-
-        sb.append("<html><head/><body><div>");
-
-        String gotoWorkId = workId.toUpperCase().replaceAll("HFIX[-\\s]?", "SE-");
-
-        StringBuilder idURL = new StringBuilder();
-        idURL.append(GOTO_URL);
-        idURL.append("/");
-        idURL.append(gotoWorkId);
-
-        String href = GUIUtilities.getHref(idURL.toString(), workId);
-        sb.append(href);
-
-        sb.append("</div></body></html>");
-
-        String hotfixIDHyperlinkText = sb.toString();
-
-        return hotfixIDHyperlinkText;
-    }
-
-    public static String getWorkDescHyperlinkText(String workDesc) {
-
-        StringBuilder sb = new StringBuilder();
-        int beginIndex = 0;
-        int endIndex = 0;
-
-        sb.append("<html><head/><body><div>");
-
-        Pattern workIdPattern = GeneralUtilities.getPegaWorkIdPattern();
-
-        Matcher matcher = workIdPattern.matcher(workDesc);
-
-        while (matcher.find()) {
-
-            String someId = matcher.group();
-            endIndex = matcher.start();
-
-            sb.append(workDesc.substring(beginIndex, endIndex));
-
-            StringBuilder idURL = new StringBuilder();
-
-            String idText = someId.trim().toUpperCase();
-
-            if (idText.startsWith("HFIX")) {
-                idText = idText.replaceAll("HFIX[-\\s]?", "SE-");
-            }
-
-            idURL.append(GOTO_URL);
-            idURL.append("/");
-            idURL.append(idText);
-
-            String href = GUIUtilities.getHref(idURL.toString(), someId);
-
-            sb.append(href);
-
-            beginIndex = matcher.end();
-        }
-
-        endIndex = workDesc.length();
-
-        sb.append(workDesc.substring(beginIndex, endIndex));
-        sb.append("</div></body></html>");
-
-        String workDescHyperlinkText = sb.toString();
-
-        return workDescHyperlinkText;
-    }
-
     /**
      * Get map structure from a csv.
      * 
-     * @param reader - Reader object
+     * @param reader          - Reader object
      * @param progressMonitor - ModalProgressMonitor
      * @return String - data Map from csv. key of -1 is header/column names list
-     * @throws Exception  - error
+     * @throws Exception - error
      */
     public static Map<Integer, List<String>> getDataMapFromCSV(Reader reader, ModalProgressMonitor progressMonitor)
             throws Exception {
