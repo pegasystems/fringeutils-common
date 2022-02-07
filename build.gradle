@@ -24,8 +24,8 @@ repositories {
 
 dependencies {
 
-    errorprone("com.google.errorprone:error_prone_core:latest.release")
-    errorproneJavac("com.google.errorprone:javac:latest.release")
+    errorprone("com.google.errorprone:error_prone_core:2.10.0")
+    errorproneJavac("com.google.errorprone:javac:9+181-r4173-1")
 
     api 'com.esotericsoftware:kryo:5.2.1'
     api 'commons-io:commons-io:2.11.0'
