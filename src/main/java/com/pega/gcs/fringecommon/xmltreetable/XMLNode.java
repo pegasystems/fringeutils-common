@@ -51,6 +51,8 @@ public class XMLNode extends AbstractTreeTableNode {
 
     private boolean[] secondaryParentSearchFound;
 
+    private boolean compareNodeDataDiffFound;
+
     // 0 based indexes.
     private Map<Integer, Integer> compareIndexMap;
 
@@ -203,6 +205,10 @@ public class XMLNode extends AbstractTreeTableNode {
         return secondaryParentSearch;
     }
 
+    public boolean isCompareNodeDataDiffFound() {
+        return compareNodeDataDiffFound;
+    }
+
     private void initialize() {
 
         if (nodeArray != null) {
@@ -219,6 +225,7 @@ public class XMLNode extends AbstractTreeTableNode {
             secondarySearchFound = new boolean[size + 1];
             secondaryParentSearchFound = new boolean[size + 1];
             // specialCharsInValue = new boolean[size + 1];
+            compareNodeDataDiffFound = false;
 
             // column one is only node name
             // column 2 onwards has column data
@@ -274,6 +281,11 @@ public class XMLNode extends AbstractTreeTableNode {
                         if (value.indexOf(searchStr) != -1) {
                             searchFound[i + 1] = true;
                         }
+                    }
+
+                    if ((i > 0) && (!compareNodeDataDiffFound) && (nodeValue[i] != null)
+                            && (!nodeValue[i].equals(nodeValueText))) {
+                        compareNodeDataDiffFound = true;
                     }
                 }
             }

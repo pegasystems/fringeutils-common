@@ -24,6 +24,7 @@ import com.pega.gcs.fringecommon.guiutilities.FilterColumn;
 import com.pega.gcs.fringecommon.guiutilities.FilterTableModel;
 import com.pega.gcs.fringecommon.guiutilities.FilterTableModelNavigation;
 import com.pega.gcs.fringecommon.guiutilities.MyColor;
+import com.pega.gcs.fringecommon.guiutilities.RecentFile;
 import com.pega.gcs.fringecommon.guiutilities.search.SearchModel;
 import com.pega.gcs.fringecommon.guiutilities.treetable.AbstractTreeTableNode;
 import com.pega.gcs.fringecommon.utilities.GeneralUtilities;
@@ -43,9 +44,9 @@ public abstract class AbstractDataTableModel<T, V extends DefaultTableColumn> ex
 
     protected abstract String getColumnData(T data, V dataTableColumn);
 
-    public AbstractDataTableModel() {
+    public AbstractDataTableModel(RecentFile recentFile) {
 
-        super(null);
+        super(recentFile);
 
     }
 

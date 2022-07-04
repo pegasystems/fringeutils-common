@@ -49,6 +49,8 @@ public class XMLTreeTableTree extends DefaultTreeTableTree {
                     background = MyColor.LIGHT_YELLOW;
                 } else if (GeneralUtilities.any(xmlNode.getParentSearchFoundArray())) {
                     background = MyColor.LIGHTEST_YELLOW;
+                } else if (xmlNode.isCompareNodeDataDiffFound()) {
+                    background = MyColor.LIGHTEST_RED;
                 } else if (GeneralUtilities.any(xmlNode.getHasMessageArray())) {
                     background = Color.ORANGE;
                 }

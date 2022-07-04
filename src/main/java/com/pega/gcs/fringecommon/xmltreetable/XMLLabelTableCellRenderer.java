@@ -62,6 +62,8 @@ public class XMLLabelTableCellRenderer extends DefaultTableCellRenderer {
                 background = MyColor.LIGHT_YELLOW;
             } else if (xmlNode.isParentSearchFound(column)) {
                 background = MyColor.LIGHTEST_YELLOW;
+            } else if (xmlNode.isCompareNodeDataDiffFound()) {
+                background = MyColor.LIGHTEST_RED;
             } else if (xmlNode.isHasMessage(column)) {
                 background = Color.ORANGE;
             } else if (text == null) {

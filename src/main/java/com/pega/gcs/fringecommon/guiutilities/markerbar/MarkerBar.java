@@ -53,6 +53,8 @@ public class MarkerBar<T> extends JComponent implements MarkerModelListener {
             markerModel.addMarkerModelListener(this);
         }
 
+        positionIndexMap = new HashMap<>();
+
         addMouseMotionListener(new MouseMotionAdapter() {
             @Override
             public void mouseMoved(MouseEvent mouseEvent) {
@@ -239,7 +241,7 @@ public class MarkerBar<T> extends JComponent implements MarkerModelListener {
             g2.setComposite(composite);
 
             // rebuilt whenever the bar is painted
-            positionIndexMap = new HashMap<>();
+            positionIndexMap.clear();
 
             for (MarkerModel<T> markerModel : markerModelList) {
                 paintMarkerModel(g2, markerModel, positionIndexMap);
