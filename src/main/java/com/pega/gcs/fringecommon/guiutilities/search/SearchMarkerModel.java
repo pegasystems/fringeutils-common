@@ -17,11 +17,11 @@ import com.pega.gcs.fringecommon.guiutilities.markerbar.Marker;
 import com.pega.gcs.fringecommon.guiutilities.markerbar.MarkerModel;
 import com.pega.gcs.fringecommon.log4j2.Log4j2Helper;
 
-public class SearchMarkerModel<T> extends MarkerModel<T> {
+public class SearchMarkerModel<T extends Comparable<T>> extends MarkerModel<T> {
 
     private static final Log4j2Helper LOG = new Log4j2Helper(SearchMarkerModel.class);
 
-    public SearchMarkerModel(FilterTableModel<? super T> filterTableModel) {
+    public SearchMarkerModel(FilterTableModel<T> filterTableModel) {
 
         super(Color.YELLOW, filterTableModel);
 

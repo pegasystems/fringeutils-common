@@ -23,7 +23,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 
-public class FilterTable<T extends Comparable<? super T>> extends CustomJTable {
+public class FilterTable<T extends Comparable<T>> extends CustomJTable {
 
     private static final long serialVersionUID = -3587453063266930735L;
 

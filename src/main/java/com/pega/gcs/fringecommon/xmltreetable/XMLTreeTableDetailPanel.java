@@ -42,7 +42,7 @@ import javax.swing.tree.TreePath;
 
 import org.dom4j.Element;
 
-import com.pega.gcs.fringecommon.guiutilities.NavigationTableController;
+import com.pega.gcs.fringecommon.guiutilities.NavigationController;
 import com.pega.gcs.fringecommon.guiutilities.RightClickMenuItem;
 import com.pega.gcs.fringecommon.guiutilities.search.SearchPanel;
 import com.pega.gcs.fringecommon.guiutilities.treetable.AbstractTreeTableNode;
@@ -438,12 +438,15 @@ public class XMLTreeTableDetailPanel extends JPanel {
             final XMLTreeTableModelAdapter xmlTreeTableModelAdapter;
             xmlTreeTableModelAdapter = (XMLTreeTableModelAdapter) xmlTreeTable.getModel();
 
-            NavigationTableController<XMLNode> navigationTableController = new NavigationTableController<XMLNode>(
-                    null) {
+            NavigationController<XMLNode> navigationController = new NavigationController<XMLNode>() {
+
+                @Override
+                public void navigateToRow(int startRowIndex, int endRowIndex) {
+                    // empty
+                }
 
                 @Override
                 public void scrollToKey(XMLNode key) {
-
                     DefaultTreeTableTree treeTableTree = xmlTreeTable.getTree();
 
                     TreePath treePath = new TreePath(key.getPath());
@@ -451,12 +454,10 @@ public class XMLTreeTableDetailPanel extends JPanel {
                     treeTableTree.setSelectionPath(treePath);
                     // treeTableTree.scrollPathToVisible(treePath);
                     xmlTreeTable.selectTreeNodeTableRow(key);
-
                 }
             };
 
-            searchPanel = new SearchPanel<XMLNode>(navigationTableController,
-                    xmlTreeTableModelAdapter.getSearchModel());
+            searchPanel = new SearchPanel<XMLNode>(navigationController, xmlTreeTableModelAdapter.getSearchModel());
 
         }
 

@@ -30,7 +30,7 @@ import com.pega.gcs.fringecommon.guiutilities.search.SearchModel;
 import com.pega.gcs.fringecommon.guiutilities.treetable.AbstractTreeTableNode;
 import com.pega.gcs.fringecommon.log4j2.Log4j2Helper;
 
-public abstract class FilterTableModel<T extends Comparable<? super T>> extends CustomJTableModel {
+public abstract class FilterTableModel<T extends Comparable<T>> extends CustomJTableModel {
 
     private static final long serialVersionUID = -8731407475816420561L;
 

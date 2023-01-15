@@ -29,11 +29,10 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextField;
 
 import com.pega.gcs.fringecommon.guiutilities.markerbar.Marker;
 
-public class BookmarkOpenDialog<T extends Comparable<? super T>> extends JDialog {
+public class BookmarkOpenDialog<T extends Comparable<T>> extends JDialog {
 
     private static final long serialVersionUID = -2026873336640757377L;
 

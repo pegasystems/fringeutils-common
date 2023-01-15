@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.pega.gcs.fringecommon.log4j2.Log4j2Helper;
+import com.pega.gcs.fringecommon.utilities.FileUtilities;
 import com.pega.gcs.fringecommon.utilities.GeneralUtilities;
 import com.pega.gcs.fringecommon.utilities.kyro.KryoSerializer;
 
@@ -188,18 +189,15 @@ public class RecentFileContainer implements PropertyChangeListener {
 
     public RecentFile getRecentFile(File selectedFile, String charset, Map<String, Object> defaultAttribsIfNew) {
 
-        return getRecentFile(selectedFile.getPath(), charset, defaultAttribsIfNew);
+        return getRecentFile(selectedFile, charset, true, defaultAttribsIfNew);
     }
 
-    public RecentFile getRecentFile(String selectedFilePath, String charset, Map<String, Object> defaultAttribsIfNew) {
-
-        return getRecentFile(selectedFilePath, charset, true, defaultAttribsIfNew);
-    }
-
-    public RecentFile getRecentFile(String selectedFilePath, String charset, boolean persist,
+    public RecentFile getRecentFile(File selectedFile, String charset, boolean persist,
             Map<String, Object> defaultAttribsIfNew) {
 
         RecentFile recentFile = null;
+
+        String selectedFilePath = FileUtilities.getFilePath(selectedFile);
 
         // identify the recent file
         for (RecentFile rf : getRecentFileList()) {
@@ -224,8 +222,6 @@ public class RecentFileContainer implements PropertyChangeListener {
                 }
             }
         }
-
-        File selectedFile = new File(selectedFilePath);
 
         if (selectedFile.exists()) {
 

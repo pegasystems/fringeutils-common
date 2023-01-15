@@ -32,7 +32,7 @@ import javax.swing.JTextField;
 
 import com.pega.gcs.fringecommon.guiutilities.markerbar.Marker;
 
-public abstract class BookmarkAddDialog<T> extends JDialog {
+public abstract class BookmarkAddDialog<T extends Comparable<T>> extends JDialog {
 
     private static final long serialVersionUID = -2026873336640757377L;
 

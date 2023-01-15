@@ -30,7 +30,7 @@ import javax.swing.JPanel;
 
 import com.pega.gcs.fringecommon.guiutilities.markerbar.Marker;
 
-public class BookmarkDeleteDialog<T extends Comparable<? super T>> extends JDialog {
+public class BookmarkDeleteDialog<T extends Comparable<T>> extends JDialog {
 
     private static final long serialVersionUID = -2026873336640757377L;
 

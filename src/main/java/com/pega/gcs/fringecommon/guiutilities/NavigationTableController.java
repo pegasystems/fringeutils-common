@@ -13,14 +13,14 @@ import java.util.List;
 import com.pega.gcs.fringecommon.guiutilities.treetable.AbstractTreeTable;
 import com.pega.gcs.fringecommon.guiutilities.treetable.AbstractTreeTableNode;
 
-public class NavigationTableController<T> implements NavigationController<T> {
+public class NavigationTableController<T extends Comparable<T>> implements NavigationController<T> {
 
     // the same model is referenced/used by tables in the following list.
-    private FilterTableModel<? super T> filterTableModel;
+    private FilterTableModel<T> filterTableModel;
 
     private List<CustomJTable> customJTableList;
 
-    public NavigationTableController(FilterTableModel<? super T> filterTableModel) {
+    public NavigationTableController(FilterTableModel<T> filterTableModel) {
         super();
 
         this.filterTableModel = filterTableModel;

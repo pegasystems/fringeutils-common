@@ -27,6 +27,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
@@ -91,7 +92,7 @@ public abstract class BaseFrame extends JFrame {
 
         initialize();
 
-        setJMenuBar(getMenuJMenuBar());
+        setJMenuBar(getToolMenuBar());
 
         setContentPane(getMainJPanel());
     }
@@ -131,46 +132,64 @@ public abstract class BaseFrame extends JFrame {
         System.exit(value);
     }
 
-    protected JMenuBar getMenuJMenuBar() {
-        JMenu fileJMenu = new JMenu("File");
-        fileJMenu.setMnemonic(KeyEvent.VK_F);
+    protected JMenu getToolMenu(String name, int mnemonic) {
 
-        JMenuItem exitJMenuItem = new JMenuItem("Exit");
-        exitJMenuItem.setMnemonic(KeyEvent.VK_X);
-        exitJMenuItem.setToolTipText("Exit application");
+        int totalPaddedLen = 15;
+
+        String menuName = GeneralUtilities.getPaddedString(name, ' ', totalPaddedLen, SwingConstants.CENTER);
+
+        JMenu menu = new JMenu(menuName);
+        menu.setMnemonic(mnemonic);
+
+        return menu;
+    }
+
+    protected JMenuBar getToolMenuBar() {
+
+        JMenu fileMenu = getFileMenu();
+        JMenu helpMenu = getHelpMenu();
+
+        JMenuBar menuBar = new JMenuBar();
+        menuBar.add(fileMenu);
+        menuBar.add(helpMenu);
+
+        return menuBar;
+    }
+
+    protected JMenu getFileMenu() {
+
+        JMenu fileMenu = getToolMenu("File", KeyEvent.VK_F);
+
+        JMenuItem exitMenuItem = new JMenuItem("Exit");
+        exitMenuItem.setMnemonic(KeyEvent.VK_X);
+        exitMenuItem.setToolTipText("Exit application");
         ImageIcon ii = FileUtilities.getImageIcon(this.getClass(), "exit.png");
 
-        exitJMenuItem.setIcon(ii);
-        exitJMenuItem.addActionListener(new ActionListener() {
+        exitMenuItem.setIcon(ii);
+        exitMenuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent event) {
                 exit(0);
             }
         });
 
-        fileJMenu.addSeparator();
-        fileJMenu.add(exitJMenuItem);
+        fileMenu.addSeparator();
+        fileMenu.add(exitMenuItem);
 
-        JMenu helpJMenu = getHelpAboutJMenu();
-        JMenuBar menuBar = new JMenuBar();
-        menuBar.add(fileJMenu);
-        menuBar.add(helpJMenu);
-
-        return menuBar;
+        return fileMenu;
     }
 
-    protected JMenu getHelpAboutJMenu() {
+    protected JMenu getHelpMenu() {
 
-        JMenu helpJMenu = new JMenu("   Help   ");
-        helpJMenu.setMnemonic(KeyEvent.VK_H);
+        JMenu helpMenu = getToolMenu("Help", KeyEvent.VK_H);
 
-        JMenuItem aboutJMenuItem = new JMenuItem("About");
-        aboutJMenuItem.setToolTipText("About");
+        JMenuItem aboutMenuItem = new JMenuItem("About");
+        aboutMenuItem.setToolTipText("About");
 
         ImageIcon ii = FileUtilities.getImageIcon(this.getClass(), "pega16.png");
-        aboutJMenuItem.setIcon(ii);
+        aboutMenuItem.setIcon(ii);
 
-        aboutJMenuItem.addActionListener(new ActionListener() {
+        aboutMenuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent event) {
 
@@ -180,9 +199,9 @@ public abstract class BaseFrame extends JFrame {
             }
         });
 
-        helpJMenu.add(aboutJMenuItem);
+        helpMenu.add(aboutMenuItem);
 
-        return helpJMenu;
+        return helpMenu;
     }
 
     protected JScrollPane getComponentJScrollPane(JComponent component, int vsbPolicy, int hsbPolicy) {
@@ -210,7 +229,7 @@ public abstract class BaseFrame extends JFrame {
 
                     if (fileExtList != null) {
 
-                        String ext = FileUtilities.getExtension(file);
+                        String ext = FileUtilities.getFileExtension(file);
 
                         retVal = false;
 

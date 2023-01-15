@@ -20,8 +20,6 @@ import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
 import java.net.URL;
 import java.util.HashMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.zip.Deflater;
 import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipEntry;
@@ -30,75 +28,14 @@ import java.util.zip.ZipOutputStream;
 import javax.swing.ImageIcon;
 import javax.swing.text.html.StyleSheet;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+
 import com.pega.gcs.fringecommon.log4j2.Log4j2Helper;
 
 public class FileUtilities {
 
     private static final Log4j2Helper LOG = new Log4j2Helper(FileUtilities.class);
-
-    public static final int ONE_MB = 1024 * 1024;
-
-    public static final Pattern EXTENSION = Pattern.compile("(?<=.[.])\\p{Alnum}+$");
-
-    public static String getExtension(File file) {
-        if (file.isDirectory()) {
-            return null;
-        }
-        return getExtension(file.getName());
-    }
-
-    public static String getExtension(String name) {
-        Matcher matcher = EXTENSION.matcher(name);
-
-        if (matcher.find()) {
-            return matcher.group();
-        }
-
-        return null;
-    }
-
-    public static boolean hasExtension(File file, String[] extensions) {
-        return (hasExtension(file.getName(), extensions)) && (!file.isDirectory());
-    }
-
-    public static boolean hasExtension(String filename, String[] extensions) {
-        String extension = getExtension(filename);
-
-        for (String value : extensions) {
-            if (((extension == null) && (value == null))
-                    || ((extension != null) && (extension.equalsIgnoreCase(value)))) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public static String getNameWithoutExtension(String name) {
-        Matcher matcher = EXTENSION.matcher(name);
-
-        if (matcher.find()) {
-            return name.substring(0, matcher.start() - 1);
-        }
-
-        return name;
-    }
-
-    public static String getNameWithoutExtension(File file) {
-        if (file.isDirectory()) {
-            return getFolderName(file);
-        }
-        return getNameWithoutExtension(file.getName());
-    }
-
-    public static String getFolderName(File file) {
-        String name = file.getName();
-
-        if (!name.isEmpty()) {
-            return name;
-        }
-
-        return file.toString();
-    }
 
     /**
      * Get the parent hierarchy of file. uses 1 based indexing.
@@ -188,32 +125,6 @@ public class FileUtilities {
         return byteArray;
     }
 
-    // @SuppressWarnings("unused")
-    // private static Object decompressObject(byte[] serialized) throws Exception {
-    //
-    // Object object = null;
-    //
-    // if (serialized != null) {
-    // // deserialize from a byte array
-    // try (ByteArrayInputStream bais = new ByteArrayInputStream(serialized);
-    // BufferedInputStream bis = new BufferedInputStream(bais);
-    // GZIPInputStream zipStream = new GZIPInputStream(bis);
-    // ObjectInputStream in = new ObjectInputStream(zipStream)) {
-    //
-    // object = in.readObject();
-    //
-    // } catch (Exception e) {
-    // LOG.error("Error decompressing object", e);
-    // throw e;
-    // }
-    // } else {
-    // LOG.info("Decompress Object is null");
-    //
-    // }
-    //
-    // return object;
-    // }
-
     /**
      * Utility to check the user.dir for any overridden resources
      * 
@@ -265,7 +176,7 @@ public class FileUtilities {
 
                 targetZos.putNextEntry(zipEntry);
 
-                byte[] byteBuffer = new byte[ONE_MB];
+                byte[] byteBuffer = new byte[(int) FileUtils.ONE_MB];
                 int readLen = -1;
 
                 while ((readLen = sourceFis.read(byteBuffer)) != -1) {
@@ -282,5 +193,37 @@ public class FileUtilities {
         LOG.info("End - zipFile success:" + success);
 
         return success;
+    }
+
+    public static String getFilePath(File file) {
+
+        String filePath;
+
+        try {
+            filePath = file.getCanonicalPath();
+        } catch (IOException ioe) {
+            filePath = file.getAbsolutePath();
+            LOG.error("Exception getting canonical path:" + file + " : " + ioe.getMessage());
+        }
+
+        return filePath;
+    }
+
+    public static String getFileBaseName(File file) {
+
+        String filePath = getFilePath(file);
+
+        String fileBaseName = FilenameUtils.getBaseName(filePath);
+
+        return fileBaseName;
+    }
+
+    public static String getFileExtension(File file) {
+
+        String filePath = getFilePath(file);
+
+        String fileExtension = FilenameUtils.getExtension(filePath);
+
+        return fileExtension;
     }
 }

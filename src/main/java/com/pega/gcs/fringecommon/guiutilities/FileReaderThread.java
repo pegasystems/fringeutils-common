@@ -17,10 +17,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.commons.io.ByteOrderMark;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.input.BOMInputStream;
 
 import com.pega.gcs.fringecommon.log4j2.Log4j2Helper;
-import com.pega.gcs.fringecommon.utilities.FileUtilities;
 import com.pega.gcs.fringecommon.utilities.GeneralUtilities;
 
 /**
@@ -85,7 +85,7 @@ public class FileReaderThread implements Runnable {
     @Override
     public void run() {
 
-        int buffSize = chunkSize * FileUtilities.ONE_MB;
+        int buffSize = chunkSize * (int) FileUtils.ONE_MB;
         int readLen = 0;
 
         try {

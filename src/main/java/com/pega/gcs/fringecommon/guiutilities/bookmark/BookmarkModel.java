@@ -16,11 +16,11 @@ import com.pega.gcs.fringecommon.guiutilities.FilterTableModel;
 import com.pega.gcs.fringecommon.guiutilities.markerbar.Marker;
 import com.pega.gcs.fringecommon.guiutilities.markerbar.MarkerModel;
 
-public class BookmarkModel<T> extends MarkerModel<T> {
+public class BookmarkModel<T extends Comparable<T>> extends MarkerModel<T> {
 
     private BookmarkContainer<T> bookmarkContainer;
 
-    public BookmarkModel(BookmarkContainer<T> bookmarkContainer, FilterTableModel<? super T> filterTableModel) {
+    public BookmarkModel(BookmarkContainer<T> bookmarkContainer, FilterTableModel<T> filterTableModel) {
 
         super(Color.BLACK, filterTableModel);
 

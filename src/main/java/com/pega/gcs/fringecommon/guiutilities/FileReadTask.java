@@ -16,8 +16,9 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import javax.swing.SwingWorker;
 
+import org.apache.commons.io.FileUtils;
+
 import com.pega.gcs.fringecommon.log4j2.Log4j2Helper;
-import com.pega.gcs.fringecommon.utilities.FileUtilities;
 import com.pega.gcs.fringecommon.utilities.GeneralUtilities;
 
 /**
@@ -72,7 +73,7 @@ public class FileReadTask extends SwingWorker<Void, Void> {
     @Override
     protected Void doInBackground() throws Exception {
 
-        int buffSize = chunkSize * FileUtilities.ONE_MB;
+        int buffSize = chunkSize * (int) FileUtils.ONE_MB;
         int readLen = 0;
 
         try {

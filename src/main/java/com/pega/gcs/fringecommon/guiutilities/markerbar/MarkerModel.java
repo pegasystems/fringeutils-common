@@ -20,7 +20,7 @@ import javax.swing.event.TableModelListener;
 
 import com.pega.gcs.fringecommon.guiutilities.FilterTableModel;
 
-public abstract class MarkerModel<T> implements TableModelListener {
+public abstract class MarkerModel<T extends Comparable<T>> implements TableModelListener {
 
     private EventListenerList listenerList;
 
@@ -28,7 +28,7 @@ public abstract class MarkerModel<T> implements TableModelListener {
 
     private Color markerColor;
 
-    private FilterTableModel<? super T> filterTableModel;
+    private FilterTableModel<T> filterTableModel;
 
     protected abstract void resetFilteredMarkerMap();
 
@@ -42,7 +42,7 @@ public abstract class MarkerModel<T> implements TableModelListener {
 
     public abstract void clearMarkers();
 
-    public MarkerModel(Color markerColor, FilterTableModel<? super T> filterTableModel) {
+    public MarkerModel(Color markerColor, FilterTableModel<T> filterTableModel) {
         super();
 
         this.markerColor = markerColor;

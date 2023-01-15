@@ -14,11 +14,12 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-public class MultipleTableSelectionListener<T> extends NavigationTableController<T> implements ListSelectionListener {
+public class MultipleTableSelectionListener<T extends Comparable<T>> extends NavigationTableController<T>
+        implements ListSelectionListener {
 
     private boolean valueChanging;
 
-    public MultipleTableSelectionListener(FilterTableModel<? super T> filterTableModel,
+    public MultipleTableSelectionListener(FilterTableModel<T> filterTableModel,
             NavigationTableController<T> navigationTableController) {
 
         super(filterTableModel);

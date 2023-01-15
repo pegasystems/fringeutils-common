@@ -2,9 +2,9 @@ import net.ltgt.gradle.errorprone.CheckSeverity
 
 plugins {
     id 'java-library'
-    id 'net.ltgt.errorprone'        version '2.0.2'
-    id 'com.github.spotbugs'        version '4.8.0'
-    id 'nebula.release'             version '15.3.1'
+    id 'net.ltgt.errorprone'        version '3.0.1'
+    id 'com.github.spotbugs'        version '5.0.13'
+    id 'nebula.release'             version '17.1.0'
 }
 
 group = 'com.pega.gcs'
@@ -24,10 +24,9 @@ repositories {
 
 dependencies {
 
-    errorprone("com.google.errorprone:error_prone_core:2.10.0")
-    errorproneJavac("com.google.errorprone:javac:9+181-r4173-1")
+    errorprone("com.google.errorprone:error_prone_core:2.18.0")
 
-    api 'com.esotericsoftware:kryo:5.2.1'
+    api 'com.esotericsoftware:kryo:5.4.0'
     api 'commons-io:commons-io:2.11.0'
     api 'commons-fileupload:commons-fileupload:1.4'
     api ('org.dom4j:dom4j:2.1.3') {
@@ -36,22 +35,25 @@ dependencies {
     api 'org.lz4:lz4-java:1.8.0'
     api 'org.apache.commons:commons-csv:1.9.0'
     api 'org.apache.commons:commons-lang3:3.12.0'
-    api 'org.apache.commons:commons-text:1.9'
-    api 'org.apache.commons:commons-compress:1.21'
+    api 'org.apache.commons:commons-text:1.10.0'
+    api 'org.apache.commons:commons-compress:1.22'
     api 'org.tukaani:xz:1.9'
     
-    api 'org.apache.logging.log4j:log4j-api:2.17.1'
-    api 'org.apache.logging.log4j:log4j-core:2.17.1'
+    api 'org.apache.logging.log4j:log4j-api:2.19.0'
+    api 'org.apache.logging.log4j:log4j-core:2.19.0'
 
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.2'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
 }
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
     options.compilerArgs += ['-Xlint:-options']
     options.compilerArgs += ['-proc:none']
-    sourceCompatibility = '1.8'
-    targetCompatibility = '1.8'
     // configure error prone
     options.errorprone.check("UnnecessaryParentheses", CheckSeverity.OFF)
 }

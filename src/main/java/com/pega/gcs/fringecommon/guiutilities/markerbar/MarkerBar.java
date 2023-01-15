@@ -28,7 +28,7 @@ import javax.swing.JComponent;
 
 import com.pega.gcs.fringecommon.guiutilities.NavigationController;
 
-public class MarkerBar<T> extends JComponent implements MarkerModelListener {
+public class MarkerBar<T extends Comparable<T>> extends JComponent implements MarkerModelListener {
 
     private static final long serialVersionUID = 3414304903179140199L;
 

@@ -34,6 +34,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
+import javax.swing.SwingConstants;
+
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -719,12 +721,46 @@ public class GeneralUtilities {
         return recordDataList;
     }
 
-    public static void main(String[] args) {
-        System.out.println(humanReadableTime(1467032622000L));
-        System.out.println(getHostAddress());
+    /**
+     * Generate a padded string.
+     * 
+     * @param message           - string to be padded
+     * @param padChar           - pad char
+     * @param totalPaddedLength - length of final string
+     * @param alignment         - SwingConstants.LEFT, SwingConstants.RIGHT, SwingConstants.CENTER
+     * @return padded string
+     */
+    public static String getPaddedString(String message, char padChar, int totalPaddedLength, int alignment) {
 
-        for (String hostAddress : getAllHostAddresses()) {
-            System.out.println("\t" + hostAddress);
+        int paddingLen = totalPaddedLength - message.length();
+
+        StringBuilder messageSB = new StringBuilder();
+
+        int leftPadLen = 0;
+        int rightPadLen = 0;
+
+        if (alignment == SwingConstants.LEFT) {
+            leftPadLen = 0;
+            rightPadLen = paddingLen;
+        } else if (alignment == SwingConstants.RIGHT) {
+            leftPadLen = paddingLen;
+            rightPadLen = 0;
+        } else if (alignment == SwingConstants.CENTER) {
+            int middle = paddingLen / 2;
+            leftPadLen = middle;
+            rightPadLen = paddingLen - middle;
         }
+
+        for (int i = 0; i < leftPadLen; i++) {
+            messageSB.append(padChar);
+        }
+
+        messageSB.append(message);
+
+        for (int i = 0; i < rightPadLen; i++) {
+            messageSB.append(padChar);
+        }
+
+        return messageSB.toString();
     }
 }

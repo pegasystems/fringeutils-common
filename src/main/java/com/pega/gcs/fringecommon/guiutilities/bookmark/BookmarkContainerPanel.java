@@ -35,7 +35,7 @@ import com.pega.gcs.fringecommon.guiutilities.FilterTableModel;
 import com.pega.gcs.fringecommon.guiutilities.NavigationTableController;
 import com.pega.gcs.fringecommon.guiutilities.markerbar.Marker;
 
-public abstract class BookmarkContainerPanel<T> extends JPanel {
+public abstract class BookmarkContainerPanel<T extends Comparable<T>> extends JPanel {
 
     private static final long serialVersionUID = -7076048541108098076L;
 

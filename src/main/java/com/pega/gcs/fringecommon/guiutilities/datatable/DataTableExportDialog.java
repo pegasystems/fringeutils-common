@@ -405,7 +405,7 @@ public class DataTableExportDialog extends JDialog {
 
     private String getDefaultTSVFileName() {
 
-        String fileName = FileUtilities.getNameWithoutExtension(exportFile);
+        String fileName = FileUtilities.getFileBaseName(exportFile);
 
         StringBuilder sb = new StringBuilder();
         sb.append(fileName);
