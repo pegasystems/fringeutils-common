@@ -3,6 +3,8 @@ FringeUtils-Common
 
 [![Java CI with Gradle](https://github.com/pegasystems/fringeutils-common/actions/workflows/gradle.yml/badge.svg)](https://github.com/pegasystems/fringeutils-common/actions/workflows/gradle.yml)
 [![GitHub tag](https://img.shields.io/github/tag/pegasystems/fringeutils-common.svg)](https://github.com/pegasystems/fringeutils-common/tags)
+[![JitPack](https://jitpack.io/v/pegasystems/fringeutils-common.svg)](https://jitpack.io/#pegasystems/fringeutils-common)
+
 
 FringeUtils-Common is a common library used in Pega-LogViewer and Pega-TracerViewer tools.
 
