@@ -19,6 +19,8 @@ public class DateTimeUtilities {
 
     public static final String DATEFORMAT_PEGA_INTERNAL = "yyyyMMdd'T'HHmmss'.'SSS z";
 
+    public static final String DATEFORMAT_PEGA_CLOUDK = "yyyy-MM-dd'T'HH:mm:ss.SSS";
+
     public static final String VALID_DATEFORMAT_CHARS = "GyYMwWDdFEuaHkKhmsSzZX";
 
 }
