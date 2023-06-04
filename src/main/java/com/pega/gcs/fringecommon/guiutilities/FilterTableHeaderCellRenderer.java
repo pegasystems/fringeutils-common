@@ -59,6 +59,10 @@ public class FilterTableHeaderCellRenderer extends DefaultTableCellRenderer {
 
             origComponent.setHorizontalAlignment(CENTER);
 
+            if (value != null) {
+                origComponent.setToolTipText(value.toString());
+            }
+
             FilterTable<?> filterTable = (FilterTable<?>) table;
 
             // will be false for compare table. Remove column filter from the initial
