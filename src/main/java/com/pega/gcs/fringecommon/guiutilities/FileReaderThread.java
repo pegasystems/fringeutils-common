@@ -97,7 +97,8 @@ public class FileReaderThread implements Runnable {
             do {
 
                 // only handling UTF-8 BOM
-                try (FileInputStream fis = new FileInputStream(file); BOMInputStream bomis = new BOMInputStream(fis)) {
+                try (FileInputStream fis = new FileInputStream(file);
+                        BOMInputStream bomis = BOMInputStream.builder().setInputStream(fis).get()) {
 
                     FileChannel fileChannel = fis.getChannel();
                     long totalSize = fileChannel.size();
