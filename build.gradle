@@ -4,7 +4,7 @@ plugins {
     id 'java-library'
     id 'net.ltgt.errorprone'        version '3.1.0'
     id 'com.github.spotbugs'        version '5.1.2'
-    id 'nebula.release'             version '17.2.2'
+    id 'nebula.release'             version '20.2.0'
 }
 
 group = 'com.pega.gcs'
@@ -39,8 +39,8 @@ dependencies {
     api 'org.apache.commons:commons-compress:1.23.0'
     api 'org.tukaani:xz:1.9'
     
-    api 'org.apache.logging.log4j:log4j-api:2.20.0'
-    api 'org.apache.logging.log4j:log4j-core:2.20.0'
+    api 'org.apache.logging.log4j:log4j-api:2.26.1'
+    api 'org.apache.logging.log4j:log4j-core:2.26.1'
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.0'
 }
